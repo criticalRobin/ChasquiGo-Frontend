@@ -1,27 +1,108 @@
-# ChasquigoWebFrontend
+# Chasquigo Web Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.0.
+Este proyecto es una aplicación web desarrollada con Angular utilizando componentes standalone y siguiendo una arquitectura modular y escalable.
 
-## Development server
+## Arquitectura del Proyecto
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+El proyecto sigue una arquitectura modular organizada en los siguientes directorios principales:
 
-## Code scaffolding
+### Core (`/src/app/core`)
+Contiene todos los módulos y componentes que no forman parte de la lógica de negocio principal. Incluye:
+- Servicios base
+- Interceptores
+- Guards
+- Configuraciones globales
+- Componentes base reutilizables
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Features (`/src/app/features`)
+Alberga los módulos relacionados con la lógica de negocio principal. Cada módulo de feature sigue la siguiente estructura:
+```
+feature/
+├── components/         # Componentes específicos del módulo
+├── services/          # Servicios del módulo
+├── models/            # Interfaces y tipos
+├── routes.ts          # Configuración de rutas
+└── pages/             # Submódulos (si el módulo tiene múltiples rutas)
+    └── submodule/
+        ├── components/
+        ├── services/
+        ├── models/
+```
 
-## Build
+### Shared (`/src/app/shared`)
+Contiene código compartido entre diferentes módulos:
+- Componentes reutilizables
+- Directivas
+- Pipes
+- Servicios compartidos
+- Utilidades comunes
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Utils (`/src/app/utils`)
+Almacena funciones y código que no encaja en las otras categorías:
+- Helpers
+- Constantes
+- Configuraciones
+- Utilidades generales
 
-## Running unit tests
+## Estructura de Módulos
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Cada módulo (tanto en features como en core) sigue una estructura consistente:
 
-## Running end-to-end tests
+```
+module/
+├── components/        # Componentes del módulo
+├── services/         # Servicios específicos
+├── models/           # Interfaces y tipos
+└── routes.ts         # Configuración de rutas
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Si un módulo tiene múltiples rutas, se crea un directorio `pages/` que contiene submódulos, cada uno siguiendo la misma estructura.
 
-## Further help
+## Tecnologías Principales
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Angular (última versión)
+- Componentes Standalone
+- Tabler Admin Template
+- TypeScript
+- RxJS
+
+## Desarrollo
+
+### Requisitos Previos
+
+- Node.js (versión LTS recomendada)
+- npm
+
+### Instalación
+
+```bash
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+ng s
+```
+
+### Estructura de Commits
+
+Seguimos las convenciones de commits semánticos:
+- feat: Nueva característica
+- fix: Corrección de errores
+- docs: Cambios en documentación
+- style: Cambios que no afectan el significado del código
+- refactor: Cambios que no arreglan errores ni añaden funcionalidad
+- test: Añadir o corregir tests
+- chore: Cambios en el proceso de build o herramientas auxiliares
+
+## Convenciones de Código
+
+- Uso de componentes standalone
+- Lazy loading para módulos de features
+- Servicios singleton cuando sea apropiado
+- Tipado estricto de TypeScript
+- Nombres descriptivos para componentes y servicios
+- Documentación de código para funciones y clases complejas
+
+## Licencia
+
+[Incluir información de licencia]
