@@ -1,0 +1,32 @@
+.input-icon .form-control {
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s;
+}
+
+.input-icon .form-control:focus {
+  box-shadow: 0 2px 8px rgba(30, 41, 59, 0.15);
+}
+
+.btn-login {
+  background: linear-gradient(90deg, #49566c 0%, #1d273b 100%);
+  color: #f8fafc;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(73, 86, 108, 0.18);
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.btn-login:hover,
+.btn-login:focus {
+  background: linear-gradient(90deg, #1d273b 0%, #49566c 100%);
+  color: #e2e8f0;
+  box-shadow: 0 4px 16px rgba(29, 39, 59, 0.18);
+}
+
+.btn-login:disabled {
+  background: #9ba9be;
+  color: #e2e8f0;
+  opacity: 0.7;
+}
