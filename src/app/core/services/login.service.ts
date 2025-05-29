@@ -1,11 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { ILoginRequest } from '../models/login-request.interface';
+import { ILoginRequest } from '@shared/models/login-request.interface';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ILoginResponse } from '../models/login-response.interface';
+import { ILoginResponse } from '@shared/models/login-response.interface';
 import { IBaseUser } from '@shared/models/base-user.interface';
 import { Router } from '@angular/router';
+import { ISuccessSingleResponse } from '@shared/models/success-single-response.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +21,14 @@ export class LoginService {
   public loggedInUser$: Observable<IBaseUser | null> =
     this.loggedInUserSubject.asObservable();
 
-  signIn(userCredentials: ILoginRequest): Observable<ILoginResponse> {
+  signIn(
+    userCredentials: ILoginRequest
+  ): Observable<ISuccessSingleResponse<ILoginResponse>> {
     const signInUrl: string = `${this.baseUrl}/auth/login`;
-    return this.http.post<ILoginResponse>(signInUrl, userCredentials);
+    return this.http.post<ISuccessSingleResponse<ILoginResponse>>(
+      signInUrl,
+      userCredentials
+    );
   }
 
   saveTokenInLocalStorage(token: string): void {
@@ -33,9 +39,11 @@ export class LoginService {
     return localStorage.getItem('token') || '';
   }
 
-  saveLoggedUserInLocalStorage(loginResponse: ILoginResponse): void {
-    localStorage.setItem('loggedUser', JSON.stringify(loginResponse.user));
-    this.loggedInUserSubject.next(loginResponse.user);
+  saveLoggedUserInLocalStorage(
+    loginResponse: ISuccessSingleResponse<ILoginResponse>
+  ): void {
+    localStorage.setItem('loggedUser', JSON.stringify(loginResponse.data.user));
+    this.loggedInUserSubject.next(loginResponse.data.user);
   }
 
   getLoggedUserFromLocalStorage(): IBaseUser | null {
@@ -56,4 +64,4 @@ export class LoginService {
     localStorage.removeItem('token');
     this.loggedInUserSubject.next(null);
   }
-}
+} 
