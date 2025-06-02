@@ -1,1 +1,71 @@
-<p>login-form works!</p>
+<form [formGroup]="this.loginForm" (ngSubmit)="this.onSubmit()">
+  <div class="input-icon mb-3 px-2">
+    <span class="input-icon-addon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="icon icon-tabler icons-tabler-outline icon-tabler-mail"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"
+        />
+        <path d="M3 7l9 6l9 -6" />
+      </svg>
+    </span>
+    <input
+      type="email"
+      class="form-control"
+      placeholder="Correo electrónico"
+      formControlName="email"
+    />
+  </div>
+  <div class="input-icon mb-3 px-2">
+    <span class="input-icon-addon">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="icon icon-tabler icons-tabler-outline icon-tabler-lock-password"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"
+        />
+        <path d="M8 11v-4a4 4 0 1 1 8 0v4" />
+        <path d="M15 16h.01" />
+        <path d="M12.01 16h.01" />
+        <path d="M9.02 16h.01" />
+      </svg>
+    </span>
+    <input
+      type="password"
+      class="form-control"
+      placeholder="Contraseña"
+      formControlName="password"
+    />
+  </div>
+  <div class="text-center mb-3 px-2">
+    <button
+      [disabled]="!this.loginForm.valid"
+      type="submit"
+      class="btn btn-login w-100"
+    >
+      Iniciar Sesión
+    </button>
+  </div>
+  <div class="text-center">v 0.0.1</div>
+</form>

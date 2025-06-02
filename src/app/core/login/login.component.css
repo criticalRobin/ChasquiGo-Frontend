@@ -1,0 +1,35 @@
+/* Full viewport background with overlay */
+.login-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(rgba(30, 41, 59, 0.7), rgba(30, 41, 59, 0.7)),
+    url("/assets/chasqui-go/login-bg.jpeg") no-repeat center center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glassmorphism card */
+.responsive-width {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .responsive-width {
+    max-width: 60%;
+  }
+}
+
+@media (min-width: 992px) {
+  .responsive-width {
+    max-width: 25%;
+  }
+}
