@@ -26,6 +26,7 @@ export class LoginService {
   }
 
   saveTokenInLocalStorage(token: string): void {
+    console.log('Saving token in localStorage:', token);
     localStorage.setItem('token', token);
   }
 

@@ -1,0 +1,13 @@
+@if (this.currentRoute === 'inicio') {
+<div class="mb-4">
+  <div class="">
+    <h3 class="">
+      Bienvenido de vuelta {{ this.currentUser?.firstName }}
+      {{ this.currentUser?.lastName }} 👋
+    </h3>
+    <span class="mb-2"> Continua con tu proceso dentro de ChasquiGo! </span>
+  </div>
+</div>
+}@else {
+<h2>{{ this.title() }}</h2>
+}

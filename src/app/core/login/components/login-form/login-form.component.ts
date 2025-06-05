@@ -33,7 +33,8 @@ export class LoginFormComponent {
 
     this.loginSrv.signIn({ email, password }).subscribe({
       next: (res) => {
-        this.loginSrv.saveTokenInLocalStorage(res.accessToken);
+        console.log('Login successful:', res);
+        this.loginSrv.saveTokenInLocalStorage(res.access_token);
         this.loginSrv.saveLoggedUserInLocalStorage(res);
         this.alertSrv.showAlert({
           alertType: AlertType.SUCCESS,

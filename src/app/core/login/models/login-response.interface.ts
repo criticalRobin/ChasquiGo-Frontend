@@ -1,6 +1,6 @@
 import { IBaseUser } from '@shared/models/base-user.interface';
 
 export interface ILoginResponse {
-  accessToken: string;
+  access_token: string;
   user: IBaseUser;
 }
