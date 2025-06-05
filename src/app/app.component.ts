@@ -5,12 +5,18 @@ import { LoginService } from '@core/login/services/login.service';
 import { LoadingService } from '@shared/services/loading.service';
 import { CommonModule } from '@angular/common';
 import { AlertComponent } from './shared/components/alert/alert.component';
-import { LoginComponent } from "./core/login/login.component";
+import { BaseLayoutComponent } from './core/layout/components/base-layout/base-layout.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SpinnerComponent, AlertComponent, LoginComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    SpinnerComponent,
+    AlertComponent,
+    BaseLayoutComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
