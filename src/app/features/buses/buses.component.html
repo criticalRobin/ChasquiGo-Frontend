@@ -1,0 +1,16 @@
+<div class="mb-3">
+  <h1 class="text-secondary-yellow">Buses</h1>
+  <ol class="breadcrumb breadcrumb-arrows">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/incio']" class="text-primary-blue">Inicio</a>
+    </li>
+    <li class="breadcrumb-item active">
+      <a href="#" class="text-secondary-yellow">Buses</a>
+    </li>
+  </ol>
+</div>
+
+<app-form-buses></app-form-buses>
+<br>
+<app-buses-three [bus]="currentBus"></app-buses-three>
+
