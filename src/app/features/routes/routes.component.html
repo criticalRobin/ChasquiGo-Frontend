@@ -1,0 +1,130 @@
+<div class="mb-3">
+  <h1 class="text-secondary-yellow">Gestión de Frecuencias</h1>
+  <ol class="breadcrumb breadcrumb-arrows">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
+    </li>
+    <li class="breadcrumb-item active">
+      <a href="#" class="text-secondary-yellow">Frecuencias</a>
+    </li>
+  </ol>
+</div>
+
+<div class="row mb-3">
+  <div class="col">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2>Listado de Frecuencias</h2>
+      <button class="btn btn-primary" [routerLink]="['/rutas/crear']">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M12 5l0 14"></path>
+          <path d="M5 12l14 0"></path>
+        </svg>
+        Nueva Frecuencia
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (cooperative) {
+  <div class="alert alert-info mb-3" role="alert">
+    <div class="d-flex">
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <circle cx="12" cy="12" r="9"></circle>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          <polyline points="11 12 12 12 12 16 13 16"></polyline>
+        </svg>
+      </div>
+      <div>
+        <h4 class="alert-title">Cooperativa: {{ cooperative.name }}</h4>
+        <div class="text-secondary">Estás viendo las frecuencias de la cooperativa {{ cooperative.name }}.</div>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="row row-cards">
+  @if (isLoading) {
+    <div class="col-12 d-flex justify-content-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (frequencies.length === 0) {
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock mb-2 text-muted" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <circle cx="12" cy="12" r="9"></circle>
+            <polyline points="12 7 12 12 15 15"></polyline>
+          </svg>
+          <h3>No hay frecuencias disponibles</h3>
+          <p class="text-muted">Crea una nueva frecuencia para comenzar a gestionar tus horarios</p>
+          <div>
+            <button class="btn btn-primary" [routerLink]="['/rutas/crear']">
+              Crear primera frecuencia
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    @for (frequency of frequencies; track frequency.id) {
+      <div class="col-md-6 col-lg-4">
+        <div class="card route-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+              <h3 class="card-title">{{ frequency.originCity.name }} - {{ frequency.destinationCity.name }}</h3>
+              <span class="status-badge" [ngClass]="{
+                'status-active': frequency.status === 'activo' || frequency.status === 'Activo',
+                'status-inactive': frequency.status === 'inactivo' || frequency.status === 'Inactivo',
+                'status-pending': frequency.status === 'pendiente' || frequency.status === 'Pendiente'
+              }">
+                {{ frequency.status }}
+              </span>
+            </div>
+            <div class="mb-3">
+              <div><strong>Origen:</strong> {{ frequency.originCity.name }} ({{ frequency.originCity.province }})</div>
+              <div><strong>Destino:</strong> {{ frequency.destinationCity.name }} ({{ frequency.destinationCity.province }})</div>
+              <div><strong>Hora de salida:</strong> {{ frequency.departureTime | date:'shortTime' }}</div>
+              <div><strong>Resolución ANT:</strong> {{ frequency.antResolution }}</div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-outline-primary btn-sm" [routerLink]="['/rutas', frequency.id]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                  <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+                </svg>
+                Ver
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/rutas/editar', frequency.id]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                  <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                  <path d="M16 5l3 3"></path>
+                </svg>
+                Editar
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteFrequency(frequency.id)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M4 7l16 0"></path>
+                  <path d="M10 11l0 6"></path>
+                  <path d="M14 11l0 6"></path>
+                  <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                  <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                </svg>
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div> 

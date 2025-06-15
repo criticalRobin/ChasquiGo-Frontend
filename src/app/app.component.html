@@ -1,9 +1,11 @@
 @if (this.loadingSrv.isLoading | async) {
-<app-spinner class="fixed inset-0 z-50"> </app-spinner>
-} @if (this.isLogged) {
-<app-base-layout />
-<app-alert />
-}@if(!this.isLogged) {
-<router-outlet />
-<app-alert />
+  <app-spinner class="fixed inset-0 z-50"> </app-spinner>
+}
+
+@if (this.isLogged) {
+  <app-base-layout />
+  <app-alert />
+} @else {
+  <router-outlet />
+  <app-alert />
 }

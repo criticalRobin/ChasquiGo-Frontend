@@ -1,0 +1,13 @@
+.form-control:focus {
+  border-color: #49566c;
+  box-shadow: 0 0 0 0.25rem rgba(73, 86, 108, 0.25);
+}
+
+.invalid-feedback {
+  font-size: 0.8rem;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #49566c 0%, #1d273b 100%);
+  border: none;
+} 
