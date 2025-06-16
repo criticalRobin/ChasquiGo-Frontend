@@ -4,7 +4,7 @@ export interface IBuses {
     licensePlate: string;
     chassisBrand: string;
     bodyworkBrand: string;
-    photo?: string;
+    photo?: string | null;
     stoppageDays: number;
     busTypeId: number;
     seats: IBusSeat[];
@@ -14,10 +14,12 @@ export interface IBuses {
     photos?: string[];
     createdAt?: Date;
     updatedAt?: Date;
+    numberOfFloors?: number; // 1 or 2 - Solo para UI (ahora opcional)
 }
 
 export interface IBusSeat {
     number: string;
-    type: 'NORMAL' | 'VIP' ;
+    type: 'NORMAL' | 'VIP';
     location: 'ventana' | 'pasillo' | 'other';
+    floor?: number; // 1 or 2 - Solo para UI (ahora opcional)
 }
