@@ -1,0 +1,103 @@
+<form [formGroup]="coopForm" (ngSubmit)="onSubmit()">
+  <!-- Logo Upload -->
+  <div class="row mb-4">
+    <div class="col-12 text-center">
+      <div class="avatar avatar-xl mb-3" [style.background-image]="uploadedLogoUrl ? 'url(' + uploadedLogoUrl + ')' : 'url(assets/static/coop-placeholder.png)'">
+        @if (!uploadedLogoUrl && cooperative) {
+          <span class="avatar-initials bg-primary-lt">
+            {{ cooperative.name.charAt(0) }}
+          </span>
+        }
+      </div>
+      <div class="mb-3">
+        <input type="file" 
+               class="form-control" 
+               accept="image/*" 
+               (change)="onFileSelected($event)"
+               [class.is-invalid]="coopForm.get('logo')?.invalid && coopForm.get('logo')?.touched"
+               [disabled]="isLoading">
+        <div class="form-text">Sube el logo de tu cooperativa (PNG, JPG)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Name and Address -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label class="form-label required">Nombre de la Cooperativa</label>
+      <input type="text" 
+             class="form-control" 
+             formControlName="name"
+             [class.is-invalid]="coopForm.get('name')?.invalid && coopForm.get('name')?.touched"
+             placeholder="Ej: Cooperativa de Transportes XYZ">
+      @if (coopForm.get('name')?.invalid && coopForm.get('name')?.touched) {
+        <div class="invalid-feedback">
+          El nombre es requerido y debe tener al menos 3 caracteres
+        </div>
+      }
+    </div>
+    <div class="col-md-6">
+      <label class="form-label required">Dirección</label>
+      <input type="text" 
+             class="form-control" 
+             formControlName="address"
+             [class.is-invalid]="coopForm.get('address')?.invalid && coopForm.get('address')?.touched"
+             placeholder="Ej: Av. Principal #123">
+      @if (coopForm.get('address')?.invalid && coopForm.get('address')?.touched) {
+        <div class="invalid-feedback">
+          La dirección es requerida y debe tener al menos 5 caracteres
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Contact Information -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label class="form-label required">Teléfono</label>
+      <input type="tel" 
+             class="form-control" 
+             formControlName="phone"
+             [class.is-invalid]="coopForm.get('phone')?.invalid && coopForm.get('phone')?.touched"
+             placeholder="Ej: 0987654321">
+      @if (coopForm.get('phone')?.invalid && coopForm.get('phone')?.touched) {
+        <div class="invalid-feedback">
+          El teléfono es requerido y debe tener 10 dígitos
+        </div>
+      }
+    </div>
+    <div class="col-md-6">
+      <label class="form-label required">Correo Electrónico</label>
+      <input type="email" 
+             class="form-control" 
+             formControlName="email"
+             [class.is-invalid]="coopForm.get('email')?.invalid && coopForm.get('email')?.touched"
+             placeholder="Ej: contacto@cooperativa.com">
+      @if (coopForm.get('email')?.invalid && coopForm.get('email')?.touched) {
+        <div class="invalid-feedback">
+          Ingrese un correo electrónico válido
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="form-footer d-flex justify-content-end">
+    <div class="btn-list">
+      <button type="button" 
+              class="btn btn-link" 
+              (click)="onCancel()"
+              [disabled]="isLoading">
+        Cancelar
+      </button>
+      <button type="submit" 
+              class="btn btn-primary" 
+              [disabled]="coopForm.invalid || isLoading">
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        }
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+</form>
