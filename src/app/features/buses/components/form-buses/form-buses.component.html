@@ -1,12 +1,6 @@
-<div class="container-xl">
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">{{ isEditing ? 'Editar' : 'Registrar' }} Bus</h3>
-    </div>
-    <div class="card-body">
-      <form [formGroup]="busForm" (ngSubmit)="onSubmit()">
-        <!-- Primera fila -->
-        <div class="row mb-3">
+<form [formGroup]="busForm" (ngSubmit)="onSubmit()">
+  <!-- Primera fila -->
+  <div class="row mb-3">
           <div class="col-sm-6 col-md-6">
             <div class="mb-3">
               <label class="form-label required">Cooperativa</label>
@@ -53,12 +47,21 @@
 
         <!-- Tercera fila -->
         <div class="row mb-3">
-          <div class="col-sm-4 col-md-4">
-            <div class="mb-3">
+          <div class="col-sm-4 col-md-4">            <div class="mb-3">
               <label class="form-label required">Capacidad</label>
-              <input type="number" class="form-control" formControlName="capacity" min="1">
-              <div class="invalid-feedback" *ngIf="busForm.get('capacity')?.invalid && busForm.get('capacity')?.touched">
-                La capacidad es requerida y debe ser mayor a 0
+              <input 
+                type="number" 
+                id="capacity" 
+                formControlName="capacity" 
+                class="form-control" 
+                min="1"
+                [class.is-invalid]="busForm.get('capacity')?.invalid && busForm.get('capacity')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="busForm.get('capacity')?.errors?.['required']">
+                La capacidad es requerida
+              </div>
+              <div class="invalid-feedback" *ngIf="busForm.get('capacity')?.errors?.['min']">
+                La capacidad debe ser mayor a 0
               </div>
             </div>
           </div>
@@ -73,15 +76,17 @@
           </div>          <div class="col-sm-4 col-md-4">
             <div class="mb-3">
               <label class="form-label required">Número de Pisos</label>
-              <div class="form-selectgroup">
-                <label class="form-selectgroup-item">
-                  <input type="radio" name="floorCount" [value]="1" class="form-selectgroup-input" formControlName="floorCount">
-                  <span class="form-selectgroup-label">1 Piso</span>
-                </label>
-                <label class="form-selectgroup-item">
-                  <input type="radio" name="floorCount" [value]="2" class="form-selectgroup-input" formControlName="floorCount">
-                  <span class="form-selectgroup-label">2 Pisos</span>
-                </label>
+              <select 
+                id="floorCount" 
+                formControlName="floorCount" 
+                class="form-control"
+                [class.is-invalid]="busForm.get('floorCount')?.invalid && busForm.get('floorCount')?.touched"
+              >
+                <option [ngValue]="1">1 Piso</option>
+                <option [ngValue]="2">2 Pisos</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="busForm.get('floorCount')?.errors?.['required']">
+                El número de pisos es requerido
               </div>
             </div>
           </div>
@@ -163,9 +168,5 @@
             <button type="submit" class="btn btn-primary" [disabled]="busForm.invalid">
               {{ isEditing ? 'Actualizar' : 'Siguiente' }}
             </button>
-          </div>
-        </div>
+          </div>        </div>
       </form>
-    </div>
-  </div>
-</div>

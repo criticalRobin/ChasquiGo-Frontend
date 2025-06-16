@@ -31,4 +31,8 @@ export class BusesService {
   deleteBus(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  getBusesByCooperative(cooperativeId: number): Observable<IBuses[]> {
+    return this.http.get<IBuses[]>(`${this.apiUrl}/cooperative/${cooperativeId}`);
+  }
 }
