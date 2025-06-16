@@ -1,0 +1,129 @@
+.avatar {
+  transition: all 0.3s ease;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-sm {
+  transition: all 0.2s ease;
+}
+
+.card-sm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+  border-color: #206bc4;
+  box-shadow: 0 0 0 0.25rem rgba(32, 107, 196, 0.25);
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #206bc4 0%, #1a56a6 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #1a56a6 0%, #154a8f 100%);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.avatar-initials {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #206bc4;
+}
+
+.empty {
+  padding: 3rem 0;
+}
+
+.empty-icon {
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.empty-subtitle {
+  font-size: 1rem;
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-border {
+  animation: spin 1s linear infinite;
+}
+
+/* Form validation styles */
+.form-label.required::after {
+  content: "*";
+  color: #d63939;
+  margin-left: 0.25rem;
+}
+
+.invalid-feedback {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* File input customization */
+input[type="file"] {
+  cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  background: #206bc4;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: #1a56a6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-sm {
+    margin-bottom: 1rem;
+  }
+  
+  .avatar-xl {
+    width: 8rem;
+    height: 8rem;
+  }
+  
+  .empty {
+    padding: 2rem 1rem;
+  }
+}
