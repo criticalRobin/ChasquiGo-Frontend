@@ -1,0 +1,171 @@
+<div class="container-xl">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ isEditing ? 'Editar' : 'Registrar' }} Bus</h3>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="busForm" (ngSubmit)="onSubmit()">
+        <!-- Primera fila -->
+        <div class="row mb-3">
+          <div class="col-sm-6 col-md-6">
+            <div class="mb-3">
+              <label class="form-label required">Cooperativa</label>
+              <select class="form-select" formControlName="cooperativeId">
+                <option [ngValue]="null" disabled>Seleccione una cooperativa</option>
+                <option *ngFor="let coop of cooperatives" [value]="coop.id">{{ coop.name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="busForm.get('cooperativeId')?.invalid && busForm.get('cooperativeId')?.touched">
+                La cooperativa es requerida
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-6">
+            <div class="mb-3">              <label class="form-label required">Placa</label>
+              <input type="text" class="form-control" formControlName="licensePlate" placeholder="Ej: ICH-090">
+              <div class="invalid-feedback" *ngIf="busForm.get('licensePlate')?.invalid && busForm.get('licensePlate')?.touched">
+                La placa es requerida y debe tener el formato correcto (Ej: ICH-090)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segunda fila -->
+        <div class="row mb-3">
+          <div class="col-sm-6 col-md-6">
+            <div class="mb-3">
+              <label class="form-label required">Marca del Chasis</label>
+              <input type="text" class="form-control" formControlName="chassisBrand" placeholder="Ej: Mercedes-Benz">
+              <div class="invalid-feedback" *ngIf="busForm.get('chassisBrand')?.invalid && busForm.get('chassisBrand')?.touched">
+                La marca del chasis es requerida
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-6">
+            <div class="mb-3">
+              <label class="form-label required">Marca de Carrocería</label>
+              <input type="text" class="form-control" formControlName="bodyworkBrand" placeholder="Ej: Marcopolo">
+              <div class="invalid-feedback" *ngIf="busForm.get('bodyworkBrand')?.invalid && busForm.get('bodyworkBrand')?.touched">
+                La marca de carrocería es requerida
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tercera fila -->
+        <div class="row mb-3">
+          <div class="col-sm-4 col-md-4">
+            <div class="mb-3">
+              <label class="form-label required">Capacidad</label>
+              <input type="number" class="form-control" formControlName="capacity" min="1">
+              <div class="invalid-feedback" *ngIf="busForm.get('capacity')?.invalid && busForm.get('capacity')?.touched">
+                La capacidad es requerida y debe ser mayor a 0
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-md-4">
+            <div class="mb-3">
+              <label class="form-label required">Días de Parada</label>
+              <input type="number" class="form-control" formControlName="stoppageDays" min="0">
+              <div class="invalid-feedback" *ngIf="busForm.get('stoppageDays')?.invalid && busForm.get('stoppageDays')?.touched">
+                El valor debe ser 0 o mayor
+              </div>
+            </div>
+          </div>          <div class="col-sm-4 col-md-4">
+            <div class="mb-3">
+              <label class="form-label required">Número de Pisos</label>
+              <div class="form-selectgroup">
+                <label class="form-selectgroup-item">
+                  <input type="radio" name="floorCount" [value]="1" class="form-selectgroup-input" formControlName="floorCount">
+                  <span class="form-selectgroup-label">1 Piso</span>
+                </label>
+                <label class="form-selectgroup-item">
+                  <input type="radio" name="floorCount" [value]="2" class="form-selectgroup-input" formControlName="floorCount">
+                  <span class="form-selectgroup-label">2 Pisos</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 col-md-4">
+            <div class="mb-3">
+              <label class="form-label required">Tipo de Bus</label>
+              <select class="form-select" formControlName="busTypeId">
+                <option [value]="1">Tipo 1 - Estándar</option>
+                <option [value]="2">Tipo 2 - Ejecutivo</option>
+                <option [value]="3">Tipo 3 - Premium</option>
+                <option [value]="4">Tipo 4 - VIP</option>
+                <option [value]="5">Tipo 5 - Lujo</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="busForm.get('busTypeId')?.invalid && busForm.get('busTypeId')?.touched">
+                El tipo de bus es requerido
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fotos -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <label class="form-label">Fotos del Bus</label>
+            <div class="mb-3">
+              <div class="input-group">
+                <input type="file" 
+                       class="form-control" 
+                       accept="image/*" 
+                       multiple
+                       (change)="onFileSelected($event)"
+                       #fileInput>
+                <button class="btn btn-outline-primary" type="button" (click)="fileInput.click()">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                    <path d="M7 9l5 -5l5 5"></path>
+                    <path d="M12 4l0 12"></path>
+                  </svg>
+                  Seleccionar Imágenes
+                </button>
+              </div>
+            </div>
+            
+            <div class="row g-2" *ngIf="photos.length > 0">
+              <div class="col-6 col-sm-4 col-md-3 col-xl-2" *ngFor="let photo of photos; let i = index">
+                <div class="card card-sm">
+                  <a href="#" class="d-block" data-bs-toggle="modal">
+                    <img [src]="photo" class="card-img-top" style="height: 120px; object-fit: cover;">
+                  </a>
+                  <div class="card-body">
+                    <div class="d-flex align-items-center">
+                      <div>
+                        <div>Foto {{ i + 1 }}</div>
+                      </div>
+                      <div class="ms-auto">
+                        <a href="#" class="text-danger" (click)="removePhoto(i); $event.preventDefault()">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M4 7l16 0"></path>
+                            <path d="M10 11l0 6"></path>
+                            <path d="M14 11l0 6"></path>
+                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="form-footer d-flex justify-content-end">
+          <div class="btn-list">
+            <button type="submit" class="btn btn-primary" [disabled]="busForm.invalid">
+              {{ isEditing ? 'Actualizar' : 'Siguiente' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

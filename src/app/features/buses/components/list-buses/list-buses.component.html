@@ -1,0 +1,80 @@
+<div class="card">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">      <h3 class="card-title">Listado de Buses</h3>
+      <button type="button" class="btn btn-primary" (click)="onCreateBus()">
+        Crear Bus
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+
+    <!-- Tabla de Buses -->
+    <div class="table-responsive">
+      <table class="table table-vcenter card-table">
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Cooperativa</th>
+            <th>Asientos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading">
+            <td colspan="6" class="text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && buses.length === 0">
+            <td colspan="6" class="text-center">No hay buses registrados</td>
+          </tr>
+          <tr *ngFor="let bus of buses">            <td>{{ bus.licensePlate }}</td>
+            <td>{{ bus.chassisBrand }}</td>
+            <td>{{ bus.bodyworkBrand }}</td>
+            <td>{{ getCooperativeName(bus.cooperativeId) }}</td>
+            <td>{{ bus.seats.length }} asientos</td>            <td>
+              <div class="btn-list">
+                <button type="button" class="btn btn-primary btn-sm" (click)="onEditBus(bus)">
+                  Editar
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" (click)="onDeleteBus(bus)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal" [style.display]="showDeleteModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" (click)="cancelDelete()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <h3>¿Está seguro?</h3>
+        <div class="text-muted">¿Realmente desea eliminar el bus con placa {{ busToDelete?.licensePlate }}? Esta acción no se puede deshacer.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Overlay oscuro para el modal -->
+<div class="modal-backdrop" [style.display]="showDeleteModal ? 'block' : 'none'"></div>

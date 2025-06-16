@@ -1,0 +1,83 @@
+<div class="mb-3">
+  <h1 class="text-secondary-yellow">Buses</h1>
+  <ol class="breadcrumb breadcrumb-arrows">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/incio']" class="text-primary-blue">Inicio</a>
+    </li>
+    <li class="breadcrumb-item active">
+      <a href="#" class="text-secondary-yellow">Buses</a>
+    </li>
+  </ol>
+</div>
+
+<div class="container-xl">  <!-- Modo Lista de Buses -->
+  <div *ngIf="viewMode === 'list'">
+    <app-list-buses (createBusClicked)="startCreatingBus()" (editBusClicked)="startEditingBus($event)"></app-list-buses>
+  </div>
+
+  <!-- Modo Formulario de Creación/Edición -->
+  <div *ngIf="viewMode === 'form'" class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="card-title">{{ isEditing ? 'Editar' : 'Registrar' }} Bus</h3>
+        <button class="btn btn-outline-secondary" (click)="returnToList()">
+          <i class="ti ti-arrow-left me-1"></i>
+          Volver al Listado
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Steps -->
+      <div class="steps steps-counter steps-primary mb-3">
+        <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+          <div class="step-item-icon">
+            <i class="ti ti-file-text"></i>
+          </div>
+          <div class="step-item-content">
+            <h4 class="step-item-title">Datos del Bus</h4>
+            <p class="step-item-description">Información básica del vehículo</p>
+          </div>
+        </div>
+        <div class="step-item" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+          <div class="step-item-icon">
+            <i class="ti ti-chair"></i>
+          </div>
+          <div class="step-item-content">
+            <h4 class="step-item-title">Configuración de Asientos</h4>
+            <p class="step-item-description">Selección y distribución de asientos</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step Content -->
+      <div class="step-content">
+        <div *ngIf="currentStep === 1">
+          <app-form-buses [cachedBusData]="currentBus" (formSubmitted)="onFormSubmitted($event)"></app-form-buses>
+        </div>
+        <div *ngIf="currentStep === 2 && currentBus">
+          <app-buses-three [bus]="currentBus" (seatsConfigured)="updateBusSeats($event)"></app-buses-three>
+        </div>
+      </div>
+
+      <!-- Step Navigation -->
+      <div class="form-footer d-flex justify-content-between mt-3">
+        <button class="btn btn-outline-secondary" *ngIf="currentStep > 1" (click)="previousStep()">
+          <i class="ti ti-arrow-left me-1"></i>
+          Anterior
+        </button>
+        <div class="btn-list">
+          <ng-container *ngIf="currentStep === 2">
+            <button class="btn btn-outline-secondary" (click)="cancel()">
+              Cancelar
+            </button>
+            <button class="btn btn-success" (click)="saveBus()">
+              <i class="ti ti-device-floppy me-1"></i>
+              Guardar Bus
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
