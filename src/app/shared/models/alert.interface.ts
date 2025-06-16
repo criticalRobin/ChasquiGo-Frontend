@@ -4,4 +4,8 @@ export interface IAlert {
   alertType: AlertType;
   mainMessage: string;
   subMessage?: string;
+  showConfirmButton?: boolean;
+  confirmButtonText?: string;
+  cancelButtonText?: string;
+  onConfirm?: () => void;
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RoutesService } from './services/routes.service';
+import { RoutesService } from './services/frequencies.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
 import { LoginService } from '@core/login/services/login.service';
@@ -12,8 +12,8 @@ import { IFrequency } from './models/frequency.interface';
   selector: 'app-routes',
   standalone: true,
   imports: [RouterLink, CommonModule],
-  templateUrl: './routes.component.html',
-  styleUrl: './routes.component.css',
+  templateUrl: './frequencies.component.html',
+  styleUrl: './frequencies.component.css',
 })
 export class RoutesComponent implements OnInit {
   private readonly routesService: RoutesService = inject(RoutesService);
@@ -70,6 +70,30 @@ export class RoutesComponent implements OnInit {
           });
         },
       });
+    }
+  }
+
+  formatTimeDisplay(isoTimeString: string): string {
+    if (!isoTimeString) return 'N/A';
+
+    try {
+      // Parse the ISO string to extract hours and minutes
+      const date = new Date(isoTimeString);
+      
+      // Get hours in 12-hour format
+      let hours = date.getUTCHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      
+      // Get minutes with leading zero
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+      
+      // Return formatted time
+      return `${hours}:${minutes} ${ampm}`;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return isoTimeString;
     }
   }
 } 

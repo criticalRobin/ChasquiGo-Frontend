@@ -72,7 +72,16 @@
       <div *ngIf="alert.subMessage" class="text-secondary">
         {{ alert.subMessage }}
       </div>
+      
+      <div *ngIf="alert.showConfirmButton" class="mt-3">
+        <button class="btn btn-sm btn-danger me-2" (click)="onConfirm()">
+          {{ alert.confirmButtonText || 'Confirmar' }}
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="closeAlert()">
+          {{ alert.cancelButtonText || 'Cancelar' }}
+        </button>
+      </div>
     </div>
   </div>
-  <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+  <a *ngIf="!alert.showConfirmButton" class="btn-close" (click)="closeAlert()" aria-label="close"></a>
 </div>
