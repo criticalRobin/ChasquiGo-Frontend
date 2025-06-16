@@ -1,0 +1,125 @@
+<div class="mb-3">
+  <h1 class="text-secondary-yellow">Detalle de Frecuencia</h1>
+  <ol class="breadcrumb breadcrumb-arrows">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/rutas']" class="text-primary-blue">Frecuencias</a>
+    </li>
+    <li class="breadcrumb-item active">
+      <a href="#" class="text-secondary-yellow">Detalle</a>
+    </li>
+  </ol>
+</div>
+
+@if (isLoading) {
+  <div class="card">
+    <div class="card-body d-flex justify-content-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  </div>
+} @else if (frequencyData) {
+  <div class="card route-detail-card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+          <h2 class="card-title mb-1">{{ frequencyData.originCity.name }} - {{ frequencyData.destinationCity.name }}</h2>
+          <p class="text-muted">Frecuencia de viaje</p>
+        </div>
+        <span class="status-badge" [ngClass]="{
+          'status-active': frequencyData.status === 'activo' || frequencyData.status === 'Activo',
+          'status-inactive': frequencyData.status === 'inactivo' || frequencyData.status === 'Inactivo',
+          'status-pending': frequencyData.status === 'pendiente' || frequencyData.status === 'Pendiente'
+        }">
+          {{ frequencyData.status }}
+        </span>
+      </div>
+      
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <span class="detail-label">Ciudad de origen:</span>
+            <div>{{ frequencyData.originCity.name }} ({{ frequencyData.originCity.province }})</div>
+          </div>
+          <div class="mb-3">
+            <span class="detail-label">Ciudad de destino:</span>
+            <div>{{ frequencyData.destinationCity.name }} ({{ frequencyData.destinationCity.province }})</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <span class="detail-label">Hora de salida:</span>
+            <div>{{ frequencyData.departureTime | date:'shortTime' }}</div>
+          </div>
+          <div class="mb-3">
+            <span class="detail-label">Resolución ANT:</span>
+            <div>
+              <a href="{{ frequencyData.antResolution }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-type-pdf" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                  <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"></path>
+                  <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"></path>
+                  <path d="M17 18h2"></path>
+                  <path d="M20 15h-3v6"></path>
+                  <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"></path>
+                </svg>
+                Ver documento
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <span class="detail-label">Cooperativa:</span>
+            <div>{{ cooperativeName }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <span class="detail-label">ID de Cooperativa:</span>
+            <div>{{ frequencyData.cooperativeId }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button class="btn btn-outline-secondary" [routerLink]="['/rutas']">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M5 12l14 0"></path>
+            <path d="M5 12l6 6"></path>
+            <path d="M5 12l6 -6"></path>
+          </svg>
+          Volver
+        </button>
+        <button class="btn btn-outline-primary" [routerLink]="['/rutas/editar', frequencyId]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+            <path d="M16 5l3 3"></path>
+          </svg>
+          Editar
+        </button>
+        <button class="btn btn-outline-danger" (click)="deleteFrequency()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M4 7l16 0"></path>
+            <path d="M10 11l0 6"></path>
+            <path d="M14 11l0 6"></path>
+            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+          </svg>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+} 
