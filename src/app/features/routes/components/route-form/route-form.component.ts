@@ -39,7 +39,7 @@ export class RouteFormComponent implements OnInit {
       destinationCityId: ['', [Validators.required]],
       departureTime: ['', [Validators.required]],
       status: ['Activo', [Validators.required]],
-      antResolution: ['', [Validators.required]],
+      antResolution: [''],  // Quitamos el validador requerido ya que lo manejaremos manualmente
     });
   }
 
@@ -91,7 +91,6 @@ export class RouteFormComponent implements OnInit {
           destinationCityId: frequency.destinationCityId,
           departureTime: formattedTime,
           status: frequency.status,
-          antResolution: frequency.antResolution,
         });
         
         this.uploadedFileUrl = frequency.antResolution;
@@ -122,35 +121,61 @@ export class RouteFormComponent implements OnInit {
     }
   }
 
-  async uploadFile(): Promise<string | null> {
-    if (!this.selectedFile) {
-      // Si no hay archivo seleccionado y estamos en modo edición, usamos el URL existente
-      if (this.isEditMode && this.uploadedFileUrl) {
-        return this.uploadedFileUrl;
+  uploadFile(): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      if (!this.selectedFile) {
+        // Si no hay archivo seleccionado y estamos en modo edición, usamos el URL existente
+        if (this.isEditMode && this.uploadedFileUrl) {
+          resolve(this.uploadedFileUrl);
+          return;
+        }
+        
+        // Si estamos creando una nueva frecuencia, necesitamos un archivo
+        if (!this.isEditMode) {
+          this.alertService.showAlert({
+            alertType: AlertType.ERROR,
+            mainMessage: 'Archivo requerido',
+            subMessage: 'Por favor, seleccione un archivo PDF con la resolución ANT',
+          });
+          resolve(null);
+          return;
+        }
       }
-      
-      this.alertService.showAlert({
-        alertType: AlertType.ERROR,
-        mainMessage: 'Archivo requerido',
-        subMessage: 'Por favor, seleccione un archivo PDF con la resolución ANT',
-      });
-      return null;
-    }
 
-    try {
-      this.isLoading = true;
-      const response = await this.routesService.uploadPdfFile(this.selectedFile).toPromise();
-      return response.url;
-    } catch (error: any) {
-      this.alertService.showAlert({
-        alertType: AlertType.ERROR,
-        mainMessage: 'Error al subir archivo',
-        subMessage: error.message,
-      });
-      return null;
-    } finally {
-      this.isLoading = false;
-    }
+      // Si llegamos aquí, tenemos un archivo para subir
+      if (this.selectedFile) {
+        this.isLoading = true;
+        const formData = new FormData();
+        formData.append('file', this.selectedFile);
+        
+        this.routesService.uploadPdfFile(formData).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            if (response && response.url) {
+              resolve(response.url);
+            } else {
+              this.alertService.showAlert({
+                alertType: AlertType.ERROR,
+                mainMessage: 'Error al subir archivo',
+                subMessage: 'No se recibió una URL válida del servidor',
+              });
+              resolve(null);
+            }
+          },
+          error: (error) => {
+            this.isLoading = false;
+            this.alertService.showAlert({
+              alertType: AlertType.ERROR,
+              mainMessage: 'Error al subir archivo',
+              subMessage: error.message,
+            });
+            resolve(null);
+          }
+        });
+      } else {
+        resolve(null);
+      }
+    });
   }
 
   async onSubmit(): Promise<void> {
@@ -159,28 +184,48 @@ export class RouteFormComponent implements OnInit {
       return;
     }
 
+    // Validar que tengamos un archivo o una URL existente
+    if (!this.selectedFile && !this.uploadedFileUrl && !this.isEditMode) {
+      this.alertService.showAlert({
+        alertType: AlertType.ERROR,
+        mainMessage: 'Archivo requerido',
+        subMessage: 'Por favor, seleccione un archivo PDF con la resolución ANT',
+      });
+      return;
+    }
+
     // Primero subimos el archivo si hay uno seleccionado
-    const fileUrl = await this.uploadFile();
-    if (fileUrl === null && !this.isEditMode) {
-      return; // Si no hay URL de archivo y no estamos en modo edición, detenemos el proceso
+    this.isLoading = true;
+    let fileUrl: string | null = null;
+    
+    if (this.selectedFile) {
+      fileUrl = await this.uploadFile();
+      if (!fileUrl && !this.isEditMode) {
+        this.isLoading = false;
+        return; // Si no hay URL de archivo y no estamos en modo edición, detenemos el proceso
+      }
+    } else if (this.uploadedFileUrl) {
+      fileUrl = this.uploadedFileUrl;
     }
 
     // Preparar los datos de la frecuencia
     const formData = this.frequencyForm.value;
     
-    // Convertir la hora del formulario a formato ISO
-    const [hours, minutes] = formData.departureTime.split(':');
-    const departureDate = new Date();
-    departureDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+    // Usamos directamente el valor del formulario para departureTime (HH:MM)
+    // El backend espera un formato HH:MM según el DTO
+    const departureTime = formData.departureTime;
     
     const frequencyData: IFrequencyRequest = {
-      ...formData,
-      departureTime: departureDate.toISOString(),
-      antResolution: fileUrl || this.uploadedFileUrl || '',
+      originCityId: Number(formData.originCityId),
+      destinationCityId: Number(formData.destinationCityId),
+      departureTime: departureTime, // Formato HH:MM como lo requiere el backend
+      status: formData.status,
+      antResolution: fileUrl || '',
+      cooperativeId: this.routesService.cooperativeId || 0
     };
 
-    this.isLoading = true;
-    
+    console.log('Enviando datos de frecuencia:', frequencyData);
+
     if (this.isEditMode && this.frequencyId) {
       this.routesService.updateFrequency(this.frequencyId, frequencyData).subscribe({
         next: () => {
@@ -194,10 +239,11 @@ export class RouteFormComponent implements OnInit {
         },
         error: (error) => {
           this.isLoading = false;
+          console.error('Error al actualizar frecuencia:', error);
           this.alertService.showAlert({
             alertType: AlertType.ERROR,
             mainMessage: 'Error al actualizar frecuencia',
-            subMessage: error.message,
+            subMessage: error.message || JSON.stringify(error),
           });
         },
       });
@@ -214,10 +260,11 @@ export class RouteFormComponent implements OnInit {
         },
         error: (error) => {
           this.isLoading = false;
+          console.error('Error al crear frecuencia:', error);
           this.alertService.showAlert({
             alertType: AlertType.ERROR,
             mainMessage: 'Error al crear frecuencia',
-            subMessage: error.message,
+            subMessage: error.message || JSON.stringify(error),
           });
         },
       });

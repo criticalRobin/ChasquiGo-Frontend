@@ -77,7 +77,13 @@
         <div class="card route-card">
           <div class="card-body">
             <div class="d-flex justify-content-between mb-3">
-              <h3 class="card-title">{{ frequency.originCity.name }} - {{ frequency.destinationCity.name }}</h3>
+              <h3 class="card-title">
+                @if (frequency.originCity && frequency.destinationCity) {
+                  {{ frequency.originCity.name }} - {{ frequency.destinationCity.name }}
+                } @else {
+                  Ciudades ID: {{ frequency.originCityId }} - {{ frequency.destinationCityId }}
+                }
+              </h3>
               <span class="status-badge" [ngClass]="{
                 'status-active': frequency.status === 'activo' || frequency.status === 'Activo',
                 'status-inactive': frequency.status === 'inactivo' || frequency.status === 'Inactivo',
@@ -87,10 +93,37 @@
               </span>
             </div>
             <div class="mb-3">
-              <div><strong>Origen:</strong> {{ frequency.originCity.name }} ({{ frequency.originCity.province }})</div>
-              <div><strong>Destino:</strong> {{ frequency.destinationCity.name }} ({{ frequency.destinationCity.province }})</div>
+              <div>
+                <strong>Origen:</strong>
+                @if (frequency.originCity) {
+                  {{ frequency.originCity.name }}
+                  @if (frequency.originCity.province) {
+                    ({{ frequency.originCity.province }})
+                  }
+                } @else {
+                  ID: {{ frequency.originCityId }}
+                }
+              </div>
+              <div>
+                <strong>Destino:</strong>
+                @if (frequency.destinationCity) {
+                  {{ frequency.destinationCity.name }}
+                  @if (frequency.destinationCity.province) {
+                    ({{ frequency.destinationCity.province }})
+                  }
+                } @else {
+                  ID: {{ frequency.destinationCityId }}
+                }
+              </div>
               <div><strong>Hora de salida:</strong> {{ frequency.departureTime | date:'shortTime' }}</div>
-              <div><strong>Resolución ANT:</strong> {{ frequency.antResolution }}</div>
+              <div>
+                <strong>Resolución ANT:</strong>
+                @if (frequency.antResolution) {
+                  <a href="{{ frequency.antResolution }}" target="_blank" class="text-primary">Ver PDF</a>
+                } @else {
+                  <span class="text-muted">No disponible</span>
+                }
+              </div>
             </div>
             <div class="d-flex justify-content-between">
               <button class="btn btn-outline-primary btn-sm" [routerLink]="['/rutas', frequency.id]">

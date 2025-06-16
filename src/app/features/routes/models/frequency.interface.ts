@@ -15,8 +15,8 @@ export interface IFrequency {
 
 export interface IFrequencyRequest {
   cooperativeId: number;
-  originCityId: number;
-  destinationCityId: number;
+  originCityId: number | string;
+  destinationCityId: number | string;
   departureTime: string;
   status: string;
   antResolution: string;

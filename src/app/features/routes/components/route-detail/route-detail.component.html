@@ -26,7 +26,13 @@
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-          <h2 class="card-title mb-1">{{ frequencyData.originCity.name }} - {{ frequencyData.destinationCity.name }}</h2>
+          <h2 class="card-title mb-1">
+            @if (frequencyData.originCity && frequencyData.destinationCity) {
+              {{ frequencyData.originCity.name }} - {{ frequencyData.destinationCity.name }}
+            } @else {
+              Ciudades: {{ frequencyData.originCityId }} - {{ frequencyData.destinationCityId }}
+            }
+          </h2>
           <p class="text-muted">Frecuencia de viaje</p>
         </div>
         <span class="status-badge" [ngClass]="{
@@ -42,11 +48,29 @@
         <div class="col-md-6">
           <div class="mb-3">
             <span class="detail-label">Ciudad de origen:</span>
-            <div>{{ frequencyData.originCity.name }} ({{ frequencyData.originCity.province }})</div>
+            <div>
+              @if (frequencyData.originCity) {
+                {{ frequencyData.originCity.name }} 
+                @if (frequencyData.originCity.province) {
+                  ({{ frequencyData.originCity.province }})
+                }
+              } @else {
+                ID: {{ frequencyData.originCityId }}
+              }
+            </div>
           </div>
           <div class="mb-3">
             <span class="detail-label">Ciudad de destino:</span>
-            <div>{{ frequencyData.destinationCity.name }} ({{ frequencyData.destinationCity.province }})</div>
+            <div>
+              @if (frequencyData.destinationCity) {
+                {{ frequencyData.destinationCity.name }} 
+                @if (frequencyData.destinationCity.province) {
+                  ({{ frequencyData.destinationCity.province }})
+                }
+              } @else {
+                ID: {{ frequencyData.destinationCityId }}
+              }
+            </div>
           </div>
         </div>
         <div class="col-md-6">
@@ -57,34 +81,32 @@
           <div class="mb-3">
             <span class="detail-label">Resolución ANT:</span>
             <div>
-              <a href="{{ frequencyData.antResolution }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-type-pdf" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-                  <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"></path>
-                  <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"></path>
-                  <path d="M17 18h2"></path>
-                  <path d="M20 15h-3v6"></path>
-                  <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"></path>
-                </svg>
-                Ver documento
-              </a>
+              @if (frequencyData.antResolution) {
+                <a href="{{ frequencyData.antResolution }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-type-pdf" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                    <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4"></path>
+                    <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6"></path>
+                    <path d="M17 18h2"></path>
+                    <path d="M20 15h-3v6"></path>
+                    <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z"></path>
+                  </svg>
+                  Ver documento
+                </a>
+              } @else {
+                <span class="text-muted">No disponible</span>
+              }
             </div>
           </div>
         </div>
       </div>
       
       <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <div class="mb-3">
             <span class="detail-label">Cooperativa:</span>
             <div>{{ cooperativeName }}</div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <span class="detail-label">ID de Cooperativa:</span>
-            <div>{{ frequencyData.cooperativeId }}</div>
           </div>
         </div>
       </div>
@@ -118,6 +140,24 @@
             <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
           </svg>
           Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="card">
+    <div class="card-body text-center py-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-triangle mb-2 text-warning" width="40" height="40" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z"></path>
+        <path d="M12 9v4"></path>
+        <path d="M12 17h.01"></path>
+      </svg>
+      <h3>Frecuencia no encontrada</h3>
+      <p class="text-muted">No se pudo cargar la información de esta frecuencia</p>
+      <div>
+        <button class="btn btn-primary" [routerLink]="['/rutas']">
+          Volver al listado
         </button>
       </div>
     </div>
