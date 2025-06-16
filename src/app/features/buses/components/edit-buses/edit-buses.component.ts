@@ -30,27 +30,23 @@ export class EditBusesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const busId = this.route.snapshot.paramMap.get('id');
-    if (busId) {
-      this.loadBus(busId);
-    }
-  }
-
-  private loadBus(id: string): void {
-    this.loadingService.setLoading(true);
-    this.busesService.getBusById(id).subscribe({
-      next: (bus) => {
-        this.currentBus = bus;
-        this.loadingService.setLoading(false);
-      },
-      error: (error) => {
-        this.loadingService.setLoading(false);
-        this.alertService.showAlert({
-          alertType: AlertType.ERROR,
-          mainMessage: 'Error al cargar el bus',
-          subMessage: error.message
+    this.route.params.subscribe((params) => {
+      const id = +params['id']; // Convertir a número con el operador +
+      if (id) {
+        this.busesService.getBusById(id).subscribe({
+          next: (bus) => {
+            this.currentBus = bus;
+            this.isLoading = false;
+          },
+          error: (error) => {
+            this.alertService.showAlert({
+              alertType: AlertType.ERROR,
+              mainMessage: 'Error al cargar el bus',
+              subMessage: error.message,
+            });
+            this.isLoading = false;
+          },
         });
-        this.router.navigate(['/buses']);
       }
     });
   }

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { RouteSheetService } from '../../services/route-sheet.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
@@ -18,7 +19,7 @@ import { IIntermediateStop, IIntermediateStopRequest } from '../../models/interm
 @Component({
   selector: 'app-create-update-route-sheet',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './create-update-route-sheet.component.html',
   styleUrl: './create-update-route-sheet.component.css'
 })
@@ -41,6 +42,7 @@ export class CreateUpdateRouteSheetComponent implements OnInit {
   protected buses: IBuses[] = [];
   protected frequencies: IFrequency[] = [];
   protected intermediateStops: IIntermediateStop[] = [];
+  protected statusOptions: string[] = ['Activo', 'Pendiente', 'Completado', 'Cancelado'];
   
   // Variables para el formulario de múltiples pasos
   protected currentStep: number = 1;
