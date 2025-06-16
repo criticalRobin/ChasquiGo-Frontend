@@ -23,9 +23,14 @@ export class BusService {
   createBus(bus: Bus): Observable<Bus> {
     return this.http.post<Bus>(this.apiUrl, bus);
   }
-
   updateBus(bus: Bus): Observable<Bus> {
-    return this.http.put<Bus>(`${this.apiUrl}/${bus.id}`, bus);
+    const busId = bus.id;
+    
+    // Crear una copia sin el ID para enviar al backend
+    const busCopy = { ...bus };
+    delete busCopy.id;
+    
+    return this.http.put<Bus>(`${this.apiUrl}/${busId}`, busCopy);
   }
 
   deleteBus(id: number): Observable<void> {

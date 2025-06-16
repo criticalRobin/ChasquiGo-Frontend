@@ -1,11 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, AfterViewInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormBusesComponent } from './components/form-buses/form-buses.component';
 import { BusesThreeComponent } from './components/buses-three/buses-three.component';
 import { ListBusesComponent } from './components/list-buses/list-buses.component';
-import { Bus } from './models/bus.model';
-import { BusService } from './services/bus.service';
+import { IBuses } from './models/buses.interface';
+import { BusesService } from './services/buses.service';
 import { BusFormCacheService } from './services/bus-form-cache.service';
 
 @Component({
@@ -17,16 +17,16 @@ import { BusFormCacheService } from './services/bus-form-cache.service';
 })
 export class BusesComponent implements OnInit, AfterViewInit {
   currentStep = 1;
-  currentBus: Bus | null = null;
+  currentBus: IBuses | null = null;
   isFormValid = false;
   isEditing = false;
   viewMode: 'list' | 'form' = 'list'; // Por defecto mostrar la lista de buses
-  
-  constructor(
-    private busService: BusService,
+    constructor(
+    private busService: BusesService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private busFormCacheService: BusFormCacheService
+    private busFormCacheService: BusFormCacheService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -47,19 +47,12 @@ export class BusesComponent implements OnInit, AfterViewInit {
       this.cdr.markForCheck();
     });
   }
-  
-  startEditingBus(bus: Bus): void {
-    this.ngZone.run(() => {
-      this.viewMode = 'form';
-      this.currentStep = 1;
-      this.currentBus = { ...bus }; // Crear una copia para evitar modificaciones directas
-      this.isEditing = true;
-      
-      // Cache the form data
-      this.busFormCacheService.cacheFormData(this.currentBus);
-      
-      this.cdr.markForCheck();
-    });
+    startEditingBus(bus: IBuses): void {
+    if (bus && bus.id) {
+      this.router.navigate(['/buses/editar', bus.id]);
+    } else {
+      console.error('No se puede editar el bus porque no tiene un ID válido');
+    }
   }
   
   returnToList(): void {
@@ -70,7 +63,7 @@ export class BusesComponent implements OnInit, AfterViewInit {
     });
   }
   
-  onFormSubmitted(bus: Bus): void {
+  onFormSubmitted(bus: IBuses): void {
     // Use NgZone to run this outside Angular's change detection
     this.ngZone.run(() => {
       this.currentBus = bus;
@@ -111,6 +104,7 @@ export class BusesComponent implements OnInit, AfterViewInit {
       const busCopy: any = { ...this.currentBus };
       
       // Eliminar propiedades que no deben enviarse al backend
+      delete busCopy.id;
       delete busCopy.isDeleted;
       delete busCopy.capacity;
       delete busCopy.floorCount;
@@ -131,18 +125,17 @@ export class BusesComponent implements OnInit, AfterViewInit {
       // Clean the seats array to match API expectations
       if (busCopy.seats && busCopy.seats.length > 0) {
         console.log('Using configured seats:', busCopy.seats);
-          // Map seats to the format expected by the API
+        // Map seats to the format expected by the API
         busCopy.seats = busCopy.seats.map((seat: any) => {
-          // Keep only the fields needed by the API
+          // Keep only the fields needed by the API and ensure type is uppercase
           return {
             number: seat.number,
-            type: seat.type,
+            type: seat.type.toUpperCase(), // Asegurar que el tipo esté en mayúsculas
             location: seat.location
           };
         });
       } else {
         // Si no hay asientos configurados, crear asientos por defecto
-        // usando capacity y floorCount como valores locales (no se envían al backend)
         console.log('No seats configured, generating defaults...');
         busCopy.seats = this.generateDefaultSeats(this.currentBus.capacity || 20, this.currentBus.floorCount || 1);
       }
@@ -150,17 +143,19 @@ export class BusesComponent implements OnInit, AfterViewInit {
       console.log('Sending bus data to backend:', busCopy);
       
       if (this.isEditing) {
-        this.busService.updateBus(busCopy).subscribe({
+        this.busService.updateBus(busCopy.id!, busCopy).subscribe({
           next: () => {
             this.ngZone.run(() => {
               this.returnToList();
             });
-          },          error: (error) => {
+          },
+          error: (error) => {
             console.error('Error al actualizar el bus:', error);
           }
         });
       } else {
-        this.busService.createBus(busCopy).subscribe({next: () => {
+        this.busService.createBus(busCopy).subscribe({
+          next: () => {
             this.ngZone.run(() => {
               this.returnToList();
             });
@@ -173,7 +168,7 @@ export class BusesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateBusSeats(updatedBus: Bus): void {
+  updateBusSeats(updatedBus: IBuses): void {
     // Update the current bus with the configured seats
     this.currentBus = updatedBus;
   }
@@ -185,40 +180,14 @@ export class BusesComponent implements OnInit, AfterViewInit {
    * @returns Array of seat objects in the format expected by the API
    */  private generateDefaultSeats(capacity: number, floorCount: number): any[] {
     const seats = [];
-    // Total capacity per floor (each floor gets the full capacity)
-    const capacityPerFloor = capacity;
-    // Seats per row (typically 4 - 2 on each side of aisle)
-    const seatsPerRow = 4;
-    // Calculate rows needed per floor
-    const rowsPerFloor = Math.ceil(capacityPerFloor / seatsPerRow);
-    // Total VIP seats (10% of total capacity per floor, rounded down)
-    const vipSeatCount = Math.floor(capacityPerFloor * 0.1);
+    const seatsPerFloor = Math.ceil(capacity / floorCount);
     
-    let seatNumber = 1; // Contador secuencial global para los asientos
-    
-    for (let floor = 1; floor <= floorCount; floor++) {
-      let floorSeatCounter = 0;
-      
-      for (let row = 1; row <= rowsPerFloor && floorSeatCounter < capacityPerFloor; row++) {
-        // Each row has 4 seats max (2 on each side of aisle)
-        for (let col = 0; col < 4 && floorSeatCounter < capacityPerFloor; col++) {
-          floorSeatCounter++;
-          
-          // Determine seat location (window or aisle)
-          const isWindow = col === 0 || col === 3;
-          const location = isWindow ? 'ventana' : 'pasillo';
-          
-          // Determine seat type (first 10% are VIP)
-          const type = floorSeatCounter <= vipSeatCount ? 'VIP' : 'NORMAL';
-          
-          seats.push({
-            number: seatNumber.toString(), // Usar número secuencial como string
-            type: type,
-            location: location
-          });
-            seatNumber++; // Incrementar el contador secuencial
-        }
-      }
+    for (let i = 1; i <= capacity; i++) {
+      seats.push({
+        number: i.toString(),
+        type: 'NORMAL', // Asegurar que el tipo por defecto esté en mayúsculas
+        location: i % 2 === 0 ? 'pasillo' : 'ventana'
+      });
     }
     
     return seats;

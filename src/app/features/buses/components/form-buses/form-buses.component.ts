@@ -2,10 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { IBuses } from '../../models/buses.interface';
+import { IBuses, IBusSeat } from '../../models/buses.interface';
 import { BusesService } from '../../services/buses.service';
 import { CooperativeService } from '../../services/cooperative.service';
 import { Bus } from '../../models/bus.model';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 interface Cooperative {
   id: number;
@@ -20,14 +22,16 @@ interface Cooperative {
   styleUrl: './form-buses.component.css'
 })
 export class FormBusesComponent implements OnInit {
-  @Output() formSubmitted = new EventEmitter<Bus>();
-  @Input() cachedBusData: Bus | null = null;
+  @Output() formSubmitted = new EventEmitter<IBuses>();
+  @Input() cachedBusData: IBuses | null = null;
+  @Input() isEditMode: boolean = false;
   
   busForm: FormGroup;
   isEditing = false;
   busId: number | null = null;
   photos: string[] = [];
   cooperatives: Cooperative[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -35,32 +39,24 @@ export class FormBusesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cooperativeService: CooperativeService
-  ) {    this.busForm = this.fb.group({
-      cooperativeId: [null, Validators.required],
-      licensePlate: ['', [Validators.required, Validators.pattern(/^[A-Z]{3}-[0-9]{3}$/)]],
+  ) {
+    this.busForm = this.fb.group({
+      cooperativeId: ['', Validators.required],
+      licensePlate: ['', Validators.required],
       chassisBrand: ['', Validators.required],
       bodyworkBrand: ['', Validators.required],
-      capacity: [0, [Validators.required, Validators.min(1)]],
-      stoppageDays: [0, [Validators.required, Validators.min(0)]],
-      floorCount: [1, Validators.required],
-      busTypeId: [1, Validators.required] // Valor por defecto 1, ajustar según las opciones disponibles
+      stoppageDays: [0, Validators.required],
+      busTypeId: [1, Validators.required],
+      capacity: [20, [Validators.required, Validators.min(1)]],
+      floorCount: [1, [Validators.required, Validators.min(1), Validators.max(2)]]
     });
   }
+
   ngOnInit(): void {
     this.loadCooperatives();
     
-    // If we have cached bus data, populate the form with it
     if (this.cachedBusData) {
-      this.busForm.patchValue({
-        cooperativeId: this.cachedBusData.cooperativeId,
-        licensePlate: this.cachedBusData.licensePlate,
-        chassisBrand: this.cachedBusData.chassisBrand,
-        bodyworkBrand: this.cachedBusData.bodyworkBrand,
-        capacity: this.cachedBusData.capacity,
-        stoppageDays: this.cachedBusData.stoppageDays,
-        floorCount: this.cachedBusData.floorCount
-      });
-      
+      this.busForm.patchValue(this.cachedBusData);
       if (this.cachedBusData.photos) {
         this.photos = [...this.cachedBusData.photos];
       }
@@ -133,13 +129,35 @@ export class FormBusesComponent implements OnInit {
 
   onSubmit(): void {
     if (this.busForm.valid) {
-      const busData: Bus = {
+      const busData: IBuses = {
         ...this.busForm.value,
         photos: this.photos,
-        seats: []
+        seats: this.generateDefaultSeats(
+          this.busForm.value.capacity,
+          this.busForm.value.floorCount
+        )
       };
       this.formSubmitted.emit(busData);
     }
+  }
+
+  private generateDefaultSeats(capacity: number, floorCount: number): IBusSeat[] {
+    const seats: IBusSeat[] = [];
+    const seatsPerFloor = capacity; // Capacidad por piso
+    
+    // Generar asientos para cada piso
+    for (let floor = 1; floor <= floorCount; floor++) {
+      for (let i = 1; i <= seatsPerFloor; i++) {
+        const seatNumber = (floor - 1) * seatsPerFloor + i;
+        seats.push({
+          number: seatNumber.toString(),
+          type: 'NORMAL',
+          location: i % 2 === 0 ? 'pasillo' : 'ventana',
+          floor
+        });
+      }
+    }
+    return seats;
   }
 
   cancel(): void {
