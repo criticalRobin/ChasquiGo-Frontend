@@ -135,22 +135,15 @@
           type="button"
           class="btn btn-link"
           [routerLink]="['/drivers']"
-          [disabled]="isLoading"
         >
           Cancelar
         </button>
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="driverForm.invalid || isLoading"
+          [disabled]="driverForm.invalid"
         >
-          @if (isLoading) {
-          <span
-            class="spinner-border spinner-border-sm me-2"
-            role="status"
-            aria-hidden="true"
-          ></span>
-          } Registrar Conductor
+          Registrar Conductor
         </button>
       </div>
     </div>

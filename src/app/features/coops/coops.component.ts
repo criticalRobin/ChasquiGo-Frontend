@@ -19,7 +19,6 @@ import { CoopFormComponent } from './components/coop-form/coop-form.component';
   styleUrl: './coops.component.css',
 })
 export class CoopsComponent implements OnInit, OnDestroy {
-  protected isLoading: boolean = false;
   protected currentCoop: ICoopResponse | null = null;
   protected isEditing: boolean = false;
   protected adminId: number | null = null;
@@ -61,11 +60,9 @@ export class CoopsComponent implements OnInit, OnDestroy {
   }
 
   private loadCoopData(adminId: number): void {
-    this.isLoading = true;
     this.coopsService.getCoopByAdminId(adminId).subscribe({
       next: (coop) => {
         this.currentCoop = coop;
-        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading cooperative data:', error);
@@ -73,7 +70,6 @@ export class CoopsComponent implements OnInit, OnDestroy {
           alertType: AlertType.ERROR,
           mainMessage: 'Error al cargar los datos de la cooperativa'
         });
-        this.isLoading = false;
       }
     });
   }
@@ -84,12 +80,10 @@ export class CoopsComponent implements OnInit, OnDestroy {
 
   protected onFormSubmit(coopData: ICoopRequest): void {
     if (this.currentCoop && this.adminId) {
-      this.isLoading = true;
       this.coopsService.updateCoop(this.currentCoop.id, coopData, this.adminId).subscribe({
         next: (updatedCoop) => {
           this.currentCoop = updatedCoop;
           this.isEditing = false;
-          this.isLoading = false;
           this.alertService.showAlert({
             alertType: AlertType.SUCCESS,
             mainMessage: 'Cooperativa actualizada exitosamente'
@@ -101,7 +95,6 @@ export class CoopsComponent implements OnInit, OnDestroy {
             alertType: AlertType.ERROR,
             mainMessage: 'Error al actualizar la cooperativa'
           });
-          this.isLoading = false;
         }
       });
     }

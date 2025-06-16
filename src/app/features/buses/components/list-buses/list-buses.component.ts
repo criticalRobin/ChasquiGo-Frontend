@@ -25,7 +25,6 @@ export class ListBusesComponent implements OnInit {
   buses: Bus[] = [];
   cooperatives: Cooperative[] = [];
   selectedCooperativeId: number | null = null;
-  loading: boolean = true;
   busToDelete: Bus | null = null;
   showDeleteModal = false;
   
@@ -51,32 +50,26 @@ export class ListBusesComponent implements OnInit {
   }
   
   loadBuses(): void {
-    this.loading = true;
     this.busService.getBuses().subscribe({
       next: (buses) => {
         this.buses = buses;
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading buses:', error);
-        this.loading = false;
       }
     });
   }
   
   filterBuses(): void {
-    this.loading = true;
     if (this.selectedCooperativeId) {
       // En un escenario real, deberías tener un endpoint para filtrar por cooperativa
       // Por ahora, simplemente filtramos en el cliente
       this.busService.getBuses().subscribe({
         next: (buses) => {
           this.buses = buses.filter(bus => bus.cooperativeId === this.selectedCooperativeId);
-          this.loading = false;
         },
         error: (error) => {
           console.error('Error filtering buses:', error);
-          this.loading = false;
         }
       });
     } else {
@@ -101,7 +94,6 @@ export class ListBusesComponent implements OnInit {
   
   confirmDelete(): void {
     if (this.busToDelete && this.busToDelete.id) {
-      this.loading = true;
       this.busService.deleteBus(this.busToDelete.id).subscribe({
         next: () => {
           this.loadBuses();
@@ -109,7 +101,6 @@ export class ListBusesComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al eliminar el bus:', error);
-          this.loading = false;
           this.cancelDelete();
         }
       });

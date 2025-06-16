@@ -15,177 +15,169 @@
 
 <div class="card">
   <div class="card-body">
-    @if (isLoading) {
-      <div class="d-flex justify-content-center my-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Cargando...</span>
+    <form [formGroup]="frequencyForm" (ngSubmit)="onSubmit()">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="originCityId" class="form-label">Ciudad de origen</label>
+          <select
+            class="form-select"
+            id="originCityId"
+            formControlName="originCityId"
+            [ngClass]="{'is-invalid': frequencyForm.get('originCityId')?.invalid && frequencyForm.get('originCityId')?.touched}"
+          >
+            <option value="">Seleccione una ciudad</option>
+            @for (city of cities; track city.id) {
+              <option [value]="city.id">{{ city.name }} ({{ city.province }})</option>
+            }
+          </select>
+          @if (frequencyForm.get('originCityId')?.invalid && frequencyForm.get('originCityId')?.touched) {
+            <div class="invalid-feedback">
+              La ciudad de origen es requerida
+            </div>
+          }
+        </div>
+        
+        <div class="col-md-6">
+          <label for="destinationCityId" class="form-label">Ciudad de destino</label>
+          <select
+            class="form-select"
+            id="destinationCityId"
+            formControlName="destinationCityId"
+            [ngClass]="{'is-invalid': frequencyForm.get('destinationCityId')?.invalid && frequencyForm.get('destinationCityId')?.touched}"
+          >
+            <option value="">Seleccione una ciudad</option>
+            @for (city of cities; track city.id) {
+              <option [value]="city.id">{{ city.name }} ({{ city.province }})</option>
+            }
+          </select>
+          @if (frequencyForm.get('destinationCityId')?.invalid && frequencyForm.get('destinationCityId')?.touched) {
+            <div class="invalid-feedback">
+              La ciudad de destino es requerida
+            </div>
+          }
         </div>
       </div>
-    } @else {
-      <form [formGroup]="frequencyForm" (ngSubmit)="onSubmit()">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="originCityId" class="form-label">Ciudad de origen</label>
-            <select
-              class="form-select"
-              id="originCityId"
-              formControlName="originCityId"
-              [ngClass]="{'is-invalid': frequencyForm.get('originCityId')?.invalid && frequencyForm.get('originCityId')?.touched}"
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="departureTime" class="form-label">Hora de salida</label>
+          <div class="input-group">
+            <select 
+              class="form-select" 
+              id="departureHour" 
+              [value]="getHourFromTime(frequencyForm.get('departureTime')?.value)" 
+              (change)="updateTime($event, 'hour')"
+              [ngClass]="{'is-invalid': frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched}"
             >
-              <option value="">Seleccione una ciudad</option>
-              @for (city of cities; track city.id) {
-                <option [value]="city.id">{{ city.name }} ({{ city.province }})</option>
+              <option value="" disabled>Hora</option>
+              @for (hour of hours; track hour) {
+                <option [value]="hour">{{ hour }}</option>
               }
             </select>
-            @if (frequencyForm.get('originCityId')?.invalid && frequencyForm.get('originCityId')?.touched) {
-              <div class="invalid-feedback">
-                La ciudad de origen es requerida
-              </div>
-            }
-          </div>
-          
-          <div class="col-md-6">
-            <label for="destinationCityId" class="form-label">Ciudad de destino</label>
-            <select
-              class="form-select"
-              id="destinationCityId"
-              formControlName="destinationCityId"
-              [ngClass]="{'is-invalid': frequencyForm.get('destinationCityId')?.invalid && frequencyForm.get('destinationCityId')?.touched}"
+            <span class="input-group-text">:</span>
+            <select 
+              class="form-select" 
+              id="departureMinute" 
+              [value]="getMinuteFromTime(frequencyForm.get('departureTime')?.value)" 
+              (change)="updateTime($event, 'minute')"
+              [ngClass]="{'is-invalid': frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched}"
             >
-              <option value="">Seleccione una ciudad</option>
-              @for (city of cities; track city.id) {
-                <option [value]="city.id">{{ city.name }} ({{ city.province }})</option>
+              <option value="" disabled>Min</option>
+              @for (minute of minutes; track minute) {
+                <option [value]="minute">{{ minute }}</option>
               }
             </select>
-            @if (frequencyForm.get('destinationCityId')?.invalid && frequencyForm.get('destinationCityId')?.touched) {
-              <div class="invalid-feedback">
-                La ciudad de destino es requerida
-              </div>
-            }
+            <select 
+              class="form-select" 
+              id="departureAmPm" 
+              [value]="getAmPmFromTime(frequencyForm.get('departureTime')?.value)" 
+              (change)="updateTime($event, 'ampm')"
+              [ngClass]="{'is-invalid': frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched}"
+            >
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
           </div>
-        </div>
-        
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="departureTime" class="form-label">Hora de salida</label>
-            <div class="input-group">
-              <select 
-                class="form-select" 
-                id="departureHour" 
-                [value]="getHourFromTime(frequencyForm.get('departureTime')?.value)" 
-                (change)="updateTime($event, 'hour')"
-                [ngClass]="{'is-invalid': frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched}"
-              >
-                <option value="" disabled>Hora</option>
-                @for (hour of hours; track hour) {
-                  <option [value]="hour">{{ hour }}</option>
-                }
-              </select>
-              <span class="input-group-text">:</span>
-              <select 
-                class="form-select" 
-                id="departureMinute" 
-                [value]="getMinuteFromTime(frequencyForm.get('departureTime')?.value)" 
-                (change)="updateTime($event, 'minute')"
-                [ngClass]="{'is-invalid': frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched}"
-              >
-                <option value="" disabled>Min</option>
-                @for (minute of minutes; track minute) {
-                  <option [value]="minute">{{ minute }}</option>
-                }
-              </select>
-              <select 
-                class="form-select" 
-                id="departureAmPm" 
-                [value]="getAmPmFromTime(frequencyForm.get('departureTime')?.value)" 
-                (change)="updateTime($event, 'ampm')"
-                [ngClass]="{'is-invalid': frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched}"
-              >
-                <option value="AM">AM</option>
-                <option value="PM">PM</option>
-              </select>
+          <input type="hidden" formControlName="departureTime" />
+          @if (frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched) {
+            <div class="invalid-feedback d-block">
+              La hora de salida es requerida
             </div>
-            <input type="hidden" formControlName="departureTime" />
-            @if (frequencyForm.get('departureTime')?.invalid && frequencyForm.get('departureTime')?.touched) {
-              <div class="invalid-feedback d-block">
-                La hora de salida es requerida
-              </div>
-            }
-          </div>
-          
-          <div class="col-md-6">
-            <label for="status" class="form-label">Estado</label>
-            <select
-              class="form-select"
-              id="status"
-              formControlName="status"
-              [ngClass]="{'is-invalid': frequencyForm.get('status')?.invalid && frequencyForm.get('status')?.touched}"
-            >
-              <option value="Activo">Activo</option>
-              <option value="Inactivo">Inactivo</option>
-              <option value="Pendiente">Pendiente</option>
-            </select>
-            @if (frequencyForm.get('status')?.invalid && frequencyForm.get('status')?.touched) {
-              <div class="invalid-feedback">
-                El estado es requerido
-              </div>
-            }
-          </div>
+          }
         </div>
         
-        <div class="row mb-4">
-          <div class="col-md-12">
-            <label for="antResolution" class="form-label">
-              Resolución ANT (PDF)
-              @if (!isEditMode) {
-                <span class="text-danger">*</span>
-              }
-            </label>
-            <div class="input-group">
-              <input
-                type="file"
-                class="form-control"
-                id="antResolution"
-                accept="application/pdf"
-                (change)="onFileSelected($event)"
-                [ngClass]="{'is-invalid': (!selectedFile && !uploadedFileUrl && !isEditMode)}"
-              />
-              @if (uploadedFileUrl) {
-                <a href="{{ uploadedFileUrl }}" target="_blank" class="btn btn-outline-secondary">
-                  Ver PDF actual
-                </a>
-              }
-            </div>
-            @if (!selectedFile && !uploadedFileUrl && !isEditMode) {
-              <div class="text-danger mt-1 small">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-circle" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                  <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
-                  <path d="M12 8l0 4"></path>
-                  <path d="M12 16l.01 0"></path>
-                </svg>
-                La resolución ANT es requerida para crear una nueva frecuencia
-              </div>
-            }
-            <small class="form-text text-muted">
-              Suba el documento PDF de la resolución ANT para esta frecuencia
-            </small>
-          </div>
-        </div>
-        
-        <div class="d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-outline-secondary" [routerLink]="['/frecuencias']">
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="btn btn-primary" 
-            [disabled]="frequencyForm.invalid || (!isEditMode && !selectedFile && !uploadedFileUrl)"
+        <div class="col-md-6">
+          <label for="status" class="form-label">Estado</label>
+          <select
+            class="form-select"
+            id="status"
+            formControlName="status"
+            [ngClass]="{'is-invalid': frequencyForm.get('status')?.invalid && frequencyForm.get('status')?.touched}"
           >
-            {{ isEditMode ? 'Actualizar' : 'Crear' }} Frecuencia
-          </button>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+            <option value="Pendiente">Pendiente</option>
+          </select>
+          @if (frequencyForm.get('status')?.invalid && frequencyForm.get('status')?.touched) {
+            <div class="invalid-feedback">
+              El estado es requerido
+            </div>
+          }
         </div>
-      </form>
-    }
+      </div>
+      
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <label for="antResolution" class="form-label">
+            Resolución ANT (PDF)
+            @if (!isEditMode) {
+              <span class="text-danger">*</span>
+            }
+          </label>
+          <div class="input-group">
+            <input
+              type="file"
+              class="form-control"
+              id="antResolution"
+              accept="application/pdf"
+              (change)="onFileSelected($event)"
+              [ngClass]="{'is-invalid': (!selectedFile && !uploadedFileUrl && !isEditMode)}"
+            />
+            @if (uploadedFileUrl) {
+              <a href="{{ uploadedFileUrl }}" target="_blank" class="btn btn-outline-secondary">
+                Ver PDF actual
+              </a>
+            }
+          </div>
+          @if (!selectedFile && !uploadedFileUrl && !isEditMode) {
+            <div class="text-danger mt-1 small">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-circle" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                <path d="M12 8l0 4"></path>
+                <path d="M12 16l.01 0"></path>
+              </svg>
+              La resolución ANT es requerida para crear una nueva frecuencia
+            </div>
+          }
+          <small class="form-text text-muted">
+            Suba el documento PDF de la resolución ANT para esta frecuencia
+          </small>
+        </div>
+      </div>
+      
+      <div class="d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary" [routerLink]="['/frecuencias']">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="frequencyForm.invalid || (!isEditMode && !selectedFile && !uploadedFileUrl)"
+        >
+          {{ isEditMode ? 'Actualizar' : 'Crear' }} Frecuencia
+        </button>
+      </div>
+    </form>
   </div>
 </div> 

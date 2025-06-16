@@ -86,16 +86,12 @@
     <div class="btn-list">
       <button type="button" 
               class="btn btn-link" 
-              (click)="onCancel()"
-              [disabled]="isLoading">
+              (click)="onCancel()">
         Cancelar
       </button>
       <button type="submit" 
               class="btn btn-primary" 
-              [disabled]="coopForm.invalid || isLoading">
-        @if (isLoading) {
-          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        }
+              [disabled]="coopForm.invalid">
         Guardar Cambios
       </button>
     </div>

@@ -22,21 +22,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="loading">
-            <td colspan="6" class="text-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="!loading && buses.length === 0">
+          <tr *ngIf="buses.length === 0">
             <td colspan="6" class="text-center">No hay buses registrados</td>
           </tr>
-          <tr *ngFor="let bus of buses">            <td>{{ bus.licensePlate }}</td>
+          <tr *ngFor="let bus of buses">
+            <td>{{ bus.licensePlate }}</td>
             <td>{{ bus.chassisBrand }}</td>
             <td>{{ bus.bodyworkBrand }}</td>
             <td>{{ getCooperativeName(bus.cooperativeId) }}</td>
-            <td>{{ bus.seats.length }} asientos</td>            <td>
+            <td>{{ bus.seats.length }} asientos</td>
+            <td>
               <div class="btn-list">
                 <button type="button" class="btn btn-primary btn-sm" (click)="onEditBus(bus)">
                   Editar

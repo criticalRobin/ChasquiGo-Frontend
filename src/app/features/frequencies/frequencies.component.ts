@@ -21,7 +21,6 @@ export class RoutesComponent implements OnInit {
   private readonly loginService: LoginService = inject(LoginService);
   
   protected frequencies: IFrequency[] = [];
-  protected isLoading: boolean = false;
   protected cooperative: ICooperative | null = null;
 
   ngOnInit(): void {
@@ -32,14 +31,11 @@ export class RoutesComponent implements OnInit {
   }
 
   loadFrequencies(): void {
-    this.isLoading = true;
     this.routesService.getAllFrequencies().subscribe({
       next: (frequencies) => {
         this.frequencies = frequencies;
-        this.isLoading = false;
       },
       error: (error) => {
-        this.isLoading = false;
         this.alertService.showAlert({
           alertType: AlertType.ERROR,
           mainMessage: 'Error al cargar frecuencias',
@@ -51,7 +47,6 @@ export class RoutesComponent implements OnInit {
 
   deleteFrequency(id: number): void {
     if (confirm('¿Estás seguro de eliminar esta frecuencia?')) {
-      this.isLoading = true;
       this.routesService.deleteFrequency(id).subscribe({
         next: () => {
           this.loadFrequencies();
@@ -62,7 +57,6 @@ export class RoutesComponent implements OnInit {
           });
         },
         error: (error) => {
-          this.isLoading = false;
           this.alertService.showAlert({
             alertType: AlertType.ERROR,
             mainMessage: 'Error al eliminar frecuencia',

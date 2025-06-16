@@ -30,15 +30,7 @@
 </button>
 
 <div class="container-xl">
-  @if (isLoading) {
-  <div class="card">
-    <div class="card-body d-flex justify-content-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-    </div>
-  </div>
-  } @else if (drivers.length > 0) {
+  @if (drivers.length > 0) {
   <div class="row row-cards">
     @for (driver of drivers; track driver.id) {
     <div class="col-md-6 col-lg-4">

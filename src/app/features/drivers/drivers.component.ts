@@ -19,7 +19,6 @@ import { DriverCardComponent } from './components/driver-card/driver-card.compon
 })
 export class DriversComponent implements OnInit, OnDestroy {
   protected drivers: IDriver[] = [];
-  protected isLoading: boolean = false;
   protected currentCooperativeId: number | null = null;
   private subscriptions: Subscription = new Subscription();
 
@@ -30,7 +29,6 @@ export class DriversComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.isLoading = true;
     this.subscriptions.add(
       this.loginService.loggedInUser$.subscribe({
         next: (user: IBaseUser | null) => {
@@ -48,19 +46,16 @@ export class DriversComponent implements OnInit, OnDestroy {
                 },
                 error: (error) => {
                   console.error('Error loading cooperative:', error);
-                  this.isLoading = false;
                   // Optionally show an alert
                 },
               })
             );
           } else {
             console.warn('No logged in user ID found.');
-            this.isLoading = false;
           }
         },
         error: (error) => {
           console.error('Error fetching logged in user:', error);
-          this.isLoading = false;
         },
       })
     );
@@ -76,11 +71,9 @@ export class DriversComponent implements OnInit, OnDestroy {
             (user) =>
               user.role === 'DRIVER'
           );
-          this.isLoading = false;
         },
         error: (error) => {
           console.error('Error loading drivers:', error);
-          this.isLoading = false;
           // Optionally show an alert
         },
       })
