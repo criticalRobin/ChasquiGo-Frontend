@@ -1,4 +1,4 @@
-<div class="card driver-detail-card">
+<div class="card route-detail-card">
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-start mb-4">
       <div>
@@ -8,44 +8,67 @@
         </h2>
         <p class="text-muted">{{ driver.role }}</p>
       </div>
-      <div class="status-indicator">
-        <span class="status-badge d-flex align-items-center status-active">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="icon icon-tabler icon-tabler-circle-check me-1"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-            <path d="M9 12l2 2l4 -4" />
-          </svg>
-          Activo
+      <!-- <div class="status-indicator">
+        <span class="status-badge d-flex align-items-center" [ngClass]="{
+          'status-active': !driver.isDeleted,
+          'status-inactive': driver.isDeleted
+        }">
+          @if (!driver.isDeleted) {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="icon icon-tabler icon-tabler-circle-check me-1"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+              <path d="M9 12l2 2l4 -4" />
+            </svg>
+            Activo
+          } @else {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="icon icon-tabler icon-tabler-circle-x me-1"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+              <path d="M10 10l4 4m0 -4l-4 4" />
+            </svg>
+            Inactivo
+          }
         </span>
-      </div>
+      </div> -->
     </div>
 
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="mb-3">
           <span class="detail-label">Cédula/RUC:</span>
-          <div>{{ driver.idNumber }}</div>
+          <div class="text-secondary">{{ driver.idNumber }}</div>
         </div>
         <div class="mb-3">
           <span class="detail-label">Email:</span>
-          <div>{{ driver.email }}</div>
+          <div class="text-secondary">{{ driver.email }}</div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="mb-3">
           <span class="detail-label">Teléfono:</span>
-          <div>{{ driver.phone }}</div>
+          <div class="text-secondary">{{ driver.phone }}</div>
         </div>
       </div>
     </div>
