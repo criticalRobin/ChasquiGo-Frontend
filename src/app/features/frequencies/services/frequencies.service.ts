@@ -41,17 +41,11 @@ export class RoutesService {
     if (this.cooperativeId) {
       const frequencyWithCooperative = {
         ...frequency,
-        cooperativeId: this.cooperativeId,
-        originCityId: Number(frequency.originCityId),
-        destinationCityId: Number(frequency.destinationCityId)
+        cooperativeId: this.cooperativeId
       };
       return this.http.post<IFrequency>(this.baseUrl, frequencyWithCooperative);
     }
-    return this.http.post<IFrequency>(this.baseUrl, {
-      ...frequency,
-      originCityId: Number(frequency.originCityId),
-      destinationCityId: Number(frequency.destinationCityId)
-    });
+    return this.http.post<IFrequency>(this.baseUrl, frequency);
   }
 
   updateFrequency(id: number, frequency: IFrequencyRequest): Observable<IFrequency> {
@@ -59,17 +53,11 @@ export class RoutesService {
     if (this.cooperativeId) {
       const frequencyWithCooperative = {
         ...frequency,
-        cooperativeId: this.cooperativeId,
-        originCityId: Number(frequency.originCityId),
-        destinationCityId: Number(frequency.destinationCityId)
+        cooperativeId: this.cooperativeId
       };
       return this.http.put<IFrequency>(`${this.baseUrl}/${id}`, frequencyWithCooperative);
     }
-    return this.http.put<IFrequency>(`${this.baseUrl}/${id}`, {
-      ...frequency,
-      originCityId: Number(frequency.originCityId),
-      destinationCityId: Number(frequency.destinationCityId)
-    });
+    return this.http.put<IFrequency>(`${this.baseUrl}/${id}`, frequency);
   }
 
   deleteFrequency(id: number): Observable<void> {

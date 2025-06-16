@@ -5,7 +5,7 @@
       <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
     </li>
     <li class="breadcrumb-item">
-      <a [routerLink]="['/rutas']" class="text-primary-blue">Frecuencias</a>
+      <a [routerLink]="['/frecuencias']" class="text-primary-blue">Frecuencias</a>
     </li>
     <li class="breadcrumb-item active">
       <a href="#" class="text-secondary-yellow">Detalle</a>
@@ -35,13 +35,34 @@
           </h2>
           <p class="text-muted">Frecuencia de viaje</p>
         </div>
-        <span class="status-badge" [ngClass]="{
-          'status-active': frequencyData.status === 'activo' || frequencyData.status === 'Activo',
-          'status-inactive': frequencyData.status === 'inactivo' || frequencyData.status === 'Inactivo',
-          'status-pending': frequencyData.status === 'pendiente' || frequencyData.status === 'Pendiente'
-        }">
-          {{ frequencyData.status }}
-        </span>
+        <div class="status-indicator">
+          <span class="status-badge d-flex align-items-center" [ngClass]="{
+            'status-active': frequencyData.status === 'activo' || frequencyData.status === 'Activo',
+            'status-inactive': frequencyData.status === 'inactivo' || frequencyData.status === 'Inactivo',
+            'status-pending': frequencyData.status === 'pendiente' || frequencyData.status === 'Pendiente'
+          }">
+            @if (frequencyData.status === 'activo' || frequencyData.status === 'Activo') {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                <path d="M9 12l2 2l4 -4" />
+              </svg>
+            } @else if (frequencyData.status === 'inactivo' || frequencyData.status === 'Inactivo') {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-x me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                <path d="M10 10l4 4m0 -4l-4 4" />
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+            }
+            {{ frequencyData.status }}
+          </span>
+        </div>
       </div>
       
       <div class="row mb-4">
@@ -76,7 +97,7 @@
         <div class="col-md-6">
           <div class="mb-3">
             <span class="detail-label">Hora de salida:</span>
-            <div>{{ frequencyData.departureTime | date:'shortTime' }}</div>
+            <div>{{ formatTimeDisplay(frequencyData.departureTime) }}</div>
           </div>
           <div class="mb-3">
             <span class="detail-label">Resolución ANT:</span>
@@ -102,17 +123,8 @@
         </div>
       </div>
       
-      <div class="row mb-3">
-        <div class="col-md-12">
-          <div class="mb-3">
-            <span class="detail-label">Cooperativa:</span>
-            <div>{{ cooperativeName }}</div>
-          </div>
-        </div>
-      </div>
-      
       <div class="d-flex justify-content-end gap-2 mt-4">
-        <button class="btn btn-outline-secondary" [routerLink]="['/rutas']">
+        <button class="btn btn-outline-secondary" [routerLink]="['/frecuencias']">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M5 12l14 0"></path>
@@ -121,7 +133,7 @@
           </svg>
           Volver
         </button>
-        <button class="btn btn-outline-primary" [routerLink]="['/rutas/editar', frequencyId]">
+        <button class="btn btn-outline-primary" [routerLink]="['/frecuencias/editar', frequencyId]">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
@@ -156,7 +168,7 @@
       <h3>Frecuencia no encontrada</h3>
       <p class="text-muted">No se pudo cargar la información de esta frecuencia</p>
       <div>
-        <button class="btn btn-primary" [routerLink]="['/rutas']">
+        <button class="btn btn-primary" [routerLink]="['/frecuencias']">
           Volver al listado
         </button>
       </div>

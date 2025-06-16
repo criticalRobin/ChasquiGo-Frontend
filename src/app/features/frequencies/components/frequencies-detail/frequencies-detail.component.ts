@@ -1,22 +1,20 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { RoutesService } from '../../services/routes.service';
+import { RoutesService } from '../../services/frequencies.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
 import { LoginService } from '@core/login/services/login.service';
-import { ICooperative } from '@features/coops/models/cooperative.interface';
 import { IFrequency } from '../../models/frequency.interface';
 import { CitiesService } from '../../services/cities.service';
-import { ICity } from '../../models/city.interface';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-route-detail',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './route-detail.component.html',
-  styleUrl: './route-detail.component.css',
+  templateUrl: './frequencies-detail.component.html',
+  styleUrl: './frequencies-detail.component.css',
 })
 export class RouteDetailComponent implements OnInit {
   private readonly routesService: RoutesService = inject(RoutesService);
@@ -29,22 +27,16 @@ export class RouteDetailComponent implements OnInit {
   protected frequencyId: number | null = null;
   protected frequencyData: IFrequency | null = null;
   protected isLoading: boolean = false;
-  protected cooperativeName: string = 'No disponible';
+  protected showDeleteConfirmation: boolean = false;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    
-    // Cargar información de la cooperativa
-    const cooperative = this.loginService.getCooperativeFromLocalStorage();
-    if (cooperative) {
-      this.cooperativeName = cooperative.name;
-    }
     
     if (id) {
       this.frequencyId = +id;
       this.loadFrequencyData(this.frequencyId);
     } else {
-      this.router.navigate(['/rutas']);
+      this.router.navigate(['/frecuencias']);
     }
   }
 
@@ -100,29 +92,64 @@ export class RouteDetailComponent implements OnInit {
     });
   }
 
-  deleteFrequency(): void {
-    if (confirm('¿Estás seguro de eliminar esta frecuencia?') && this.frequencyId) {
-      this.isLoading = true;
+  formatTimeDisplay(isoTimeString: string): string {
+    if (!isoTimeString) return 'N/A';
+
+    try {
+      // Parse the ISO string to extract hours and minutes
+      const date = new Date(isoTimeString);
       
-      this.routesService.deleteFrequency(this.frequencyId).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.alertService.showAlert({
-            alertType: AlertType.SUCCESS,
-            mainMessage: 'Frecuencia eliminada',
-            subMessage: 'La frecuencia ha sido eliminada exitosamente',
-          });
-          this.router.navigate(['/rutas']);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.alertService.showAlert({
-            alertType: AlertType.ERROR,
-            mainMessage: 'Error al eliminar frecuencia',
-            subMessage: error.message || 'Ocurrió un error al eliminar la frecuencia',
-          });
-        },
-      });
+      // Get hours in 12-hour format
+      let hours = date.getUTCHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      
+      // Get minutes with leading zero
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+      
+      // Return formatted time
+      return `${hours}:${minutes} ${ampm}`;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return isoTimeString;
     }
+  }
+
+  deleteFrequency(): void {
+    // Mostrar alerta personalizada usando el servicio de alertas
+    this.alertService.showAlert({
+      alertType: AlertType.WARNING,
+      mainMessage: '¿Eliminar frecuencia?',
+      subMessage: '¿Estás seguro de que deseas eliminar esta frecuencia? Esta acción no se puede deshacer.',
+      showConfirmButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      onConfirm: () => {
+        if (this.frequencyId) {
+          this.isLoading = true;
+          
+          this.routesService.deleteFrequency(this.frequencyId).subscribe({
+            next: () => {
+              this.isLoading = false;
+              this.alertService.showAlert({
+                alertType: AlertType.SUCCESS,
+                mainMessage: 'Frecuencia eliminada',
+                subMessage: 'La frecuencia ha sido eliminada exitosamente',
+              });
+              this.router.navigate(['/frecuencias']);
+            },
+            error: (error) => {
+              this.isLoading = false;
+              this.alertService.showAlert({
+                alertType: AlertType.ERROR,
+                mainMessage: 'Error al eliminar frecuencia',
+                subMessage: error.message || 'Ocurrió un error al eliminar la frecuencia',
+              });
+            },
+          });
+        }
+      }
+    });
   }
 } 
