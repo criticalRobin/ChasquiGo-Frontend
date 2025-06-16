@@ -25,12 +25,18 @@ export class AppComponent implements OnInit {
   protected readonly loadingSrv: LoadingService = inject(LoadingService);
   private readonly router: Router = inject(Router);
 
-  protected isLogged: boolean = false;
+  protected isLogged: boolean = !!this.loginSrv.getTokenFromLocalStorage();
   protected currentRoute: string = '';
 
   ngOnInit(): void {
     this.loginSrv.loggedInUser$.subscribe((user) => {
       this.isLogged = user !== null;
+      
+      if (this.isLogged && this.router.url === '/login') {
+        this.router.navigate(['/inicio']);
+      } else if (!this.isLogged && this.router.url !== '/login') {
+        this.router.navigate(['/login']);
+      }
     });
 
     this.router.events.subscribe(() => {
