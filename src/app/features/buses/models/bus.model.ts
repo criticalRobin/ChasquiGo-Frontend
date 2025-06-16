@@ -15,14 +15,15 @@ export interface Bus {
   isDeleted?: boolean;
 }
 
-export interface IBusSeat {  id?: number;
+export interface IBusSeat {  
+  id?: number;
   busId?: number;
   number: string;
   row?: number;
   column?: number;
   floor?: number;
   status?: 'available' | 'occupied' | 'reserved';
-  type: 'NORMAL' | 'VIP';
+  type: 'NORMAL' | 'VIP' | 'normal' | 'vip'; // Soportamos mayúsculas en la UI y minúsculas para API
   location: 'ventana' | 'pasillo';
   isDeleted?: boolean;
 } 

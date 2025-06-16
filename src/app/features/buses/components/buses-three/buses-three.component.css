@@ -25,23 +25,11 @@
 }
 
 .normal-seat {
-  background-color: #4caf50;
+  background-color: #ff0000;
 }
 
 .vip-seat {
   background-color: #ff9800;
-}
-
-.preferential-seat {
-  background-color: #2196f3;
-}
-
-.reserved-seat {
-  background-color: #f44336;
-}
-
-.selected-seat {
-  background-color: #9c27b0;
 }
 
 .card-actions {

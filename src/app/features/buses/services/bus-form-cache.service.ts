@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Bus } from '../models/bus.model';
+import { IBuses } from '../models/buses.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BusFormCacheService {
-  private cachedBusData: Bus | null = null;
+  private cachedData: IBuses | null = null;
 
-  cacheFormData(data: Bus): void {
-    this.cachedBusData = data;
+  cacheFormData(data: IBuses): void {
+    this.cachedData = data;
   }
 
-  getCachedFormData(): Bus | null {
-    return this.cachedBusData;
+  getCachedData(): IBuses | null {
+    return this.cachedData;
   }
 
   clearCache(): void {
-    this.cachedBusData = null;
+    this.cachedData = null;
   }
 }

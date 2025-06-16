@@ -1,24 +1,32 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { IBuses, IBusSeat } from '../../models/buses.interface';
-import { Subject } from 'rxjs';
-import gsap from 'gsap';
+import { BusesService } from '../../services/buses.service';
+import { LoadingService } from '../../../../shared/services/loading.service';
+import { AlertService } from '../../../../shared/services/alert.service';
+import { AlertType } from '../../../../utils/enums/alert-type.enum';
+
+interface SeatUserData {
+  seatNumber: string;
+  type: 'NORMAL' | 'VIP';
+  location: 'ventana' | 'pasillo' | 'other';
+  floor: number;
+}
 
 @Component({
-  selector: 'app-buses-three',
+  selector: 'app-edit-buses-three',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './buses-three.component.html',
-  styleUrl: './buses-three.component.css'
+  templateUrl: './edit-buses-three.component.html',
 })
-export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+export class EditBusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+  @ViewChild('busContainer') busContainer!: ElementRef;
   @Input() bus!: IBuses;
-  @Input() editable: boolean = true;
   @Output() seatsConfigured = new EventEmitter<IBuses>();
-  @ViewChild('busContainer', { static: true }) busContainer!: ElementRef;
 
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
@@ -31,14 +39,18 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
 
-  viewMode: '3d' | 'top' = '3d';
   selectedSeatType: 'NORMAL' | 'VIP' = 'NORMAL';
   selectedSeat: IBusSeat | null = null;
 
-  constructor() {}
+  constructor(
+    private busesService: BusesService,
+    private loadingService: LoadingService,
+    private alertService: AlertService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Initial setup will be handled in ngAfterViewInit and ngOnChanges
+    console.log('EditBusesThreeComponent initialized with bus:', this.bus);
   }
 
   ngAfterViewInit(): void {
@@ -100,6 +112,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     this.animationFrameId = null;
     this.resizeObserver = null;
 
+    // Call cleanUpThreeJS as well for thorough cleanup
     this.cleanUpThreeJS();
   }
 
@@ -182,7 +195,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     console.log('initThreeJS: Directional light added.');
 
     // Agregar el event listener para el clic
-      this.renderer.domElement.addEventListener('click', this.onMouseClick.bind(this));
+    this.renderer.domElement.addEventListener('click', this.onMouseClick.bind(this));
     console.log('initThreeJS: Click event listener added.');
     console.log('initThreeJS: Process completed.');
   }
@@ -208,7 +221,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     // Primer piso
     const firstFloorGeometry = new THREE.BoxGeometry(busWidth, busHeight, busLength);
     const firstFloorMaterial = new THREE.MeshLambertMaterial({
-      color: 0x2c3e50, 
+      color: 0x2c3e50,
       transparent: true,
       opacity: 0.3
     });
@@ -246,10 +259,10 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     
     // Posiciones de las ruedas
     const wheelPositions = [
-      { x: -busWidth / 2 - 0.2, y: 0.4, z: -busLength / 3 },
-      { x: busWidth / 2 + 0.2, y: 0.4, z: -busLength / 3 },
-      { x: -busWidth / 2 - 0.2, y: 0.4, z: busLength / 3 },
-      { x: busWidth / 2 + 0.2, y: 0.4, z: busLength / 3 }
+      { x: -busWidth/2 - 0.2, y: 0.4, z: -busLength/3 },
+      { x: busWidth/2 + 0.2, y: 0.4, z: -busLength/3 },
+      { x: -busWidth/2 - 0.2, y: 0.4, z: busLength/3 },
+      { x: busWidth/2 + 0.2, y: 0.4, z: busLength/3 }
     ];
 
     wheelPositions.forEach(pos => {
@@ -294,7 +307,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     const xSpacing = 1.2;
     const zSpacing = 1.2;
     const startX = -(seatsPerRow - 1) * xSpacing / 2;
-    const yOffset = floor === 2 ? 2.8 : 0; // Ensure correct vertical offset for second floor
+    const yOffset = floor === 2 ? 2.8 : 0;
     console.log(`createSeatsForFloor: Seat layout parameters - seatsPerRow: ${seatsPerRow}, xSpacing: ${xSpacing}, zSpacing: ${zSpacing}, startX: ${startX}, yOffset: ${yOffset}`);
 
     floorSeats.forEach((seat: IBusSeat) => {
@@ -303,7 +316,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
       // Crear el asiento
       const seatGeometry = new THREE.BoxGeometry(0.9, 0.1, 0.9);
       const seatMaterial = new THREE.MeshLambertMaterial({
-        color: this.getSeatColor(seat.type) // Use getSeatColor
+        color: seat.type === 'VIP' ? 0xe74c3c : 0x4caf50
       });
       const seatMesh = new THREE.Mesh(seatGeometry, seatMaterial);
       seatMesh.position.y = 0.05;
@@ -319,12 +332,12 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
       backMesh.castShadow = true;
       backMesh.receiveShadow = true;
       seatGroup.add(backMesh);
-      
+
       // Calcular la posición del asiento
       const seatNumber = parseInt(seat.number);
       const row = Math.floor((seatNumber - 1) / seatsPerRow);
       const col = (seatNumber - 1) % seatsPerRow;
-      
+
       seatGroup.position.set(
         startX + col * xSpacing,
         yOffset,
@@ -361,7 +374,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
       step.position.set(
         0,
         busHeight + (i * stepHeight),
-        -busLength / 2 + (i * stepDepth)
+        -busLength/2 + (i * stepDepth)
       );
       step.castShadow = true;
       step.receiveShadow = true;
@@ -369,15 +382,15 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     }
 
     // Agregar paredes laterales
-    const wallGeometry = new THREE.BoxGeometry(0.1, busHeight, busLength / 2);
+    const wallGeometry = new THREE.BoxGeometry(0.1, busHeight, busLength/2);
     const leftWall = new THREE.Mesh(wallGeometry, stairsMaterial);
-    leftWall.position.set(-stepWidth / 2, busHeight + (stepCount * stepHeight) / 2, -busLength / 2 + (stepCount * stepDepth) / 2);
+    leftWall.position.set(-stepWidth/2, busHeight + (stepCount * stepHeight)/2, -busLength/2 + (stepCount * stepDepth)/2);
     leftWall.castShadow = true;
     leftWall.receiveShadow = true;
     stairsGroup.add(leftWall);
 
     const rightWall = new THREE.Mesh(wallGeometry, stairsMaterial);
-    rightWall.position.set(stepWidth / 2, busHeight + (stepCount * stepHeight) / 2, -busLength / 2 + (stepCount * stepDepth) / 2);
+    rightWall.position.set(stepWidth/2, busHeight + (stepCount * stepHeight)/2, -busLength/2 + (stepCount * stepDepth)/2);
     rightWall.castShadow = true;
     rightWall.receiveShadow = true;
     stairsGroup.add(rightWall);
@@ -385,9 +398,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     this.busObject.add(stairsGroup);
   }
 
-  onMouseClick(event: MouseEvent): void {
-    if (!this.editable) return; // Only allow clicks if in editable mode
-
+  private onMouseClick(event: MouseEvent): void {
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -397,32 +408,32 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
 
     if (intersects.length > 0) {
       const clickedObject = intersects[0].object;
-      const seatGroup = clickedObject.parent; // This should be the seat group
-
+      const seatGroup = clickedObject.parent; 
+      
       if (seatGroup && seatGroup.userData && 'seatNumber' in seatGroup.userData) {
         const seatNumber = seatGroup.userData['seatNumber'];
         const currentSeat = this.bus.seats.find(s => s.number === seatNumber);
-
+        
         if (currentSeat) {
           this.selectedSeat = currentSeat;
-        // Toggle seat type
+          // Toggle seat type
           this.selectedSeatType = currentSeat.type === 'NORMAL' ? 'VIP' : 'NORMAL';
           currentSeat.type = this.selectedSeatType;
-
+          
           // Update seat color
           const seatMesh = seatGroup.children[0] as THREE.Mesh;
           if (seatMesh.material instanceof THREE.MeshLambertMaterial) {
-            seatMesh.material.color.set(this.getSeatColor(this.selectedSeatType));
+            seatMesh.material.color.set(this.selectedSeatType === 'VIP' ? 0xe74c3c : 0x4caf50);
           }
-
+          
           // Update back color
           const backMesh = seatGroup.children[1] as THREE.Mesh;
           if (backMesh.material instanceof THREE.MeshLambertMaterial) {
-            backMesh.material.color.set(this.getSeatColor(this.selectedSeatType));
+            backMesh.material.color.set(this.selectedSeatType === 'VIP' ? 0xe74c3c : 0x4caf50);
           }
-
+          
           // Emit updated bus object with seats
-          this.seatsConfigured.emit(this.bus); // Emit the full bus object
+          this.seatsConfigured.emit(this.bus);
         }
       }
     }
@@ -437,13 +448,13 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
   private onWindowResize(): void {
     const container = this.busContainer.nativeElement;
     if (container) {
-    const width = container.clientWidth;
+      const width = container.clientWidth;
       const height = container.clientHeight;
       if (width > 0 && height > 0) {
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
-  }
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+      }
     }
   }
 
@@ -468,7 +479,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
           }
         }
       });
-      this.scene = null as any; // Set to null after disposing children
+      this.scene = null as any;
     }
     if (this.renderer) {
       this.renderer.domElement.removeEventListener('click', this.onMouseClick.bind(this));
@@ -492,27 +503,27 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
       if (seatGroup) {
         const seatMesh = seatGroup.children[0] as THREE.Mesh;
         if (seatMesh.material instanceof THREE.MeshLambertMaterial) {
-          seatMesh.material.color.set(this.getSeatColor(type));
+          seatMesh.material.color.set(this.selectedSeatType === 'VIP' ? 0xe74c3c : 0x4caf50);
         }
         const backMesh = seatGroup.children[1] as THREE.Mesh;
         if (backMesh.material instanceof THREE.MeshLambertMaterial) {
-          backMesh.material.color.set(this.getSeatColor(type));
+          backMesh.material.color.set(this.selectedSeatType === 'VIP' ? 0xe74c3c : 0x4caf50);
         }
         // Update the actual seat data in the bus object
         const seatToUpdate = this.bus.seats.find(s => s.number === this.selectedSeat!.number);
         if (seatToUpdate) {
           seatToUpdate.type = type;
         }
-        this.seatsConfigured.emit(this.bus); // Emit the full bus object
+        this.seatsConfigured.emit(this.bus);
       }
     }
   }
 
   // This method will be called from the parent component when the save button is clicked
-  saveSeatsConfiguration(): void {
+  saveConfiguration(): void {
     // The seats array in this.bus is already updated on each click, 
     // so we just need to emit the bus object.
-    this.seatsConfigured.emit(this.bus); // Emit the full bus object
+    this.seatsConfigured.emit(this.bus);
   }
 
   // Add getSeatColor method
@@ -527,59 +538,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy, AfterV
     }
   }
 
-  // Add resetView method
-  resetView(): void {
-    if (this.controls) {
-      this.controls.reset();
-    }
+  cancel(): void {
+    this.router.navigate(['/buses']);
   }
-
-  // Add updateCameraPosition method
-  updateCameraPosition(): void {
-    if (this.viewMode === 'top') {
-      this.camera.position.set(0, 15, 0);
-      this.camera.lookAt(0, 0, 0);
-    } else {
-      this.camera.position.set(5, 5, 5);
-      this.camera.lookAt(0, 0, 0);
-    }
-  }
-
-  // Add onViewModeChange method
-  onViewModeChange(): void {
-    this.updateCameraPosition();
-  }
-
-  // Add resetAllSeats method
-  resetAllSeats(): void {
-    if (this.bus && this.bus.seats) {
-      let vipSeatsResetCount = 0;
-      this.bus.seats.forEach(seat => {
-        if (seat.type === 'VIP') {
-          seat.type = 'NORMAL';
-          vipSeatsResetCount++;
-          // Update the 3D representation as well
-          const seatGroup = this.seatObjects.get(seat.number);
-          if (seatGroup) {
-            const seatMesh = seatGroup.children[0] as THREE.Mesh;
-            if (seatMesh.material instanceof THREE.MeshLambertMaterial) {
-              seatMesh.material.color.set(this.getSeatColor('NORMAL'));
-            }
-            const backMesh = seatGroup.children[1] as THREE.Mesh;
-            if (backMesh.material instanceof THREE.MeshLambertMaterial) {
-              backMesh.material.color.set(this.getSeatColor('NORMAL'));
-            }
-          }
-        }
-      });
-      console.log(`Reset all seats to NORMAL. ${vipSeatsResetCount} VIP seats were reset.`);
-      this.seatsConfigured.emit(this.bus); // Emit the full bus object
-    }
-  }
-
-  // Add updateViewMode method
-  updateViewMode(mode: '3d' | 'top'): void {
-    this.viewMode = mode;
-    this.onViewModeChange();
-  }
-}
+} 
