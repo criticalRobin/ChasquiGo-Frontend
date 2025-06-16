@@ -16,4 +16,14 @@ export class DriverManagementService {
     const url: string = `${this.baseUrl}/drivers`;
     return this.http.post<IDriver>(url, driverData);
   }
+
+  updateDriver(id: number, driverData: IDriverRequest): Observable<IDriver> {
+    const url: string = `${this.baseUrl}/drivers/${id}`;
+    return this.http.put<IDriver>(url, driverData);
+  }
+
+  deleteDriver(id: number): Observable<void> {
+    const url: string = `${this.baseUrl}/drivers/${id}`;
+    return this.http.delete<void>(url);
+  }
 }

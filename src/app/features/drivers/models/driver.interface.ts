@@ -10,8 +10,10 @@ export interface IDriver {
   email: string;
   phone: string;
   role: string;
-  cooperative: {
+  cooperative?: {
     id: number;
     name: string;
   };
+  cooperativeId: number;
+  isDeleted: boolean;
 }

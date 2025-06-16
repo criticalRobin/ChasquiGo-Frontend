@@ -6,6 +6,8 @@ import {
   OnInit,
   Output,
   inject,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -21,6 +23,7 @@ import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
 import { IDriverRequest } from '../../models/driver-request.interface';
 import { HttpErrorResponse } from '@angular/common/http';
+import { IDriver } from '@features/drivers/models/driver.interface';
 
 @Component({
   selector: 'app-driver-form',
@@ -29,12 +32,15 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './driver-form.component.html',
   styleUrl: './driver-form.component.css',
 })
-export class DriverFormComponent implements OnInit, OnDestroy {
+export class DriverFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input() cooperativeId!: number;
+  @Input() driverToEdit: IDriver | null = null;
   @Output() driverCreated = new EventEmitter<void>();
+  @Output() driverUpdated = new EventEmitter<void>();
 
   protected driverForm: FormGroup;
   protected isLoading: boolean = false;
+  protected isEditMode: boolean = false;
   private subscriptions: Subscription = new Subscription();
 
   private readonly fb: FormBuilder = inject(FormBuilder);
@@ -67,6 +73,29 @@ export class DriverFormComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['driverToEdit'] && changes['driverToEdit'].currentValue) {
+      const driver = changes['driverToEdit'].currentValue as IDriver;
+      this.driverToEdit = driver;
+      this.isEditMode = true;
+      console.log(
+        'Driver data received by form in ngOnChanges:',
+        this.driverToEdit
+      );
+      this.driverForm.patchValue({
+        idNumber: driver.idNumber,
+        documentType: 'CEDULA',
+        firstName: driver.firstName,
+        lastName: driver.lastName,
+        email: driver.email,
+        phone: driver.phone,
+        cooperativeId: driver.cooperativeId,
+      });
+      this.driverForm.get('password')?.clearValidators();
+      this.driverForm.get('password')?.updateValueAndValidity();
+    }
+  }
+
   protected onSubmit(): void {
     if (this.driverForm.valid) {
       this.isLoading = true;
@@ -74,24 +103,44 @@ export class DriverFormComponent implements OnInit, OnDestroy {
         ...this.driverForm.value,
       };
 
+      if (this.isEditMode && !driverData.password) {
+        delete driverData.password;
+      }
+
       console.log('Submitting driver data:', driverData);
 
+      const request$ =
+        this.isEditMode && this.driverToEdit
+          ? this.driverManagementService.updateDriver(
+              this.driverToEdit.id,
+              driverData
+            )
+          : this.driverManagementService.createDriver(driverData);
+
       this.subscriptions.add(
-        this.driverManagementService.createDriver(driverData).subscribe({
+        request$.subscribe({
           next: () => {
             this.alertService.showAlert({
               alertType: AlertType.SUCCESS,
-              mainMessage: 'Conductor registrado exitosamente',
+              mainMessage: this.isEditMode
+                ? 'Conductor actualizado exitosamente'
+                : 'Conductor registrado exitosamente',
             });
-            this.driverCreated.emit();
+            if (this.isEditMode) {
+              this.driverUpdated.emit();
+            } else {
+              this.driverCreated.emit();
+            }
             this.router.navigate(['/drivers']);
           },
           error: (error: HttpErrorResponse) => {
-            console.error('Error registering driver:', error);
+            console.error('Error with driver:', error);
             this.isLoading = false;
             this.alertService.showAlert({
               alertType: AlertType.ERROR,
-              mainMessage: 'Error al registrar conductor',
+              mainMessage: this.isEditMode
+                ? 'Error al actualizar conductor'
+                : 'Error al registrar conductor',
             });
           },
         })
