@@ -1,23 +1,90 @@
 <app-banner />
 <div class="row row-deck row-cards">
+  <!-- Total de Conductores -->
   <div class="col-4">
     <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="subheader">Conductores</div>
+        </div>
+        <div class="h1 mb-3">{{ stats.totalDrivers }}</div>
+        <div class="d-flex mb-2">
+          <div>Total de conductores registrados</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Total de Buses -->
   <div class="col-4">
     <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="subheader">Buses</div>
+        </div>
+        <div class="h1 mb-3">{{ stats.totalBuses }}</div>
+        <div class="d-flex mb-2">
+          <div>Total de buses en la flota</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Total de Frecuencias -->
   <div class="col-4">
     <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="subheader">Frecuencias</div>
+        </div>
+        <div class="h1 mb-3">{{ stats.totalFrequencies }}</div>
+        <div class="d-flex mb-2">
+          <div>Total de frecuencias programadas</div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Gráfico de Estado de Frecuencias -->
   <div class="col-12">
     <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="subheader">Estado de Frecuencias</div>
+        </div>
+        <div class="row">
+          <div class="col-md-8">
+            <div style="max-width: 400px; margin: auto;">
+              <canvas id="frequencyStatusChart"></canvas>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex flex-column gap-3">
+              <div class="d-flex align-items-center">
+                <span class="badge bg-success me-2"></span>
+                <div>
+                  <div class="h3 mb-0">{{ stats.frequencyStatus.active }}</div>
+                  <div class="text-muted">Frecuencias Activas</div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge bg-danger me-2"></span>
+                <div>
+                  <div class="h3 mb-0">{{ stats.frequencyStatus.inactive }}</div>
+                  <div class="text-muted">Frecuencias Inactivas</div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <span class="badge bg-warning me-2"></span>
+                <div>
+                  <div class="h3 mb-0">{{ stats.frequencyStatus.pending }}</div>
+                  <div class="text-muted">Frecuencias Pendientes</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
