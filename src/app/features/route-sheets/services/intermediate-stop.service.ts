@@ -19,8 +19,16 @@ export class IntermediateStopService {
     return this.http.get<IIntermediateStop[]>(`${this.baseUrl}/frequency/${frequencyId}`);
   }
 
+  // Este método no es correcto, ya que la API no tiene un endpoint por ID de hoja de ruta
+  // Lo dejamos comentado por ahora
+  // getIntermediateStopsByRouteSheetId(routeSheetId: number): Observable<IIntermediateStop[]> {
+  //   return this.http.get<IIntermediateStop[]>(`${this.baseUrl}/route-sheet/${routeSheetId}`);
+  // }
+
+  // Método para obtener una parada intermedia específica por su ID
   getIntermediateStopById(id: number): Observable<IIntermediateStop> {
-    return this.http.get<IIntermediateStop>(`${this.baseUrl}/${id}`);
+    const url: string = 'https://chasquigo-backend-7yn2.onrender.com/intermediate-stops';
+    return this.http.get<IIntermediateStop>(`${url}/${id}`);
   }
 
   createIntermediateStop(intermediateStop: IIntermediateStopRequest): Observable<IIntermediateStop> {

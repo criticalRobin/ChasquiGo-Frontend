@@ -22,8 +22,9 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
+            <th>Fecha</th>
+            <th>Frecuencia</th>
+            <th>Bus</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -32,22 +33,18 @@
           @for (routeSheet of routeSheets; track routeSheet.id) {
             <tr>
               <td>{{ routeSheet.id }}</td>
-              <td>{{ routeSheet.startDate | date:'dd/MM/yyyy' }}</td>
-              <td>{{ routeSheet.endDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ formatDate(routeSheet.date) }}</td>
+              <td>{{ getFrequencyName(routeSheet.frequencyId) }}</td>
+              <td>{{ getBusName(routeSheet.busId) }}</td>
               <td>
                 <span [class]="'badge ' + getStatusClass(routeSheet.status)">
                   {{ routeSheet.status }}
                 </span>
               </td>
               <td>
-                <div class="btn-group">
-                  <a [routerLink]="['/hojas-ruta/edit', routeSheet.id]" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-pencil"></i>
-                  </a>
-                  <button (click)="deleteRouteSheet(routeSheet.id)" class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
+                <button (click)="viewRouteSheetDetails(routeSheet.id)" class="btn btn-info">
+                  <i class="bi bi-eye"></i> Ver Detalles
+                </button>
               </td>
             </tr>
           }
@@ -55,4 +52,98 @@
       </table>
     </div>
   }
+</div>
+
+<!-- Modal de detalles -->
+<div class="modal" [class.show]="showDetailsModal" [style.display]="showDetailsModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalles de Hoja de Ruta</h5>
+        <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedRouteSheet">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6>Información General</h6>
+              <p><strong>Frecuencia:</strong> {{ getFrequencyName(selectedRouteSheet.frequencyId) }}</p>
+              <p><strong>Bus:</strong> {{ getBusName(selectedRouteSheet.busId) }}</p>
+              <p><strong>Fecha:</strong> {{ formatDate(selectedRouteSheet.date) }}</p>
+              <p><strong>Estado:</strong> <span class="badge {{ getStatusClass(selectedRouteSheet.status) }}">{{ selectedRouteSheet.status }}</span></p>
+            </div>
+            <div class="col-md-6">
+              <h6>Detalles Adicionales</h6>
+              <p><strong>Asientos disponibles:</strong> {{ selectedRouteSheet.availableSeats }}</p>
+              <p><strong>Asientos ocupados:</strong> {{ selectedRouteSheet.occupiedSeats }}</p>
+              <p><strong>Asientos totales:</strong> {{ selectedRouteSheet.totalSeats }}</p>
+              <p><strong>Creado:</strong> {{ formatDate(selectedRouteSheet.createdAt) }}</p>
+            </div>
+          </div>
+
+          <!-- Paradas Intermedias -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <h6>Paradas Intermedias</h6>
+              <div *ngIf="loadingIntermediateStops" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+              <div *ngIf="!loadingIntermediateStops && intermediateStops.length > 0">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Orden</th>
+                      <th>Ciudad</th>
+                      <th>Provincia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let stop of intermediateStops">
+                      <td>{{ stop.order }}</td>
+                      <td>{{ stop.city?.name || 'No disponible' }}</td>
+                      <td>{{ stop.city?.province || 'No disponible' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div *ngIf="!loadingIntermediateStops && intermediateStops.length === 0" class="alert alert-info">
+                No hay paradas intermedias registradas para esta hoja de ruta.
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalles de la hoja de ruta -->
+          <div *ngIf="selectedRouteSheet.routeSheetDetails && selectedRouteSheet.routeSheetDetails.length > 0">
+            <h6>Detalles de Pasajeros</h6>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Asiento</th>
+                  <th>Cliente</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let detail of selectedRouteSheet.routeSheetDetails">
+                  <td>{{ detail.seatNumber }}</td>
+                  <td>{{ detail.client?.firstName || 'No disponible' }} {{ detail.client?.lastName || '' }}</td>
+                  <td><span class="badge {{ getStatusClass(detail.status) }}">{{ detail.status }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!selectedRouteSheet.routeSheetDetails || selectedRouteSheet.routeSheetDetails.length === 0" class="alert alert-info">
+            No hay detalles de pasajeros registrados para esta hoja de ruta.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a [routerLink]="['/route-sheets/edit', selectedRouteSheet?.id]" class="btn btn-warning">Editar</a>
+        <button type="button" class="btn btn-danger" (click)="deleteRouteSheet(selectedRouteSheet?.id!)">Eliminar</button>
+        <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
 </div>
