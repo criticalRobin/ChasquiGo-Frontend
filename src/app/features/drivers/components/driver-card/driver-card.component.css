@@ -1,0 +1,35 @@
+.driver-detail-card {
+  border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  box-shadow: var(--tblr-box-shadow-sm);
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--tblr-body-color);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.status-indicator .status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--tblr-border-radius-sm);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background-color: var(--tblr-green-lt);
+  color: var(--tblr-green);
+}
+
+.status-inactive {
+  background-color: var(--tblr-red-lt);
+  color: var(--tblr-red);
+}
+
+.status-pending {
+  background-color: var(--tblr-yellow-lt);
+  color: var(--tblr-yellow);
+}

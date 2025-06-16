@@ -1,0 +1,158 @@
+<form [formGroup]="driverForm" (ngSubmit)="onSubmit()" class="card">
+  <div class="card-header">
+    <h3 class="card-title">Información del Conductor</h3>
+  </div>
+  <div class="card-body">
+    <!-- ID Number and Document Type -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label required">Cédula/RUC</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="idNumber"
+          [class.is-invalid]="
+            driverForm.get('idNumber')?.invalid &&
+            driverForm.get('idNumber')?.touched
+          "
+          placeholder="Ej: 1712345678"
+        />
+        @if (driverForm.get('idNumber')?.invalid &&
+        driverForm.get('idNumber')?.touched) {
+        <div class="invalid-feedback">
+          Cédula/RUC requerida y debe tener 10 dígitos
+        </div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Contraseña</label>
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+          [class.is-invalid]="
+            driverForm.get('password')?.invalid &&
+            driverForm.get('password')?.touched
+          "
+          placeholder="Ingrese una contraseña"
+        />
+        @if (driverForm.get('password')?.invalid &&
+        driverForm.get('password')?.touched) {
+        <div class="invalid-feedback">
+          Contraseña requerida y debe tener al menos 6 caracteres
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- First Name and Last Name -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label required">Nombres</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [class.is-invalid]="
+            driverForm.get('firstName')?.invalid &&
+            driverForm.get('firstName')?.touched
+          "
+          placeholder="Ej: Juan"
+        />
+        @if (driverForm.get('firstName')?.invalid &&
+        driverForm.get('firstName')?.touched) {
+        <div class="invalid-feedback">
+          Nombre requerido y debe tener al menos 3 caracteres
+        </div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Apellidos</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [class.is-invalid]="
+            driverForm.get('lastName')?.invalid &&
+            driverForm.get('lastName')?.touched
+          "
+          placeholder="Ej: Pérez"
+        />
+        @if (driverForm.get('lastName')?.invalid &&
+        driverForm.get('lastName')?.touched) {
+        <div class="invalid-feedback">
+          Apellido requerido y debe tener al menos 3 caracteres
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Email and Phone -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label required">Correo Electrónico</label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [class.is-invalid]="
+            driverForm.get('email')?.invalid && driverForm.get('email')?.touched
+          "
+          placeholder="Ej: juan.perez@example.com"
+        />
+        @if (driverForm.get('email')?.invalid &&
+        driverForm.get('email')?.touched) {
+        <div class="invalid-feedback">Ingrese un correo electrónico válido</div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Teléfono</label>
+        <input
+          type="tel"
+          class="form-control"
+          formControlName="phone"
+          [class.is-invalid]="
+            driverForm.get('phone')?.invalid && driverForm.get('phone')?.touched
+          "
+          placeholder="Ej: 0987654321"
+        />
+        @if (driverForm.get('phone')?.invalid &&
+        driverForm.get('phone')?.touched) {
+        <div class="invalid-feedback">
+          Teléfono requerido y debe tener 10 dígitos
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Hidden role field -->
+    <input type="hidden" formControlName="role" />
+
+    <!-- Action Buttons -->
+    <div class="form-footer d-flex justify-content-end">
+      <div class="btn-list">
+        <button
+          type="button"
+          class="btn btn-link"
+          [routerLink]="['/drivers']"
+          [disabled]="isLoading"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="driverForm.invalid || isLoading"
+        >
+          @if (isLoading) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          } Registrar Conductor
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
