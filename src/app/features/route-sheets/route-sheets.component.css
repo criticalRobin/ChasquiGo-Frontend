@@ -1,0 +1,94 @@
+.modal-backdrop {
+  opacity: 0.5;
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.list-group-item {
+  padding: 0.75rem 1.25rem;
+}
+
+.table-responsive {
+  margin-bottom: 1rem;
+}
+
+.progress {
+  margin-top: 0.25rem;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.4em 0.7em;
+}
+
+.btn-info {
+  color: #fff;
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+}
+
+.btn-info:hover {
+  color: #fff;
+  background-color: #0baccc;
+  border-color: #0aa2c0;
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: 90vh;
+}
+
+.text-primary {
+  font-weight: 500;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.table-sm td, .table-sm th {
+  padding: 0.5rem;
+}
+
+.btn-group .btn {
+  margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+  margin-right: 0;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.badge.bg-success {
+  background-color: #198754 !important;
+}
+
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000;
+}
+
+.badge.bg-info {
+  background-color: #0dcaf0 !important;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+}
