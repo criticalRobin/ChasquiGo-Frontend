@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DriversService } from '@features/drivers/services/drivers.service';
 import { BusesService } from '@features/buses/services/buses.service';
 import { RoutesService } from '@features/frequencies/services/frequencies.service';
+import { LoginService } from '@core/login/services/login.service';
 import { forkJoin } from 'rxjs';
 import { Chart } from 'chart.js/auto';
 
@@ -42,7 +43,8 @@ export class HomepageComponent implements OnInit {
   constructor(
     private driversService: DriversService,
     private busesService: BusesService,
-    private routesService: RoutesService
+    private routesService: RoutesService,
+    private loginService: LoginService
   ) {}
 
   ngOnInit(): void {
@@ -50,8 +52,14 @@ export class HomepageComponent implements OnInit {
   }
 
   private loadDashboardStats(): void {
+    const cooperative = this.loginService.getCooperativeFromLocalStorage();
+    if (!cooperative?.id) {
+      console.error('No cooperative ID found');
+      return;
+    }
+
     forkJoin({
-      drivers: this.driversService.getAllUsers(),
+      drivers: this.driversService.getAllUsers(cooperative.id),
       buses: this.busesService.getBuses(),
       frequencies: this.routesService.getAllFrequencies()
     }).subscribe({

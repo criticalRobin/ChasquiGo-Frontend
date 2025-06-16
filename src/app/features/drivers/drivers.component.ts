@@ -64,13 +64,11 @@ export class DriversComponent implements OnInit, OnDestroy {
   private loadDrivers(): void {
     console.log(this.currentCooperativeId);
     this.subscriptions.add(
-      this.driversService.getAllUsers().subscribe({
+      this.driversService.getAllUsers(this.currentCooperativeId!).subscribe({
         next: (allUsers: IDriver[]) => {
-          console.log('All users loaded:', allUsers);
-          this.drivers = allUsers.filter(
-            (user) =>
-              user.role === 'DRIVER'
-          );
+          console.log('Drivers loaded:', allUsers);
+          this.drivers = allUsers;
+          console.log('Drivers set to:', this.drivers);
         },
         error: (error) => {
           console.error('Error loading drivers:', error);

@@ -14,7 +14,7 @@ interface Cooperative {
 @Component({
   selector: 'app-list-buses',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './list-buses.component.html',
   styleUrl: './list-buses.component.css'
 })

@@ -6,4 +6,5 @@ export interface IDriverRequest {
   email: string;
   phone: string;
   password?: string;
+  cooperativeId: number;
 }

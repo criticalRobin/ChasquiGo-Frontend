@@ -53,11 +53,18 @@ export class DriverFormComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      cooperativeId: [this.cooperativeId, Validators.required],
     });
   }
 
   ngOnInit(): void {
-    // No additional initialization needed for now
+    console.log(
+      'Initializing DriverFormComponent with cooperativeId:',
+      this.cooperativeId
+    );
+    this.driverForm.patchValue({
+      cooperativeId: this.cooperativeId,
+    });
   }
 
   protected onSubmit(): void {
