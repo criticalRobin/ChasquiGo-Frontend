@@ -1,1 +1,134 @@
-<p>create-update-route-sheet works!</p>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            {{ isEditMode ? 'Editar' : 'Crear' }} Hoja de Ruta
+          </h3>
+        </div>
+        <div class="card-body">
+          @if (isLoading) {
+            <div class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          } @else {
+            <form [formGroup]="routeSheetForm" (ngSubmit)="onSubmit()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="startDate" class="form-label">Fecha de Inicio</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="startDate"
+                    formControlName="startDate"
+                    [class.is-invalid]="routeSheetForm.get('startDate')?.invalid && routeSheetForm.get('startDate')?.touched"
+                  >
+                  @if (routeSheetForm.get('startDate')?.invalid && routeSheetForm.get('startDate')?.touched) {
+                    <div class="invalid-feedback">
+                      La fecha de inicio es requerida
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="endDate" class="form-label">Fecha de Fin</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="endDate"
+                    formControlName="endDate"
+                    [class.is-invalid]="routeSheetForm.get('endDate')?.invalid && routeSheetForm.get('endDate')?.touched"
+                  >
+                  @if (routeSheetForm.get('endDate')?.invalid && routeSheetForm.get('endDate')?.touched) {
+                    <div class="invalid-feedback">
+                      La fecha de fin es requerida
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="frequencies" class="form-label">Frecuencias</label>
+                  <select
+                    multiple
+                    class="form-select"
+                    id="frequencies"
+                    formControlName="frequencyIds"
+                    [class.is-invalid]="routeSheetForm.get('frequencyIds')?.invalid && routeSheetForm.get('frequencyIds')?.touched"
+                  >
+                    @for (frequency of frequencies; track frequency.id) {
+                      <option [value]="frequency.id">
+                        {{ frequency.originCity.name }} - {{ frequency.destinationCity.name }}
+                      </option>
+                    }
+                  </select>
+                  @if (routeSheetForm.get('frequencyIds')?.invalid && routeSheetForm.get('frequencyIds')?.touched) {
+                    <div class="invalid-feedback">
+                      Debe seleccionar al menos una frecuencia
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="buses" class="form-label">Buses</label>
+                  <select
+                    multiple
+                    class="form-select"
+                    id="buses"
+                    formControlName="busIds"
+                    [class.is-invalid]="routeSheetForm.get('busIds')?.invalid && routeSheetForm.get('busIds')?.touched"
+                  >
+                    @for (bus of buses; track bus.id) {
+                      <option [value]="bus.id">
+                        {{ bus.licensePlate }} - {{ bus.chassisBrand }}
+                      </option>
+                    }
+                  </select>
+                  @if (routeSheetForm.get('busIds')?.invalid && routeSheetForm.get('busIds')?.touched) {
+                    <div class="invalid-feedback">
+                      Debe seleccionar al menos un bus
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="status" class="form-label">Estado</label>
+                  <select
+                    class="form-select"
+                    id="status"
+                    formControlName="status"
+                    [class.is-invalid]="routeSheetForm.get('status')?.invalid && routeSheetForm.get('status')?.touched"
+                  >
+                    @for (status of statusOptions; track status) {
+                      <option [value]="status">{{ status }}</option>
+                    }
+                  </select>
+                  @if (routeSheetForm.get('status')?.invalid && routeSheetForm.get('status')?.touched) {
+                    <div class="invalid-feedback">
+                      El estado es requerido
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" routerLink="/hojas-ruta">
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="routeSheetForm.invalid || isLoading"
+                >
+                  {{ isEditMode ? 'Actualizar' : 'Crear' }}
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

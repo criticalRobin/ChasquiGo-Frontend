@@ -16,7 +16,11 @@ export class BusesService {
     return this.http.get<IBuses[]>(this.apiUrl);
   }
 
-  getBusById(id: string): Observable<IBuses> {
+  getBusesByCooperativeId(cooperativeId: number): Observable<IBuses[]> {
+    return this.http.get<IBuses[]>(`${this.apiUrl}/cooperative/${cooperativeId}`);
+  }
+
+  getBusById(id: number): Observable<IBuses> {
     return this.http.get<IBuses>(`${this.apiUrl}/${id}`);
   }
 
@@ -24,11 +28,11 @@ export class BusesService {
     return this.http.post<IBuses>(this.apiUrl, bus);
   }
 
-  updateBus(id: string, bus: IBuses): Observable<IBuses> {
+  updateBus(id: number, bus: IBuses): Observable<IBuses> {
     return this.http.put<IBuses>(`${this.apiUrl}/${id}`, bus);
   }
 
-  deleteBus(id: string): Observable<void> {
+  deleteBus(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

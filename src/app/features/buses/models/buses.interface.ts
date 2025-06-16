@@ -1,5 +1,5 @@
 export interface IBuses {
-    id?: string;
+    id?: number;
     cooperativeId: number;
     licensePlate: string;
     chassisBrand: string;
@@ -14,10 +14,14 @@ export interface IBuses {
     photos?: string[];
     createdAt?: Date;
     updatedAt?: Date;
+    isDeleted?: boolean;
 }
 
 export interface IBusSeat {
+    id?: number;
+    busId?: number;
     number: string;
-    type: 'NORMAL' | 'VIP' ;
+    type: 'NORMAL' | 'VIP';
     location: 'ventana' | 'pasillo' | 'other';
+    isDeleted?: boolean;
 }

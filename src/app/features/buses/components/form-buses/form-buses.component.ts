@@ -25,7 +25,7 @@ export class FormBusesComponent implements OnInit {
   
   busForm: FormGroup;
   isEditing = false;
-  busId: string | null = null;
+  busId: number | null = null;
   photos: string[] = [];
   cooperatives: Cooperative[] = [];
 
@@ -68,7 +68,7 @@ export class FormBusesComponent implements OnInit {
       // Check for bus ID in route params for editing mode
       this.route.params.subscribe(params => {
         if (params['id']) {
-          this.busId = params['id'];
+          this.busId = Number(params['id']);
           this.isEditing = true;
           if (this.busId !== null) {
             this.loadBusData(this.busId);
@@ -89,7 +89,7 @@ export class FormBusesComponent implements OnInit {
     });
   }
 
-  loadBusData(id: string): void {
+  loadBusData(id: number): void {
     this.busesService.getBusById(id).subscribe({
       next: (bus: IBuses) => {
         this.busForm.patchValue({
