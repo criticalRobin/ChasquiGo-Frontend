@@ -1,9 +1,9 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { IBuses, IBusSeat } from '../../models/buses.interface';
+import { Bus, IBusSeat } from '../../models/bus.model';
 import { Subject, takeUntil } from 'rxjs';
 import gsap from 'gsap';
 
@@ -15,8 +15,9 @@ import gsap from 'gsap';
   styleUrl: './buses-three.component.css'
 })
 export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() bus!: IBuses;
+  @Input() bus!: Bus;
   @Input() editable: boolean = true;
+  @Output() seatsConfigured = new EventEmitter<Bus>();
   @ViewChild('busContainer', { static: true }) busContainer!: ElementRef;
 
   private scene!: THREE.Scene;
@@ -26,11 +27,10 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
   private seats: THREE.Mesh[] = [];
   private busBody!: THREE.Group;
   private busFloor1!: THREE.Group;
-  private busFloor2!: THREE.Group;
-  private seatObjects: { [key: string]: { mesh: THREE.Mesh, data: IBusSeat } } = {};
+  private busFloor2!: THREE.Group;  private seatObjects: { [key: string]: { mesh: THREE.Mesh, data: IBusSeat } } = {};
 
   viewMode: '3d' | 'top' = '3d';
-  selectedSeatType: 'normal' | 'vip' | 'preferential' = 'normal';
+  selectedSeatType: 'NORMAL' | 'VIP' = 'NORMAL';
   private currentSeatNumber = 1;
   private destroy$ = new Subject<void>();
 
@@ -53,12 +53,13 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
     window.addEventListener('resize', this.onWindowResize.bind(this));
   }
 
+  // Add a watcher for viewMode changes
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['bus'] && !changes['bus'].firstChange) {
       this.updateBusLayout();
     }
 
-    if (changes['viewMode']) {
+    if (this.scene && changes['viewMode'] && !changes['viewMode'].firstChange) {
       this.updateCameraPosition();
     }
   }
@@ -84,7 +85,8 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
         }
       }
     });
-  }  private initThreeJS(): void {
+  }
+  private initThreeJS(): void {
     // Create scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xf0f0f0);
@@ -104,7 +106,6 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
     
     console.log('Initializing Three.js canvas with size:', width, 'x', height);
     
-    // Create camera with proper aspect ratio
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(0, 10, 20);
     
@@ -147,14 +148,16 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
     this.scene.add(directionalLight);
-  }
-  private createBus(): void {
+  }  private createBus(): void {
     if (!this.bus) {
       console.error('Cannot create bus: bus data is undefined');
       return;
     }
 
     console.log('Creating 3D bus with data:', this.bus);
+    
+    // Reset seat counter to ensure sequential numbering
+    this.currentSeatNumber = 1;
     
     // Create bus group
     this.busBody = new THREE.Group();
@@ -163,7 +166,7 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
 
     // Bus dimensions
     const busWidth = 2.5;
-    const busLength = this.bus.capacity > 30 ? 12 : 9; // Adjust length based on capacity
+    const busLength = (this.bus?.capacity ?? 0) > 30 ? 12 : 9; // Adjust length based on capacity
     const busHeight = 2.8;
     
     // Create the bus base/chassis
@@ -248,16 +251,15 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
 
   private createSeats(isSecondFloor: boolean = false): void {
     const busWidth = 2.5;
-    const busLength = this.bus.capacity > 30 ? 12 : 9;
-    const floorGroup = isSecondFloor ? this.busFloor2 : this.busFloor1;
-    
+    const busLength = (this.bus?.capacity ?? 0) > 30 ? 12 : 9;
+    const floorGroup = isSecondFloor ? this.busFloor2 : this.busFloor1;    
     // Determine how many seats to create on this floor
-    const totalCapacity = this.bus.capacity;
+    const totalCapacity = this.bus.capacity ?? 0;
     let floorCapacity: number;
     
     if (this.bus.floorCount === 2) {
-      // Split seats between floors
-      floorCapacity = isSecondFloor ? Math.floor(totalCapacity / 2) : Math.ceil(totalCapacity / 2);
+      // Each floor gets the full capacity
+      floorCapacity = totalCapacity;
     } else {
       floorCapacity = totalCapacity;
     }
@@ -325,19 +327,30 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
     const back = new THREE.Mesh(backGeometry, seatMaterial);
     back.position.set(0, 0.25, -depth / 2);
     seat.add(back);
+      seat.receiveShadow = true;
     
-    seat.castShadow = true;
-    seat.receiveShadow = true;
-    
-    // Store the seat in our reference object
-    const seatNumber = `${isSecondFloor ? "2" : "1"}${row + 1}${String.fromCharCode(65 + col)}`;
+    // Generate sequential seat number (as string)
+    const seatNumber = this.currentSeatNumber.toString();
     
     // Create default seat data
     const seatData: IBusSeat = {
+      id: this.currentSeatNumber,
       number: seatNumber,
-      type: "normal",
-      location: col === 0 || col === 2 ? "ventana" : "pasillo"
+      row: row + 1,
+      column: col + 1,
+      floor: isSecondFloor ? 2 : 1,
+      status: 'available',
+      type: "NORMAL",
+      location: col === 0 || col === 3 ? "ventana" : "pasillo"
     };
+    
+    // Increment seat counter for next seat
+    this.currentSeatNumber++;
+    
+    // If bus has an ID, associate the seat with the bus
+    if (this.bus && this.bus.id) {
+      seatData.busId = this.bus.id;
+    }
     
     // Add the seat to the scene
     floorGroup.add(seat);
@@ -381,10 +394,14 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
         
         if (object && object.userData['clickable']) {
           const seatNumber = object.userData['seatData'].number;
-          
-          if (this.seatObjects[seatNumber]) {
+            if (this.seatObjects[seatNumber]) {
+            // Log the seat type change for debugging
+            const oldType = this.seatObjects[seatNumber].data.type;
+            
             // Update seat type based on selection
             this.seatObjects[seatNumber].data.type = this.selectedSeatType;
+            
+            console.log(`Seat ${seatNumber} changed from ${oldType} to ${this.selectedSeatType}`);
             
             // Update seat color
             this.updateSeatColor(seatNumber);
@@ -402,16 +419,12 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
     const seat = seatObj.mesh;
     const seatType = seatObj.data.type;
     
-    let color: number;
-    switch (seatType) {
-      case 'normal':
+    let color: number;    switch (seatType) {
+      case 'NORMAL':
         color = 0x4caf50; // Green
         break;
-      case 'vip':
+      case 'VIP':
         color = 0xff9800; // Orange
-        break;
-      case 'preferential':
-        color = 0x2196f3; // Blue
         break;
       default:
         color = 0x4caf50; // Default green
@@ -428,7 +441,6 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
       }
     });
   }
-
   updateBusLayout(): void {
     // Clear existing seats
     this.busFloor1.clear();
@@ -436,7 +448,9 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
       this.busFloor2.clear();
     }
     
+    // Reset seat data and counter
     this.seatObjects = {};
+    this.currentSeatNumber = 1;
     this.createBus();
   }
 
@@ -456,25 +470,27 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
   }
-
   resetView(): void {
-    if (this.viewMode === '3d') {
-      this.camera.position.set(0, 10, 20);
-    } else {
-      this.camera.position.set(0, 20, 0);
-      this.camera.lookAt(0, 0, 0);
-    }
-    this.controls.update();
+    // Reset the camera position using the view mode
+    this.updateCameraPosition();
   }
-
   updateCameraPosition(): void {
+    if (!this.camera || !this.controls) return;
+    
     if (this.viewMode === '3d') {
       gsap.to(this.camera.position, {
         x: 0,
         y: 10,
         z: 20,
         duration: 1,
-        onUpdate: () => this.camera.lookAt(0, 0, 0)
+        onUpdate: () => {
+          this.camera.lookAt(0, 0, 0);
+          this.controls.update();
+        },
+        onComplete: () => {
+          this.controls.update();
+          this.renderer.render(this.scene, this.camera);
+        }
       });
     } else {
       gsap.to(this.camera.position, {
@@ -482,21 +498,111 @@ export class BusesThreeComponent implements OnInit, OnChanges, OnDestroy {
         y: 20,
         z: 0,
         duration: 1,
-        onUpdate: () => this.camera.lookAt(0, 0, 0)
+        onUpdate: () => {
+          this.camera.lookAt(0, 0, 0);
+          this.controls.update();
+        },
+        onComplete: () => {
+          this.controls.update();
+          this.renderer.render(this.scene, this.camera);
+        }
       });
     }
-  }
-
-  saveSeatsConfiguration(): void {
+  }  saveSeatsConfiguration(): void {
     // Extract all seat data
-    const seats: IBusSeat[] = Object.values(this.seatObjects).map(obj => obj.data);
+    const seats: IBusSeat[] = Object.values(this.seatObjects).map(obj => {
+      const seat = { ...obj.data };
+      
+      // Map the seat types to match backend expectations
+      let mappedType: 'NORMAL' | 'VIP' | 'discapacitado';
+      switch(seat.type) {
+        case 'VIP':
+          mappedType = 'VIP'; // Uppercase as expected by backend
+          break;
+        default:
+          mappedType = 'NORMAL';
+      }
+      
+      // Create simplified seat object for the API with correct type mapping
+      return {
+        number: seat.number,
+        type: mappedType,
+        location: seat.location
+      };
+    });
+      
+    // Log the VIP seats to verify they're being saved correctly
+    const vipSeats = seats.filter(seat => seat.type === 'VIP');
+    console.log(`Total seats: ${seats.length}, VIP seats: ${vipSeats.length}`);
+    console.log('VIP seat numbers:', vipSeats.map(s => s.number).join(', '));
     
     // Update the bus object with the configured seats
     if (this.bus) {
       this.bus.seats = seats;
       console.log('Seat configuration saved:', seats);
-      // Here you would typically emit an event or call a service method
-      // to save the updated bus configuration
+      console.log('Bus configuration ready to save:', this.bus);
+      
+      // Emit the configured bus to the parent component
+      this.seatsConfigured.emit(this.bus);
+    }
+  }
+
+  // Listen for viewMode changes from the radio buttons
+  onViewModeChange(): void {
+    // Update the camera position based on the new view mode
+    this.updateCameraPosition();
+  }  // Reset all seats to NORMAL type
+  resetAllSeats(): void {
+    if (!this.bus || !this.editable) return;
+
+    console.log('Resetting all seats to NORMAL type');
+    let vipCount = 0;
+    
+    // Iterate through all seat objects and set them to NORMAL
+    Object.keys(this.seatObjects).forEach(seatId => {
+      const seatObj = this.seatObjects[seatId];
+      
+      if (seatObj.data.type === 'VIP') {
+        vipCount++;
+      }
+      
+      seatObj.data.type = 'NORMAL';
+      
+      // Update the seat mesh material
+      const material = new THREE.MeshLambertMaterial({ color: this.getSeatColor('NORMAL') });
+      seatObj.mesh.material = material;
+      
+      // Also update children materials
+      seatObj.mesh.children.forEach(child => {
+        if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshLambertMaterial) {
+          child.material.color.set(this.getSeatColor('NORMAL'));
+        }
+      });
+    });
+
+    console.log(`Reset ${Object.keys(this.seatObjects).length} seats, including ${vipCount} VIP seats`);
+
+    // Update the bus data
+    if (this.bus && this.bus.seats) {
+      this.bus.seats.forEach(seat => {
+        seat.type = 'NORMAL';
+      });
+    }
+
+    // Force a render update
+    this.renderer.render(this.scene, this.camera);
+  }  private getSeatColor(type: string): number {
+    switch (type) {
+      case 'NORMAL':
+        return 0x4caf50; // Green
+      case 'VIP':
+        return 0xff9800; // Orange
+      case 'reserved':
+        return 0xf44336; // Red
+      case 'selected':
+        return 0x9c27b0; // Purple
+      default:
+        return 0x4caf50; // Default to green
     }
   }
 }

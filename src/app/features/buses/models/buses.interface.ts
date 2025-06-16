@@ -4,17 +4,20 @@ export interface IBuses {
     licensePlate: string;
     chassisBrand: string;
     bodyworkBrand: string;
-    photos: string[];
-    capacity: number;
+    photo?: string;
     stoppageDays: number;
-    floorCount: number;
+    busTypeId: number;
     seats: IBusSeat[];
+    // Campos locales para UI (no se envían al backend)
+    capacity?: number;
+    floorCount?: number;
+    photos?: string[];
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export interface IBusSeat {
     number: string;
-    type: 'normal' | 'vip' | 'preferential';
+    type: 'NORMAL' | 'VIP' ;
     location: 'ventana' | 'pasillo' | 'other';
 }

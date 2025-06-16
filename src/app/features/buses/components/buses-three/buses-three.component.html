@@ -1,33 +1,31 @@
-<div class="container-xl">
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">Configuración de Asientos</h3>
-      <div class="card-actions">
-        <button class="btn btn-sm btn-primary" (click)="resetView()">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
-            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
-          </svg>
-          Reiniciar Vista
-        </button>
-      </div>
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Configuración de Asientos</h3>
+    <div class="card-actions">
+      <button class="btn btn-sm btn-primary" (click)="resetView()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+          <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+        </svg>
+        Reiniciar Vista
+      </button>
     </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-8">
-          <div class="bus-container" #busContainer style="height: 500px; width: 100%;"></div>
-        </div>
-        <div class="col-md-4">
-        <div class="mb-3">
-          <label class="form-label mb-2">Opciones de visualización</label>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="bus-container" #busContainer></div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">          <label class="form-label mb-2">Opciones de visualización</label>
           <div class="form-selectgroup">
             <label class="form-selectgroup-item">
-              <input type="radio" name="viewMode" [value]="'3d'" class="form-selectgroup-input" [(ngModel)]="viewMode">
+              <input type="radio" name="viewMode" [value]="'3d'" class="form-selectgroup-input" [(ngModel)]="viewMode" (ngModelChange)="onViewModeChange()">
               <span class="form-selectgroup-label">Vista 3D</span>
             </label>
             <label class="form-selectgroup-item">
-              <input type="radio" name="viewMode" [value]="'top'" class="form-selectgroup-input" [(ngModel)]="viewMode">
+              <input type="radio" name="viewMode" [value]="'top'" class="form-selectgroup-input" [(ngModel)]="viewMode" (ngModelChange)="onViewModeChange()">
               <span class="form-selectgroup-label">Vista Superior</span>
             </label>
           </div>
@@ -35,18 +33,13 @@
 
         <div class="mb-3">
           <label class="form-label">Tipo de asiento seleccionado</label>
-          <div class="form-selectgroup">
-            <label class="form-selectgroup-item">
-              <input type="radio" name="seatType" [value]="'normal'" class="form-selectgroup-input" [(ngModel)]="selectedSeatType">
+          <div class="form-selectgroup">            <label class="form-selectgroup-item">
+              <input type="radio" name="seatType" [value]="'NORMAL'" class="form-selectgroup-input" [(ngModel)]="selectedSeatType">
               <span class="form-selectgroup-label">Normal</span>
             </label>
             <label class="form-selectgroup-item">
-              <input type="radio" name="seatType" [value]="'vip'" class="form-selectgroup-input" [(ngModel)]="selectedSeatType">
+              <input type="radio" name="seatType" [value]="'VIP'" class="form-selectgroup-input" [(ngModel)]="selectedSeatType">
               <span class="form-selectgroup-label">VIP</span>
-            </label>
-            <label class="form-selectgroup-item">
-              <input type="radio" name="seatType" [value]="'preferential'" class="form-selectgroup-input" [(ngModel)]="selectedSeatType">
-              <span class="form-selectgroup-label">Preferencial</span>
             </label>
           </div>
         </div>
@@ -61,21 +54,17 @@
             <div class="legend-box vip-seat"></div>
             <span class="ms-2">Asiento VIP</span>
           </div>
-          <div class="d-flex align-items-center mb-2">
-            <div class="legend-box preferential-seat"></div>
-            <span class="ms-2">Asiento Preferencial</span>
-          </div>
-          <div class="d-flex align-items-center mb-2">
-            <div class="legend-box reserved-seat"></div>
-            <span class="ms-2">Asiento Reservado</span>
-          </div>
-          <div class="d-flex align-items-center">
-            <div class="legend-box selected-seat"></div>
-            <span class="ms-2">Asiento Seleccionado</span>
-          </div>
         </div>
 
         <div class="mt-4">
+          <button class="btn btn-danger w-100 mb-3" (click)="resetAllSeats()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-refresh" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+              <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+            </svg>
+            Reiniciar Todos los Asientos
+          </button>
           <button class="btn btn-primary w-100" (click)="saveSeatsConfiguration()">Guardar Configuración</button>
         </div>
       </div>

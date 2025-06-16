@@ -20,11 +20,10 @@
             </div>
           </div>
           <div class="col-sm-6 col-md-6">
-            <div class="mb-3">
-              <label class="form-label required">Placa</label>
-              <input type="text" class="form-control" formControlName="licensePlate" placeholder="Ej: ABC-1234">
+            <div class="mb-3">              <label class="form-label required">Placa</label>
+              <input type="text" class="form-control" formControlName="licensePlate" placeholder="Ej: ICH-090">
               <div class="invalid-feedback" *ngIf="busForm.get('licensePlate')?.invalid && busForm.get('licensePlate')?.touched">
-                La placa es requerida
+                La placa es requerida y debe tener el formato correcto (Ej: ICH-090)
               </div>
             </div>
           </div>
@@ -71,8 +70,7 @@
                 El valor debe ser 0 o mayor
               </div>
             </div>
-          </div>
-          <div class="col-sm-4 col-md-4">
+          </div>          <div class="col-sm-4 col-md-4">
             <div class="mb-3">
               <label class="form-label required">Número de Pisos</label>
               <div class="form-selectgroup">
@@ -87,6 +85,21 @@
               </div>
             </div>
           </div>
+          <div class="col-sm-4 col-md-4">
+            <div class="mb-3">
+              <label class="form-label required">Tipo de Bus</label>
+              <select class="form-select" formControlName="busTypeId">
+                <option [value]="1">Tipo 1 - Estándar</option>
+                <option [value]="2">Tipo 2 - Ejecutivo</option>
+                <option [value]="3">Tipo 3 - Premium</option>
+                <option [value]="4">Tipo 4 - VIP</option>
+                <option [value]="5">Tipo 5 - Lujo</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="busForm.get('busTypeId')?.invalid && busForm.get('busTypeId')?.touched">
+                El tipo de bus es requerido
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Fotos -->
@@ -95,14 +108,20 @@
             <label class="form-label">Fotos del Bus</label>
             <div class="mb-3">
               <div class="input-group">
-                <input type="text" class="form-control" formControlName="photoUrl" placeholder="URL de la foto">
-                <button class="btn btn-outline-primary" type="button" (click)="addPhoto()">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <input type="file" 
+                       class="form-control" 
+                       accept="image/*" 
+                       multiple
+                       (change)="onFileSelected($event)"
+                       #fileInput>
+                <button class="btn btn-outline-primary" type="button" (click)="fileInput.click()">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M12 5l0 14"></path>
-                    <path d="M5 12l14 0"></path>
+                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                    <path d="M7 9l5 -5l5 5"></path>
+                    <path d="M12 4l0 12"></path>
                   </svg>
-                  Agregar
+                  Seleccionar Imágenes
                 </button>
               </div>
             </div>
@@ -141,11 +160,8 @@
         <!-- Botones de acción -->
         <div class="form-footer d-flex justify-content-end">
           <div class="btn-list">
-            <a class="btn btn-outline-secondary" (click)="cancel()">
-              Cancelar
-            </a>
             <button type="submit" class="btn btn-primary" [disabled]="busForm.invalid">
-              {{ isEditing ? 'Actualizar' : 'Guardar' }}
+              {{ isEditing ? 'Actualizar' : 'Siguiente' }}
             </button>
           </div>
         </div>
