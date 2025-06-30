@@ -1,23 +1,230 @@
 <app-banner />
-<div class="row row-deck row-cards">
-  <div class="col-4">
-    <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+
+<!-- Spinner de carga -->
+<div *ngIf="isLoading" class="d-flex justify-content-center align-items-center" style="height: 300px;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+<!-- Mensaje de error -->
+<div *ngIf="error && !isLoading" class="alert alert-danger" role="alert">
+  <div class="d-flex">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="m0 0h24v24H0z" fill="none"></path>
+        <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+        <path d="m9 9l6 6"></path>
+        <path d="m15 9l-6 6"></path>
+      </svg>
+    </div>
+    <div>
+      <h4 class="alert-title">Error!</h4>
+      <div class="text-secondary">{{ error }}</div>
     </div>
   </div>
-  <div class="col-4">
-    <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+</div>
+
+<!-- Dashboard principal -->
+<div *ngIf="!isLoading && !error" class="row row-deck row-cards">
+  <!-- Tarjetas de estadísticas -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card card-sm">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <span class="bg-blue text-white avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="m0 0h24v24H0z" fill="none"/>
+                <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                <path d="M18 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
+                <path d="M4 9h16a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2z"/>
+                <path d="M10 6v-1a2 2 0 0 1 2 -2h0a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </span>
+          </div>
+          <div class="col">
+            <div class="font-weight-medium">
+              {{ stats.totalBuses }}
+            </div>
+            <div class="text-secondary">
+              Buses
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="col-4">
-    <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card card-sm">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <span class="bg-red text-white avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="m0 0h24v24H0z" fill="none"/>
+                <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3z"/>
+                <path d="M9 4v13"/>
+                <path d="M15 7v13"/>
+              </svg>
+            </span>
+          </div>
+          <div class="col">
+            <div class="font-weight-medium">
+              {{ stats.totalRoutes }}
+            </div>
+            <div class="text-secondary">
+              Rutas
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card card-sm">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <span class="bg-yellow text-white avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="m0 0h24v24H0z" fill="none"/>
+                <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+                <path d="M12 1v6"/>
+                <path d="M12 17v6"/>
+                <path d="M5.636 5.636l4.243 4.243"/>
+                <path d="M14.121 14.121l4.243 4.243"/>
+                <path d="M1 12h6"/>
+                <path d="M17 12h6"/>
+                <path d="M5.636 18.364l4.243 -4.243"/>
+                <path d="M14.121 9.879l4.243 -4.243"/>
+              </svg>
+            </span>
+          </div>
+          <div class="col">
+            <div class="font-weight-medium">
+              {{ stats.totalFrequencies }}
+            </div>
+            <div class="text-secondary">
+              Frecuencias Activas
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card card-sm">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <span class="bg-teal text-white avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="m0 0h24v24H0z" fill="none"/>
+                <path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/>
+                <path d="M7 7h10"/>
+                <path d="M7 12h10"/>
+                <path d="M7 17h10"/>
+              </svg>
+            </span>
+          </div>
+          <div class="col">
+            <div class="font-weight-medium">
+              {{ stats.totalBusTypes }}
+            </div>
+            <div class="text-secondary">
+              Tipos de Bus
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de estadísticas generales -->
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Estadísticas Generales</h3>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px;">
+          <canvas #statsChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de distribución por tipo de bus -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Distribución por Tipo de Bus</h3>
+      </div>
+      <div class="card-body">
+        <div style="height: 300px;">
+          <canvas #busTypesChart></canvas>
+        </div>
+        <!-- Mostrar mensaje si no hay datos -->
+        <div *ngIf="busTypeStats.length === 0" class="text-center text-muted py-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="m0 0h24v24H0z" fill="none"/>
+            <path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3z"/>
+            <path d="M9 4v13"/>
+            <path d="M15 7v13"/>
+          </svg>
+          <div>No hay buses registrados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta de resumen -->
   <div class="col-12">
     <div class="card">
-      <div class="card-body" style="height: 10rem"></div>
+      <div class="card-header">
+        <h3 class="card-title">Resumen de la Cooperativa</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 text-center">
+            <div class="h3 text-blue">{{ stats.totalBuses }}</div>
+            <div class="text-secondary">Buses en operación</div>
+          </div>
+          <div class="col-md-3 text-center">
+            <div class="h3 text-red">{{ stats.totalRoutes }}</div>
+            <div class="text-secondary">Rutas registradas</div>
+          </div>
+          <div class="col-md-3 text-center">
+            <div class="h3 text-yellow">{{ stats.totalFrequencies }}</div>
+            <div class="text-secondary">Frecuencias activas</div>
+          </div>
+          <div class="col-md-3 text-center">
+            <div class="h3 text-teal">{{ stats.totalBusTypes }}</div>
+            <div class="text-secondary">Tipos de bus disponibles</div>
+          </div>
+        </div>
+        
+        <!-- Lista de tipos de bus con estadísticas -->
+        <div *ngIf="busTypeStats.length > 0" class="mt-4">
+          <h4 class="mb-3">Buses por Tipo</h4>
+          <div class="row">
+            <div *ngFor="let busType of busTypeStats" class="col-md-6 col-xl-4 mb-2">
+              <div class="d-flex align-items-center">
+                <div class="me-2">
+                  <span class="badge bg-primary">{{ busType.count }}</span>
+                </div>
+                <div>
+                  <strong>{{ busType.name }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
