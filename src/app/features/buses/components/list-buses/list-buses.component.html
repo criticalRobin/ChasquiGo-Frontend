@@ -1,21 +1,71 @@
 <div class="card">
   <div class="card-header">
-    <div class="d-flex justify-content-between align-items-center">      
-      <button type="button" class="btn btn-primary" (click)="onCreateBus()">
-        Crear Bus
-      </button>
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h3 class="card-title">Lista de Buses</h3>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-primary" (click)="onCreateBus()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Crear Bus
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+  
   <div class="card-body">
+    <!-- Buscador -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="input-group">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Buscar por placa, chasis, carrocería o tipo de bus..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          >
+          <button 
+            class="btn btn-outline-secondary" 
+            type="button" 
+            (click)="clearSearch()"
+            [disabled]="!searchTerm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Limpiar
+          </button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small">
+          <span *ngIf="searchTerm">
+            Mostrando {{ filteredBuses.length }} de {{ buses.length }} buses
+          </span>
+          <span *ngIf="!searchTerm">
+            Total: {{ buses.length }} buses
+          </span>
+        </div>
+      </div>
+    </div>
     <!-- Tabla de Buses -->
     <div class="table-responsive">
       <table class="table table-vcenter card-table">
         <thead>
           <tr>
             <th>Placa</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Cooperativa</th>
+            <th>Marca del Chasis</th>
+            <th>Marca de Carrocería</th>
+            <th>Tipo de Bus</th>
             <th>Asientos</th>
             <th>Acciones</th>
           </tr>
@@ -28,13 +78,17 @@
               </div>
             </td>
           </tr>
-          <tr *ngIf="!loading && buses.length === 0">
+          <tr *ngIf="!loading && filteredBuses.length === 0 && searchTerm">
+            <td colspan="6" class="text-center">No se encontraron buses que coincidan con la búsqueda</td>
+          </tr>
+          <tr *ngIf="!loading && buses.length === 0 && !searchTerm">
             <td colspan="6" class="text-center">No hay buses registrados</td>
           </tr>
-          <tr *ngFor="let bus of buses">            <td>{{ bus.licensePlate }}</td>
+          <tr *ngFor="let bus of filteredBuses">
+            <td>{{ bus.licensePlate }}</td>
             <td>{{ bus.chassisBrand }}</td>
             <td>{{ bus.bodyworkBrand }}</td>
-            <td>{{ getCooperativeName(bus.cooperativeId) }}</td>
+            <td>{{ getBusTypeName(bus.busTypeId) }}</td>
             <td>{{ bus.seats.length }} asientos</td>            <td>
               <div class="btn-list">
                 <button type="button" class="btn btn-primary btn-sm" (click)="onEditBus(bus)">

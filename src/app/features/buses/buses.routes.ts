@@ -9,9 +9,21 @@ export const busesRoutes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'buses/create-bus',
+    loadComponent: () =>
+      import('./buses.component').then((c) => c.BusesComponent),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'buses/editar/:id',
+    loadComponent: () =>
+      import('./components/edit-seats/edit-seats.component').then((c) => c.EditSeatsComponent),
+    canActivate: [AuthGuard],
+  }
+ /* {
     path: 'buses/editar/:id',
     loadComponent: () =>
       import('./components/edit-buses/edit-buses.component').then((c) => c.EditBusesComponent),
     canActivate: [AuthGuard],
-  }
+  }*/
 ];

@@ -2,14 +2,8 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { IBuses } from '../../models/buses.interface';
+import { IBuses, IBusType } from '../../models/buses.interface';
 import { BusesService } from '../../services/buses.service';
-import { CooperativeService } from '../../services/cooperative.service';
-
-interface Cooperative {
-  id: number;
-  name: string;
-}
 
 @Component({
   selector: 'app-list-buses',
@@ -23,118 +17,75 @@ export class ListBusesComponent implements OnInit {
   @Output() editBusClicked = new EventEmitter<IBuses>();
   
   buses: IBuses[] = [];
-  cooperatives: Cooperative[] = [];
-  selectedCooperativeId: number | null = null;
+  busTypes: IBusType[] = [];
+  filteredBuses: IBuses[] = [];
   loading: boolean = true;
   busToDelete: IBuses | null = null;
   showDeleteModal = false;
+  searchTerm: string = '';
     constructor(
     private busService: BusesService,
-    private cooperativeService: CooperativeService,
     private router: Router
   ) {}
   
   ngOnInit(): void {
-    this.loadCooperatives();
+    this.loadBusTypes();
     this.loadBuses();
-  }
-  
-  loadCooperatives(): void {
-    this.cooperativeService.getCooperatives().subscribe({
-      next: (coops) => {
-        this.cooperatives = coops;
-      },
-      error: (error) => {
-        console.error('Error loading cooperatives:', error);
-      }
-    });
   }
   
   loadBuses(): void {
     this.loading = true;
-    const userCooperativeString = localStorage.getItem('userCooperative');
-    let cooperativeId: number | null = null;
-
-    if (userCooperativeString) {
-      try {
-        const userCooperative = JSON.parse(userCooperativeString);
-        if (userCooperative && typeof userCooperative.id === 'number') {
-          cooperativeId = userCooperative.id;
-        }
-      } catch (e) {
-        console.error('Error parsing userCooperative from localStorage', e);
+    
+    // Obtener el ID de la cooperativa del localStorage
+    const userCooperative = localStorage.getItem('userCooperative');
+    if (!userCooperative) {
+      console.error('No se encontró información de la cooperativa en localStorage');
+      this.loading = false;
+      return;
+    }
+    
+    let cooperativeId: number;
+    try {
+      const cooperativeData = JSON.parse(userCooperative);
+      cooperativeId = cooperativeData.id;
+      
+      if (!cooperativeId) {
+        console.error('ID de cooperativa no válido:', cooperativeData);
+        this.loading = false;
+        return;
       }
+    } catch (error) {
+      console.error('Error al parsear datos de cooperativa desde localStorage:', error);
+      this.loading = false;
+      return;
     }
+    
+    // Usar el nuevo endpoint con el ID de la cooperativa
+    this.busService.getBusesByCooperativeId(cooperativeId).subscribe({
+      next: (buses: IBuses[]) => {
+        this.buses = buses;
+        this.filteredBuses = [...buses]; // Inicializar la lista filtrada
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading buses:', error);
+        this.loading = false;
+      }
+    });
+  }
 
-    if (cooperativeId !== null) {
-      // Use the new endpoint for the specific cooperative
-      this.busService.getBusesByCooperative(cooperativeId).subscribe({
-        next: (buses: IBuses[]) => {
-          this.buses = buses;
-          this.loading = false;
-        },
-        error: (error: any) => {
-          console.error('Error loading buses by cooperative:', error);
-          this.loading = false;
-        }
-      });
-    } else {
-      // Fallback to loading all buses if cooperativeId is not found or invalid
-      console.warn('userCooperative ID not found in localStorage or invalid. Loading all buses.');
-      this.busService.getBuses().subscribe({
-        next: (buses: IBuses[]) => {
-          this.buses = buses;
-          this.loading = false;
-        },
-        error: (error: any) => {
-          console.error('Error loading all buses:', error);
-          this.loading = false;
-        }
-      });
-    }
+  loadBusTypes(): void {
+    this.busService.getBusTypes().subscribe({
+      next: (types: IBusType[]) => {
+        this.busTypes = types;
+      },
+      error: (error) => {
+        console.error('Error al cargar los tipos de bus:', error);
+      }
+    });
   }
   
-  filterBuses(): void {
-    this.loading = true;
-    if (this.selectedCooperativeId) {
-      // Assuming this.buses already contains buses for the user's cooperative
-      // Filter locally if selectedCooperativeId is different from user's cooperative id
-      const userCooperativeString = localStorage.getItem('userCooperative');
-      let userCoopId: number | null = null;
-      if (userCooperativeString) {
-        try {
-          const userCooperative = JSON.parse(userCooperativeString);
-          if (userCooperative && typeof userCooperative.id === 'number') {
-            userCoopId = userCooperative.id;
-          }
-        } catch (e) {
-          console.error('Error parsing userCooperative from localStorage', e);
-        }
-      }
-
-      if (this.selectedCooperativeId === userCoopId) {
-        // If filtering by user's own cooperative, just reload all buses (which are already filtered by coop)
-        this.loadBuses(); 
-      } else {
-        // If filtering by a different cooperative (not typical for this feature, but just in case)
-        // You would typically make another API call to /buses/cooperative/{selectedCooperativeId}
-        // For now, filter from already loaded buses if any
-        this.busService.getBuses().subscribe({
-          next: (buses) => {
-            this.buses = buses.filter(bus => bus.cooperativeId === this.selectedCooperativeId);
-            this.loading = false;
-          },
-          error: (error) => {
-            console.error('Error filtering buses:', error);
-            this.loading = false;
-          }
-        });
-      }
-    } else {
-      this.loadBuses();
-    }
-  }
-    onCreateBus(): void {
+  onCreateBus(): void {
     console.log('Botón Crear Bus clickeado');
     this.createBusClicked.emit();
   }  onEditBus(bus: IBuses): void {
@@ -157,7 +108,7 @@ export class ListBusesComponent implements OnInit {
       this.loading = true;
       this.busService.deleteBus(this.busToDelete.id).subscribe({
         next: () => {
-          this.loadBuses();
+          this.loadBuses(); // Esto ya actualiza filteredBuses
           this.cancelDelete();
         },
         error: (error) => {
@@ -174,8 +125,45 @@ export class ListBusesComponent implements OnInit {
     this.busToDelete = null;
   }
 
-  getCooperativeName(cooperativeId: number): string {
-    const coop = this.cooperatives.find(c => c.id === cooperativeId);
-    return coop ? coop.name : 'No asignada';
+  getBusTypeName(busTypeId: number): string {
+    const busType = this.busTypes.find(type => type.id === busTypeId);
+    return busType ? busType.name : `Tipo ${busTypeId}`;
+  }
+
+  onSearchChange(): void {
+    this.filterBuses();
+  }
+
+  filterBuses(): void {
+    if (!this.searchTerm.trim()) {
+      // Si no hay término de búsqueda, mostrar todos los buses
+      this.filteredBuses = [...this.buses];
+      return;
+    }
+
+    const searchTermLower = this.searchTerm.toLowerCase().trim();
+    
+    this.filteredBuses = this.buses.filter(bus => {
+      // Filtrar por placa
+      const plateMatch = bus.licensePlate?.toLowerCase().includes(searchTermLower);
+      
+      // Filtrar por chasis
+      const chassisMatch = bus.chassisBrand?.toLowerCase().includes(searchTermLower);
+      
+      // Filtrar por carrocería
+      const bodyworkMatch = bus.bodyworkBrand?.toLowerCase().includes(searchTermLower);
+      
+      // Filtrar por tipo de bus
+      const busTypeName = this.getBusTypeName(bus.busTypeId);
+      const typeMatch = busTypeName.toLowerCase().includes(searchTermLower);
+      
+      // Retornar true si coincide con cualquiera de los criterios
+      return plateMatch || chassisMatch || bodyworkMatch || typeMatch;
+    });
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.filterBuses();
   }
 }
