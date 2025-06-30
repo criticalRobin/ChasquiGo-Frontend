@@ -1,10 +1,21 @@
-<div class="page">
+<div class="page d-flex flex-column min-vh-100">
   <app-header />
-  <div class="page-wrapper">
+  <div class="page-wrapper flex-grow-1">
     <div class="page-body">
       <div class="container-xl">
         <router-outlet />
       </div>
     </div>
   </div>
+  <footer class="footer footer-transparent d-print-none mt-auto">
+    <div class="container-xl">
+      <div class="row justify-content-center">
+        <div class="col-auto">
+          <div class="text-center">
+            ChasquiGo v0.1
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 </div>
