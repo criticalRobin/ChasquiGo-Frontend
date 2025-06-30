@@ -1,0 +1,60 @@
+/* Estilos para campos deshabilitados */
+.form-control:disabled,
+.form-select:disabled {
+  background-color: #f8f9fa;
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-color: #dee2e6;
+}
+
+.form-control:disabled::placeholder {
+  color: #6c757d;
+  opacity: 0.5;
+}
+
+/* Efecto visual adicional para campos deshabilitados */
+.form-control:disabled:hover,
+.form-select:disabled:hover {
+  border-color: #dee2e6;
+}
+
+/* Mejoras visuales para el formulario */
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-title {
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.card-subtitle {
+  margin-top: 0.25rem;
+}
+
+.form-label.required::after {
+  content: " *";
+  color: #dc3545;
+}
+
+.icon {
+  vertical-align: middle;
+}
+
+/* Animación suave para botones */
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Espaciado mejorado */
+.form-footer {
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+  margin-top: 1.5rem;
+}

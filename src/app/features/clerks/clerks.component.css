@@ -1,0 +1,20 @@
+.container-xl {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.row-cards > div {
+  margin-bottom: 1.5rem;
+}
+
+.card.py-5 {
+  min-height: 200px; /* Ensure loading card has some height */
+}
+
+/* Basic responsive adjustments if needed */
+@media (max-width: 768px) {
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}

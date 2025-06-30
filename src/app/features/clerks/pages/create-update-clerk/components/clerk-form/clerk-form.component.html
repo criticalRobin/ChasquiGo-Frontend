@@ -1,0 +1,303 @@
+<form [formGroup]="clerkForm" (ngSubmit)="onSubmit()" class="card">
+  <div class="card-header">
+    <h3 class="card-title">{{ isEditMode ? 'Editar Oficinista' : 'Registrar Oficinista' }}</h3>
+    @if (isEditMode) {
+    <div class="card-subtitle">
+      <small class="text-muted">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M12 9v2"/>
+          <path d="M12 15h.01"/>
+          <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z"/>
+        </svg>
+        Solo email y teléfono pueden modificarse
+      </small>
+    </div>
+    }
+  </div>
+  <div class="card-body">
+    <!-- ID Number and Document Type -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label required">
+          Cédula/RUC
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="idNumber"
+          [class.is-invalid]="
+            clerkForm.get('idNumber')?.invalid &&
+            clerkForm.get('idNumber')?.touched
+          "
+          placeholder="Ej: 1712345678"
+        />
+        @if (clerkForm.get('idNumber')?.invalid &&
+        clerkForm.get('idNumber')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('idNumber')?.errors?.['required']) {
+            Cédula/RUC es requerida
+          }
+          @if (clerkForm.get('idNumber')?.errors?.['pattern']) {
+            Debe tener exactamente 10 dígitos
+          }
+          @if (clerkForm.get('idNumber')?.errors?.['invalidId']) {
+            Cédula ecuatoriana inválida
+          }
+        </div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">
+          Tipo de Documento
+        </label>
+        <select
+          class="form-select"
+          formControlName="documentType"
+          [class.is-invalid]="
+            clerkForm.get('documentType')?.invalid &&
+            clerkForm.get('documentType')?.touched
+          "
+        >
+          <option value="CEDULA">Cédula</option>
+          <option value="RUC">RUC</option>
+        </select>
+        @if (clerkForm.get('documentType')?.invalid &&
+        clerkForm.get('documentType')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('documentType')?.errors?.['required']) {
+            Tipo de documento es requerido
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Password section -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        @if (!isEditMode) {
+        <label class="form-label required">Contraseña</label>
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+          [class.is-invalid]="
+            clerkForm.get('password')?.invalid &&
+            clerkForm.get('password')?.touched
+          "
+          placeholder="Ej: Password123"
+        />
+        @if (clerkForm.get('password')?.invalid &&
+        clerkForm.get('password')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('password')?.errors?.['required']) {
+            Contraseña es requerida
+          }
+          @if (clerkForm.get('password')?.errors?.['minlength']) {
+            Debe tener al menos 6 caracteres
+          }
+          @if (clerkForm.get('password')?.errors?.['maxlength']) {
+            No debe exceder 20 caracteres
+          }
+          @if (clerkForm.get('password')?.errors?.['passwordPattern']) {
+            Debe contener al menos una mayúscula y un número
+          }
+        </div>
+        }
+        } @else {
+        <label class="form-label">Contraseña</label>
+        <div class="mb-2">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm"
+            (click)="togglePasswordSection()"
+          >
+            @if (!showPasswordSection) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/>
+                <path d="M9 12l2 2l4 -4"/>
+              </svg>
+              Reestablecer contraseña
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M18 6l-12 12"/>
+                <path d="M6 6l12 12"/>
+              </svg>
+              Cancelar
+            }
+          </button>
+        </div>
+        @if (showPasswordSection) {
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+          [class.is-invalid]="
+            clerkForm.get('password')?.invalid &&
+            clerkForm.get('password')?.touched
+          "
+          placeholder="Nueva contraseña"
+        />
+        @if (clerkForm.get('password')?.invalid &&
+        clerkForm.get('password')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('password')?.errors?.['required']) {
+            Contraseña es requerida
+          }
+          @if (clerkForm.get('password')?.errors?.['minlength']) {
+            Debe tener al menos 6 caracteres
+          }
+          @if (clerkForm.get('password')?.errors?.['maxlength']) {
+            No debe exceder 20 caracteres
+          }
+          @if (clerkForm.get('password')?.errors?.['passwordPattern']) {
+            Debe contener al menos una mayúscula y un número
+          }
+        </div>
+        }
+        } @else {
+        <small class="text-muted">La contraseña actual se mantendrá sin cambios</small>
+        }
+        }
+      </div>
+    </div>
+
+    <!-- First Name and Last Name -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label required">Nombres</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          [class.is-invalid]="
+            clerkForm.get('firstName')?.invalid &&
+            clerkForm.get('firstName')?.touched
+          "
+          placeholder="Ej: Juan Carlos"
+        />
+        @if (clerkForm.get('firstName')?.invalid &&
+        clerkForm.get('firstName')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('firstName')?.errors?.['required']) {
+            Nombre es requerido
+          }
+          @if (clerkForm.get('firstName')?.errors?.['minlength']) {
+            Debe tener al menos 2 caracteres
+          }
+          @if (clerkForm.get('firstName')?.errors?.['maxlength']) {
+            No debe exceder 50 caracteres
+          }
+        </div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Apellidos</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          [class.is-invalid]="
+            clerkForm.get('lastName')?.invalid &&
+            clerkForm.get('lastName')?.touched
+          "
+          placeholder="Ej: Pérez González"
+        />
+        @if (clerkForm.get('lastName')?.invalid &&
+        clerkForm.get('lastName')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('lastName')?.errors?.['required']) {
+            Apellido es requerido
+          }
+          @if (clerkForm.get('lastName')?.errors?.['minlength']) {
+            Debe tener al menos 2 caracteres
+          }
+          @if (clerkForm.get('lastName')?.errors?.['maxlength']) {
+            No debe exceder 50 caracteres
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Email and Phone -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label required">Correo Electrónico</label>
+        <input
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [class.is-invalid]="
+            clerkForm.get('email')?.invalid && clerkForm.get('email')?.touched
+          "
+          placeholder="Ej: juan.perez@chasquigo.com"
+        />
+        @if (clerkForm.get('email')?.invalid &&
+        clerkForm.get('email')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('email')?.errors?.['required']) {
+            Correo electrónico es requerido
+          }
+          @if (clerkForm.get('email')?.errors?.['email']) {
+            Ingrese un correo electrónico válido
+          }
+        </div>
+        }
+      </div>
+      <div class="col-md-6">
+        <label class="form-label required">Teléfono</label>
+        <input
+          type="tel"
+          class="form-control"
+          formControlName="phone"
+          [class.is-invalid]="
+            clerkForm.get('phone')?.invalid && clerkForm.get('phone')?.touched
+          "
+          placeholder="Ej: 0987654321"
+        />
+        @if (clerkForm.get('phone')?.invalid &&
+        clerkForm.get('phone')?.touched) {
+        <div class="invalid-feedback">
+          @if (clerkForm.get('phone')?.errors?.['required']) {
+            Teléfono es requerido
+          }
+          @if (clerkForm.get('phone')?.errors?.['pattern']) {
+            Debe tener exactamente 10 dígitos
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-footer d-flex justify-content-end">
+      <div class="btn-list">
+        <button
+          type="button"
+          class="btn btn-link"
+          [routerLink]="['/oficinistas']"
+          [disabled]="isLoading"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="!isFormValid() || isLoading"
+        >
+          @if (isLoading) {
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          } {{ isEditMode ? 'Actualizar Oficinista' : 'Registrar Oficinista' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
