@@ -62,11 +62,11 @@
   min-width: 50px;
 }
 
-.seat-center .seat {
-  background-color: #28a745;
-  border-color: #28a745;
-  color: white;
-  font-weight: bold;
+/* El asiento central sigue las mismas reglas de color que los demás asientos */
+.seat-center .seat.seat-normal {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #495057;
 }
 
 .seat-center .seat.seat-vip {
@@ -358,4 +358,41 @@
   .aisle {
     width: 25px;
   }
+}
+
+/* Estilos para la sección de foto del bus */
+.photo-preview img {
+  border: 2px solid #dee2e6;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.photo-preview img:hover {
+  border-color: #007bff;
+}
+
+.photo-upload {
+  position: relative;
+}
+
+.photo-upload .form-control {
+  font-size: 0.875rem;
+}
+
+.photo-upload .btn {
+  font-size: 0.875rem;
+}
+
+.photo-upload .alert {
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+}
+
+/* Utilidad para gaps en flexbox */
+.d-flex.gap-2 {
+  gap: 0.5rem;
 }

@@ -27,6 +27,82 @@
           </div>
         </div>
 
+        <!-- Foto del Bus -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title text-primary">Foto del Bus</h5>
+            
+            <!-- Foto actual -->
+            <div class="photo-preview mb-3">
+              <img 
+                [src]="getCurrentPhotoUrl()" 
+                alt="Foto del bus" 
+                class="img-fluid rounded"
+                style="max-height: 200px; width: 100%; object-fit: cover;"
+              />
+            </div>
+
+            <!-- Upload de nueva foto -->
+            <div class="photo-upload">
+              <input 
+                type="file" 
+                id="photoInput" 
+                class="form-control mb-2" 
+                accept="image/jpeg,image/png,image/jpg"
+                (change)="onPhotoSelected($event)"
+                [disabled]="photoUploading"
+              />
+              
+              <!-- Preview de la foto seleccionada -->
+              <div class="photo-preview mb-2" *ngIf="photoPreview">
+                <img 
+                  [src]="photoPreview" 
+                  alt="Preview" 
+                  class="img-fluid rounded"
+                  style="max-height: 150px; width: 100%; object-fit: cover;"
+                />
+              </div>
+              
+              <!-- Error de validación -->
+              <div class="alert alert-danger py-2" *ngIf="photoError">
+                <small>{{ photoError }}</small>
+              </div>
+              
+              <!-- Botones de acción para foto -->
+              <div class="d-flex gap-2" *ngIf="selectedPhoto">
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-primary" 
+                  (click)="uploadPhoto()"
+                  [disabled]="photoUploading"
+                >
+                  <span *ngIf="photoUploading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                  <svg *ngIf="!photoUploading" xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  {{ photoUploading ? 'Subiendo...' : 'Subir Foto' }}
+                </button>
+                
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-secondary" 
+                  (click)="removePhoto()"
+                  [disabled]="photoUploading"
+                >
+                  Cancelar
+                </button>
+              </div>
+              
+              <!-- Información de ayuda -->
+              <small class="text-muted">
+                Formatos permitidos: JPG, JPEG, PNG. Tamaño máximo: 1MB
+              </small>
+            </div>
+          </div>
+        </div>
+
         <!-- Instrucciones -->
         <div class="card mb-3">
           <div class="card-body">
@@ -50,7 +126,7 @@
         </div>
 
         <!-- Leyenda de asientos -->
-        <div class="card">
+    <!-- <div class="card">
           <div class="card-body">
             <h5 class="card-title text-primary">Tipos de asientos:</h5>
             <div class="legend-vertical">
@@ -77,6 +153,7 @@
             </div>
           </div>
         </div>
+ -->
       </div>
 
       <!-- Columna 2: Asientos -->

@@ -47,4 +47,11 @@ export class BusesService {
   getBusTypeById(id: number): Observable<IBusType> {
     return this.http.get<IBusType>(`${environment.API_URL}/type-bus/${id}`);
   }
+
+  uploadImageToCloudinary(imageFile: File): Observable<{url: string}> {
+    const formData = new FormData();
+    formData.append('file', imageFile); // Cambio: usar 'file' en lugar de 'image'
+    console.log('Subiendo archivo a Cloudinary:', imageFile.name, 'Tamaño:', imageFile.size);
+    return this.http.post<{url: string}>(`${environment.API_URL}/cloudinary/image`, formData);
+  }
 }
