@@ -42,6 +42,7 @@ export class StepThreeComponent implements OnInit {
   @Input() selectedSeats!: ISeatSelection[];
   @Input() selectedFrequency!: IFrequencyDetail;
   @Output() ticketPurchased = new EventEmitter<ITicketPurchaseResponse>();
+  @Output() passengersDataReady = new EventEmitter<IPassengerData[]>();
   @Output() nextStep = new EventEmitter<void>();
   @Output() previousStep = new EventEmitter<void>();
 
@@ -187,6 +188,7 @@ export class StepThreeComponent implements OnInit {
       this.ticketsSaleService.purchaseTicket(purchaseRequest).subscribe({
         next: (response) => {
           this.ticketPurchased.emit(response);
+          this.passengersDataReady.emit(passengersData); // Emitir los datos de pasajeros
           this.alertService.showAlert({
             alertType: AlertType.SUCCESS,
             mainMessage: 'Ticket comprado exitosamente',

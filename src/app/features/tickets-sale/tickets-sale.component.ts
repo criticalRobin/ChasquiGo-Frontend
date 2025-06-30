@@ -7,6 +7,10 @@ import { StepThreeComponent } from './components/step-three/step-three.component
 import { IFrequencyDetail } from './models/frequencie-detail.interface';
 import { ISeatSelection } from './models/seats-layout.interface';
 import { ITicketPurchaseResponse } from './models/ticket.interface';
+import { IPassengerData } from './models/passenger.interface';
+import { PdfGeneratorService } from './services/pdf-generator.service';
+import { AlertService } from '@shared/services/alert.service';
+import { AlertType } from '@utils/enums/alert-type.enum';
 
 @Component({
   selector: 'app-tickets-sale',
@@ -22,6 +26,12 @@ export class TicketsSaleComponent {
   selectedFrequency: IFrequencyDetail | null = null;
   selectedSeats: ISeatSelection[] = [];
   purchaseResponse: ITicketPurchaseResponse | null = null;
+  passengersData: IPassengerData[] = [];
+
+  constructor(
+    private pdfGeneratorService: PdfGeneratorService,
+    private alertService: AlertService
+  ) {}
 
   onSearchCompleted(results: IFrequencyDetail[]): void {
     this.searchResults = results;
@@ -42,6 +52,33 @@ export class TicketsSaleComponent {
 
   onTicketPurchased(response: ITicketPurchaseResponse): void {
     this.purchaseResponse = response;
+  }
+
+  onPassengersDataReady(passengersData: IPassengerData[]): void {
+    this.passengersData = passengersData;
+  }
+
+  printTicket(): void {
+    if (this.purchaseResponse && this.selectedFrequency && this.selectedSeats.length > 0 && this.passengersData.length > 0) {
+      this.pdfGeneratorService.generateTicketPDF(
+        this.purchaseResponse,
+        this.selectedFrequency,
+        this.selectedSeats,
+        this.passengersData
+      );
+      
+      this.alertService.showAlert({
+        alertType: AlertType.SUCCESS,
+        mainMessage: 'PDF generado exitosamente',
+        subMessage: 'El archivo se ha descargado automáticamente'
+      });
+    } else {
+      this.alertService.showAlert({
+        alertType: AlertType.ERROR,
+        mainMessage: 'No se puede generar el PDF',
+        subMessage: 'Faltan datos necesarios para la generación del ticket'
+      });
+    }
   }
 
   nextStep(): void {
@@ -84,5 +121,14 @@ export class TicketsSaleComponent {
   canAccessStep(step: number): boolean {
     if (step === 1) return true;
     return this.isStepCompleted(step - 1);
+  }
+
+  resetSale(): void {
+    this.currentStep = 1;
+    this.searchResults = [];
+    this.selectedFrequency = null;
+    this.selectedSeats = [];
+    this.purchaseResponse = null;
+    this.passengersData = [];
   }
 }

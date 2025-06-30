@@ -104,13 +104,14 @@
         [selectedSeats]="selectedSeats"
         [selectedFrequency]="selectedFrequency!"
         (ticketPurchased)="onTicketPurchased($event)"
+        (passengersDataReady)="onPassengersDataReady($event)"
         (nextStep)="nextStep()"
         (previousStep)="previousStep()">
       </app-step-three>
     </div>
 
     <!-- Step 4: Pago y Confirmación -->
-    <div *ngIf="currentStep === 4">
+    <div *ngIf="currentStep === 4" class="success-container">
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">
@@ -173,8 +174,8 @@
             </div>
           </div>
           
-          <div class="text-center mt-4">
-            <button class="btn btn-primary me-2" (click)="currentStep = 1; searchResults = []; selectedFrequency = null; selectedSeats = []; purchaseResponse = null;">
+          <div class="text-center mt-4 action-buttons d-flex justify-content-center">
+            <button class="btn btn-primary me-3" (click)="resetSale()">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                 <path d="M12 5l0 14"/>
@@ -182,7 +183,7 @@
               </svg>
               Nueva Venta
             </button>
-            <button class="btn btn-outline-primary">
+            <button class="btn btn-outline-primary btn-print" (click)="printTicket()">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                 <path d="M14 3v4a1 1 0 0 0 1 1h4"/>
