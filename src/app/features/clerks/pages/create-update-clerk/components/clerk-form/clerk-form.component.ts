@@ -20,36 +20,36 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { DriverManagementService } from '../../services/driver-management.service';
+import { ClerkManagementService } from '../../../../services/clerk-management.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
-import { IDriverRequest } from '../../models/driver-request.interface';
-import { IDriver } from '@features/drivers/models/driver.interface';
+import { IClerkRequest } from '../../../../models/clerk-request.interface';
+import { IClerk } from '../../../../models/clerk-response.interface';
+import { IClerkUpdateRequest } from '../../../../models/clerk-update-request.interface';
+import { IChangePasswordRequest } from '../../../../models/change-password-request.interface';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-driver-form',
+  selector: 'app-clerk-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './driver-form.component.html',
-  styleUrl: './driver-form.component.css',
+  templateUrl: './clerk-form.component.html',
+  styleUrl: './clerk-form.component.css',
 })
-export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
+export class ClerkFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() cooperativeId!: number;
-  @Input() driverData: IDriver | null = null;
+  @Input() clerkData: IClerk | null = null;
   @Input() isEditMode: boolean = false;
-  @Output() driverCreated = new EventEmitter<void>();
+  @Output() clerkCreated = new EventEmitter<void>();
 
-  protected driverForm: FormGroup;
+  protected clerkForm: FormGroup;
   protected isLoading: boolean = false;
   protected showPasswordSection: boolean = false;
   private subscriptions: Subscription = new Subscription();
 
   private readonly fb: FormBuilder = inject(FormBuilder);
   private readonly router: Router = inject(Router);
-  private readonly driverManagementService: DriverManagementService = inject(
-    DriverManagementService
-  );
+  private readonly clerkManagementService: ClerkManagementService = inject(ClerkManagementService);
   private readonly alertService: AlertService = inject(AlertService);
 
   // Validador personalizado para contraseña con mayúscula y número
@@ -100,7 +100,7 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   constructor() {
-    this.driverForm = this.fb.group({
+    this.clerkForm = this.fb.group({
       idNumber: ['', [Validators.required, this.ecuadorianIdValidator.bind(this)]],
       documentType: ['CEDULA', Validators.required],
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -115,7 +115,7 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     // En modo edición, la contraseña NO es requerida por defecto
     if (!this.isEditMode) {
       // En modo creación, la contraseña es requerida
-      this.driverForm.get('password')?.setValidators([
+      this.clerkForm.get('password')?.setValidators([
         Validators.required, 
         Validators.minLength(6), 
         Validators.maxLength(20), 
@@ -127,28 +127,36 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     }
     
     // Si estamos en modo edición, prellenar el formulario
-    if (this.isEditMode && this.driverData) {
-      this.loadDriverDataToForm();
+    if (this.isEditMode && this.clerkData) {
+      this.loadClerkDataToForm();
     }
+  }
+
+  private disableNonEditableFields(): void {
+    // Deshabilitar campos que no pueden modificarse en modo edición
+    this.clerkForm.get('idNumber')?.disable();
+    this.clerkForm.get('documentType')?.disable();
+    this.clerkForm.get('firstName')?.disable();
+    this.clerkForm.get('lastName')?.disable();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Manejar cambios en driverData después de que el componente se ha inicializado
-    if (changes['driverData'] && changes['driverData'].currentValue) {
-      this.loadDriverDataToForm();
+    // Manejar cambios en clerkData después de que el componente se ha inicializado
+    if (changes['clerkData'] && changes['clerkData'].currentValue) {
+      this.loadClerkDataToForm();
     }
   }
 
-  private loadDriverDataToForm(): void {
-    if (!this.driverData) return;
+  private loadClerkDataToForm(): void {
+    if (!this.clerkData) return;
     
-    this.driverForm.patchValue({
-      idNumber: this.driverData.idNumber,
-      documentType: this.driverData.documentType,
-      firstName: this.driverData.firstName,
-      lastName: this.driverData.lastName,
-      email: this.driverData.email,
-      phone: this.driverData.phone,
+    this.clerkForm.patchValue({
+      idNumber: this.clerkData.idNumber,
+      documentType: this.clerkData.documentType,
+      firstName: this.clerkData.firstName,
+      lastName: this.clerkData.lastName,
+      email: this.clerkData.email,
+      phone: this.clerkData.phone,
     });
     
     // En modo edición, deshabilitar campos no editables después de cargar los datos
@@ -157,11 +165,11 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     }
     
     // En modo edición, la contraseña NO tiene validaciones por defecto
-    this.driverForm.get('password')?.clearValidators();
-    this.driverForm.get('password')?.updateValueAndValidity();
+    this.clerkForm.get('password')?.clearValidators();
+    this.clerkForm.get('password')?.updateValueAndValidity();
     
     // Forzar la actualización del estado del formulario
-    this.driverForm.updateValueAndValidity();
+    this.clerkForm.updateValueAndValidity();
   }
 
   protected togglePasswordSection(): void {
@@ -169,7 +177,7 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     
     if (this.showPasswordSection) {
       // Activar validaciones de contraseña
-      this.driverForm.get('password')?.setValidators([
+      this.clerkForm.get('password')?.setValidators([
         Validators.required, 
         Validators.minLength(6), 
         Validators.maxLength(20), 
@@ -177,24 +185,24 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
       ]);
     } else {
       // Quitar validaciones y limpiar campo
-      this.driverForm.get('password')?.clearValidators();
-      this.driverForm.get('password')?.setValue('');
+      this.clerkForm.get('password')?.clearValidators();
+      this.clerkForm.get('password')?.setValue('');
     }
-    this.driverForm.get('password')?.updateValueAndValidity();
+    this.clerkForm.get('password')?.updateValueAndValidity();
   }
 
   protected onSubmit(): void {    
-    if (this.driverForm.valid && this.cooperativeId) {
+    if (this.clerkForm.valid && this.cooperativeId) {
       this.isLoading = true;
       
       if (this.isEditMode) {
-        this.updateDriver();
+        this.updateClerk();
       } else {
-        this.createDriver();
+        this.createClerk();
       }
     } else {
       // Marcar todos los campos como tocados para mostrar errores
-      this.driverForm.markAllAsTouched();
+      this.clerkForm.markAllAsTouched();
       
       if (!this.cooperativeId) {
         this.alertService.showAlert({
@@ -210,29 +218,29 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private createDriver(): void {
-    const driverData: IDriverRequest = {
-      idNumber: this.driverForm.value.idNumber,
-      documentType: this.driverForm.value.documentType,
-      firstName: this.driverForm.value.firstName,
-      lastName: this.driverForm.value.lastName,
-      email: this.driverForm.value.email,
-      phone: this.driverForm.value.phone,
-      password: this.driverForm.value.password,
+  private createClerk(): void {
+    const clerkData: IClerkRequest = {
+      idNumber: this.clerkForm.value.idNumber,
+      documentType: this.clerkForm.value.documentType,
+      firstName: this.clerkForm.value.firstName,
+      lastName: this.clerkForm.value.lastName,
+      email: this.clerkForm.value.email,
+      phone: this.clerkForm.value.phone,
+      password: this.clerkForm.value.password,
       cooperativeId: this.cooperativeId,
     };
 
     this.subscriptions.add(
-      this.driverManagementService.createDriver(driverData).subscribe({
+      this.clerkManagementService.createClerk(clerkData).subscribe({
         next: (response) => {
-          console.log('Driver created successfully');
+          console.log('Clerk created successfully');
           this.isLoading = false;
           this.alertService.showAlert({
             alertType: AlertType.SUCCESS,
-            mainMessage: 'Conductor registrado exitosamente',
+            mainMessage: 'Oficinista registrado exitosamente',
           });
-          this.driverCreated.emit();
-          this.router.navigate(['/drivers']);
+          this.clerkCreated.emit();
+          this.router.navigate(['/oficinistas']);
         },
         error: (error: HttpErrorResponse) => {
           this.handleError(error, 'crear');
@@ -241,31 +249,37 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
-  private updateDriver(): void {
-    if (!this.driverData?.id) return;
+  private updateClerk(): void {
+    if (!this.clerkData?.id) return;
     
     // En modo edición, solo enviar campos editables
-    const updateData: any = {
-      email: this.driverForm.value.email,
-      phone: this.driverForm.value.phone,
+    const updateData: IClerkUpdateRequest = {
+      idNumber: this.clerkData.idNumber,
+      documentType: this.clerkData.documentType,
+      firstName: this.clerkData.firstName,
+      lastName: this.clerkData.lastName,
+      email: this.clerkForm.value.email,
+      phone: this.clerkForm.value.phone,
+      cooperativeId: this.cooperativeId,
     };
 
-    // Solo incluir contraseña si se va a cambiar
-    if (this.showPasswordSection && this.driverForm.value.password) {
-      updateData.password = this.driverForm.value.password;
-    }
-
     this.subscriptions.add(
-      this.driverManagementService.updateDriver(this.driverData.id, updateData).subscribe({
+      this.clerkManagementService.updateClerk(this.clerkData.id, updateData).subscribe({
         next: (response) => {
-          console.log('Driver updated successfully');
-          this.isLoading = false;
-          this.alertService.showAlert({
-            alertType: AlertType.SUCCESS,
-            mainMessage: 'Conductor actualizado exitosamente',
-          });
-          this.driverCreated.emit();
-          this.router.navigate(['/drivers']);
+          console.log('Clerk updated successfully');
+          
+          // Si se cambió la contraseña, hacer petición adicional
+          if (this.showPasswordSection && this.clerkForm.value.password) {
+            this.changePassword();
+          } else {
+            this.isLoading = false;
+            this.alertService.showAlert({
+              alertType: AlertType.SUCCESS,
+              mainMessage: 'Oficinista actualizado exitosamente',
+            });
+            this.clerkCreated.emit();
+            this.router.navigate(['/oficinistas']);
+          }
         },
         error: (error: HttpErrorResponse) => {
           this.handleError(error, 'actualizar');
@@ -274,11 +288,43 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     );
   }
 
+  private changePassword(): void {
+    if (!this.clerkData?.id || !this.clerkForm.value.password) return;
+
+    const passwordData: IChangePasswordRequest = {
+      newPassword: this.clerkForm.value.password
+    };
+
+    this.subscriptions.add(
+      this.clerkManagementService.changePassword(this.clerkData.id, passwordData).subscribe({
+        next: (response) => {
+          console.log('Password changed successfully');
+          this.isLoading = false;
+          this.alertService.showAlert({
+            alertType: AlertType.SUCCESS,
+            mainMessage: 'Oficinista y contraseña actualizados exitosamente',
+          });
+          this.clerkCreated.emit();
+          this.router.navigate(['/oficinistas']);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.isLoading = false;
+          this.alertService.showAlert({
+            alertType: AlertType.WARNING,
+            mainMessage: 'Oficinista actualizado, pero hubo un error al cambiar la contraseña',
+          });
+          this.clerkCreated.emit();
+          this.router.navigate(['/oficinistas']);
+        },
+      })
+    );
+  }
+
   private handleError(error: HttpErrorResponse, action: string): void {
-    console.error(`Error ${action} driver:`, error);
+    console.error(`Error ${action} clerk:`, error);
     this.isLoading = false;
     
-    let errorMessage = `Error al ${action} conductor`;
+    let errorMessage = `Error al ${action} oficinista`;
     
     if (error.status === 400) {
       errorMessage = 'Datos inválidos. Verifique la información ingresada.';
@@ -286,7 +332,7 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
         errorMessage = error.error.message;
       }
     } else if (error.status === 409) {
-      errorMessage = 'Ya existe un conductor con esta cédula o correo electrónico.';
+      errorMessage = 'Ya existe un oficinista con esta cédula o correo electrónico.';
     } else if (error.status === 500) {
       errorMessage = 'Error interno del servidor. Intente nuevamente.';
     } else if (error.error?.message) {
@@ -300,14 +346,14 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   protected isFormValid(): boolean {
-    if (!this.driverForm) return false;
+    if (!this.clerkForm) return false;
     
     // En modo edición, solo validar campos editables: email y phone
     if (this.isEditMode) {
       const editableFields = ['email', 'phone'];
       
       for (const field of editableFields) {
-        const control = this.driverForm.get(field);
+        const control = this.clerkForm.get(field);
         if (!control || control.invalid) {
           return false;
         }
@@ -315,7 +361,7 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
       
       // Si se está cambiando la contraseña, debe ser válida
       if (this.showPasswordSection) {
-        const passwordControl = this.driverForm.get('password');
+        const passwordControl = this.clerkForm.get('password');
         if (!passwordControl || passwordControl.invalid) {
           return false;
         }
@@ -328,27 +374,19 @@ export class DriverFormComponent implements OnInit, OnChanges, OnDestroy {
     const basicFields = ['idNumber', 'documentType', 'firstName', 'lastName', 'email', 'phone'];
     
     for (const field of basicFields) {
-      const control = this.driverForm.get(field);
+      const control = this.clerkForm.get(field);
       if (!control || control.invalid) {
         return false;
       }
     }
     
     // En modo creación, también validar contraseña
-    const passwordControl = this.driverForm.get('password');
+    const passwordControl = this.clerkForm.get('password');
     if (!passwordControl || passwordControl.invalid) {
       return false;
     }
     
     return true;
-  }
-
-  private disableNonEditableFields(): void {
-    // Deshabilitar campos que no pueden modificarse en modo edición
-    this.driverForm.get('idNumber')?.disable();
-    this.driverForm.get('documentType')?.disable();
-    this.driverForm.get('firstName')?.disable();
-    this.driverForm.get('lastName')?.disable();
   }
 
   ngOnDestroy(): void {

@@ -1,6 +1,6 @@
-<form [formGroup]="driverForm" (ngSubmit)="onSubmit()" class="card">
+<form [formGroup]="clerkForm" (ngSubmit)="onSubmit()" class="card">
   <div class="card-header">
-    <h3 class="card-title">{{ isEditMode ? 'Editar Conductor' : 'Registrar Conductor' }}</h3>
+    <h3 class="card-title">{{ isEditMode ? 'Editar Oficinista' : 'Registrar Oficinista' }}</h3>
     @if (isEditMode) {
     <div class="card-subtitle">
       <small class="text-muted">
@@ -27,21 +27,21 @@
           class="form-control"
           formControlName="idNumber"
           [class.is-invalid]="
-            driverForm.get('idNumber')?.invalid &&
-            driverForm.get('idNumber')?.touched
+            clerkForm.get('idNumber')?.invalid &&
+            clerkForm.get('idNumber')?.touched
           "
           placeholder="Ej: 1712345678"
         />
-        @if (driverForm.get('idNumber')?.invalid &&
-        driverForm.get('idNumber')?.touched) {
+        @if (clerkForm.get('idNumber')?.invalid &&
+        clerkForm.get('idNumber')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('idNumber')?.errors?.['required']) {
+          @if (clerkForm.get('idNumber')?.errors?.['required']) {
             Cédula/RUC es requerida
           }
-          @if (driverForm.get('idNumber')?.errors?.['pattern']) {
+          @if (clerkForm.get('idNumber')?.errors?.['pattern']) {
             Debe tener exactamente 10 dígitos
           }
-          @if (driverForm.get('idNumber')?.errors?.['invalidId']) {
+          @if (clerkForm.get('idNumber')?.errors?.['invalidId']) {
             Cédula ecuatoriana inválida
           }
         </div>
@@ -55,17 +55,17 @@
           class="form-select"
           formControlName="documentType"
           [class.is-invalid]="
-            driverForm.get('documentType')?.invalid &&
-            driverForm.get('documentType')?.touched
+            clerkForm.get('documentType')?.invalid &&
+            clerkForm.get('documentType')?.touched
           "
         >
           <option value="CEDULA">Cédula</option>
           <option value="RUC">RUC</option>
         </select>
-        @if (driverForm.get('documentType')?.invalid &&
-        driverForm.get('documentType')?.touched) {
+        @if (clerkForm.get('documentType')?.invalid &&
+        clerkForm.get('documentType')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('documentType')?.errors?.['required']) {
+          @if (clerkForm.get('documentType')?.errors?.['required']) {
             Tipo de documento es requerido
           }
         </div>
@@ -83,24 +83,24 @@
           class="form-control"
           formControlName="password"
           [class.is-invalid]="
-            driverForm.get('password')?.invalid &&
-            driverForm.get('password')?.touched
+            clerkForm.get('password')?.invalid &&
+            clerkForm.get('password')?.touched
           "
           placeholder="Ej: Password123"
         />
-        @if (driverForm.get('password')?.invalid &&
-        driverForm.get('password')?.touched) {
+        @if (clerkForm.get('password')?.invalid &&
+        clerkForm.get('password')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('password')?.errors?.['required']) {
+          @if (clerkForm.get('password')?.errors?.['required']) {
             Contraseña es requerida
           }
-          @if (driverForm.get('password')?.errors?.['minlength']) {
+          @if (clerkForm.get('password')?.errors?.['minlength']) {
             Debe tener al menos 6 caracteres
           }
-          @if (driverForm.get('password')?.errors?.['maxlength']) {
+          @if (clerkForm.get('password')?.errors?.['maxlength']) {
             No debe exceder 20 caracteres
           }
-          @if (driverForm.get('password')?.errors?.['passwordPattern']) {
+          @if (clerkForm.get('password')?.errors?.['passwordPattern']) {
             Debe contener al menos una mayúscula y un número
           }
         </div>
@@ -136,24 +136,24 @@
           class="form-control"
           formControlName="password"
           [class.is-invalid]="
-            driverForm.get('password')?.invalid &&
-            driverForm.get('password')?.touched
+            clerkForm.get('password')?.invalid &&
+            clerkForm.get('password')?.touched
           "
           placeholder="Nueva contraseña"
         />
-        @if (driverForm.get('password')?.invalid &&
-        driverForm.get('password')?.touched) {
+        @if (clerkForm.get('password')?.invalid &&
+        clerkForm.get('password')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('password')?.errors?.['required']) {
+          @if (clerkForm.get('password')?.errors?.['required']) {
             Contraseña es requerida
           }
-          @if (driverForm.get('password')?.errors?.['minlength']) {
+          @if (clerkForm.get('password')?.errors?.['minlength']) {
             Debe tener al menos 6 caracteres
           }
-          @if (driverForm.get('password')?.errors?.['maxlength']) {
+          @if (clerkForm.get('password')?.errors?.['maxlength']) {
             No debe exceder 20 caracteres
           }
-          @if (driverForm.get('password')?.errors?.['passwordPattern']) {
+          @if (clerkForm.get('password')?.errors?.['passwordPattern']) {
             Debe contener al menos una mayúscula y un número
           }
         </div>
@@ -174,21 +174,21 @@
           class="form-control"
           formControlName="firstName"
           [class.is-invalid]="
-            driverForm.get('firstName')?.invalid &&
-            driverForm.get('firstName')?.touched
+            clerkForm.get('firstName')?.invalid &&
+            clerkForm.get('firstName')?.touched
           "
-          placeholder="Ej: Juan"
+          placeholder="Ej: Juan Carlos"
         />
-        @if (driverForm.get('firstName')?.invalid &&
-        driverForm.get('firstName')?.touched) {
+        @if (clerkForm.get('firstName')?.invalid &&
+        clerkForm.get('firstName')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('firstName')?.errors?.['required']) {
+          @if (clerkForm.get('firstName')?.errors?.['required']) {
             Nombre es requerido
           }
-          @if (driverForm.get('firstName')?.errors?.['minlength']) {
+          @if (clerkForm.get('firstName')?.errors?.['minlength']) {
             Debe tener al menos 2 caracteres
           }
-          @if (driverForm.get('firstName')?.errors?.['maxlength']) {
+          @if (clerkForm.get('firstName')?.errors?.['maxlength']) {
             No debe exceder 50 caracteres
           }
         </div>
@@ -201,21 +201,21 @@
           class="form-control"
           formControlName="lastName"
           [class.is-invalid]="
-            driverForm.get('lastName')?.invalid &&
-            driverForm.get('lastName')?.touched
+            clerkForm.get('lastName')?.invalid &&
+            clerkForm.get('lastName')?.touched
           "
-          placeholder="Ej: Pérez"
+          placeholder="Ej: Pérez González"
         />
-        @if (driverForm.get('lastName')?.invalid &&
-        driverForm.get('lastName')?.touched) {
+        @if (clerkForm.get('lastName')?.invalid &&
+        clerkForm.get('lastName')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('lastName')?.errors?.['required']) {
+          @if (clerkForm.get('lastName')?.errors?.['required']) {
             Apellido es requerido
           }
-          @if (driverForm.get('lastName')?.errors?.['minlength']) {
+          @if (clerkForm.get('lastName')?.errors?.['minlength']) {
             Debe tener al menos 2 caracteres
           }
-          @if (driverForm.get('lastName')?.errors?.['maxlength']) {
+          @if (clerkForm.get('lastName')?.errors?.['maxlength']) {
             No debe exceder 50 caracteres
           }
         </div>
@@ -232,17 +232,17 @@
           class="form-control"
           formControlName="email"
           [class.is-invalid]="
-            driverForm.get('email')?.invalid && driverForm.get('email')?.touched
+            clerkForm.get('email')?.invalid && clerkForm.get('email')?.touched
           "
-          placeholder="Ej: juan.perez@example.com"
+          placeholder="Ej: juan.perez@chasquigo.com"
         />
-        @if (driverForm.get('email')?.invalid &&
-        driverForm.get('email')?.touched) {
+        @if (clerkForm.get('email')?.invalid &&
+        clerkForm.get('email')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('email')?.errors?.['required']) {
+          @if (clerkForm.get('email')?.errors?.['required']) {
             Correo electrónico es requerido
           }
-          @if (driverForm.get('email')?.errors?.['email']) {
+          @if (clerkForm.get('email')?.errors?.['email']) {
             Ingrese un correo electrónico válido
           }
         </div>
@@ -255,17 +255,17 @@
           class="form-control"
           formControlName="phone"
           [class.is-invalid]="
-            driverForm.get('phone')?.invalid && driverForm.get('phone')?.touched
+            clerkForm.get('phone')?.invalid && clerkForm.get('phone')?.touched
           "
           placeholder="Ej: 0987654321"
         />
-        @if (driverForm.get('phone')?.invalid &&
-        driverForm.get('phone')?.touched) {
+        @if (clerkForm.get('phone')?.invalid &&
+        clerkForm.get('phone')?.touched) {
         <div class="invalid-feedback">
-          @if (driverForm.get('phone')?.errors?.['required']) {
+          @if (clerkForm.get('phone')?.errors?.['required']) {
             Teléfono es requerido
           }
-          @if (driverForm.get('phone')?.errors?.['pattern']) {
+          @if (clerkForm.get('phone')?.errors?.['pattern']) {
             Debe tener exactamente 10 dígitos
           }
         </div>
@@ -279,7 +279,7 @@
         <button
           type="button"
           class="btn btn-link"
-          [routerLink]="['/drivers']"
+          [routerLink]="['/oficinistas']"
           [disabled]="isLoading"
         >
           Cancelar
@@ -295,7 +295,7 @@
             role="status"
             aria-hidden="true"
           ></span>
-          } {{ isEditMode ? 'Actualizar Conductor' : 'Registrar Conductor' }}
+          } {{ isEditMode ? 'Actualizar Oficinista' : 'Registrar Oficinista' }}
         </button>
       </div>
     </div>

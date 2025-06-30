@@ -5,6 +5,7 @@ import { coopsRoutes } from '@features/coops/coops.routes';
 import { busesRoutes } from '@features/buses/buses.routes';
 import { frequenciesRoutes } from '@features/frequencies/routes.routes';
 import { driversRoutes } from '@features/drivers/drivers.routes';
+import { clerksRoutes } from '@features/clerks/clerks.routes';
 import { ROUTE_SHEETS_ROUTES } from '@features/route-sheets/sheets.routes';
 
 export const routes: Routes = [
@@ -14,6 +15,7 @@ export const routes: Routes = [
   ...busesRoutes,
   ...frequenciesRoutes,
   ...driversRoutes,
+  ...clerksRoutes,
   ...ROUTE_SHEETS_ROUTES,
   {
     path: '',

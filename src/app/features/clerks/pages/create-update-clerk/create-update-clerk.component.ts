@@ -6,22 +6,22 @@ import { LoginService } from '@core/login/services/login.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
 import { HttpErrorResponse } from '@angular/common/http';
-import { DriverFormComponent } from './components/driver-form/driver-form.component';
-import { DriverManagementService } from './services/driver-management.service';
-import { IDriver } from '@features/drivers/models/driver.interface';
+import { ClerkFormComponent } from './components/clerk-form/clerk-form.component';
+import { ClerkManagementService } from '../../services/clerk-management.service';
+import { IClerk } from '../../models/clerk-response.interface';
 
 @Component({
-  selector: 'app-create-update-driver',
+  selector: 'app-create-update-clerk',
   standalone: true,
-  imports: [CommonModule, RouterLink, DriverFormComponent],
-  templateUrl: './create-update-driver.component.html',
-  styleUrl: './create-update-driver.component.css',
+  imports: [CommonModule, RouterLink, ClerkFormComponent],
+  templateUrl: './create-update-clerk.component.html',
+  styleUrl: './create-update-clerk.component.css',
 })
-export class CreateUpdateDriverComponent implements OnInit, OnDestroy {
+export class CreateUpdateClerkComponent implements OnInit, OnDestroy {
   protected isLoading: boolean = false;
   protected cooperativeId: number | null = null;
-  protected driverId: number | null = null;
-  protected driverData: IDriver | null = null;
+  protected clerkId: number | null = null;
+  protected clerkData: IClerk | null = null;
   protected isEditMode: boolean = false;
   private subscriptions: Subscription = new Subscription();
 
@@ -29,44 +29,44 @@ export class CreateUpdateDriverComponent implements OnInit, OnDestroy {
   private readonly alertService: AlertService = inject(AlertService);
   private readonly router: Router = inject(Router);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
-  private readonly driverManagementService: DriverManagementService = inject(DriverManagementService);
+  private readonly clerkManagementService: ClerkManagementService = inject(ClerkManagementService);
 
   ngOnInit(): void {
     // Verificar si estamos en modo edición
     this.route.params.subscribe(params => {
       if (params['id']) {
-        this.driverId = +params['id'];
+        this.clerkId = +params['id'];
         this.isEditMode = true;
-        this.loadDriverData();
+        this.loadClerkData();
       }
     });
     
     this.loadCooperativeId();
   }
 
-  protected onDriverCreated(): void {
-    this.router.navigate(['/drivers']);
+  protected onClerkCreated(): void {
+    this.router.navigate(['/oficinistas']);
   }
 
-  private loadDriverData(): void {
-    if (!this.driverId) return;
+  private loadClerkData(): void {
+    if (!this.clerkId) return;
     
     this.isLoading = true;
     
     this.subscriptions.add(
-      this.driverManagementService.getDriverById(this.driverId).subscribe({
-        next: (driver: IDriver) => {
-          this.driverData = driver;
+      this.clerkManagementService.getClerkById(this.clerkId).subscribe({
+        next: (clerk: IClerk) => {
+          this.clerkData = clerk;
           this.isLoading = false;
         },
         error: (error: HttpErrorResponse) => {
-          console.error('Error loading driver data:', error);
+          console.error('Error loading clerk data:', error);
           this.isLoading = false;
           this.alertService.showAlert({
             alertType: AlertType.ERROR,
-            mainMessage: 'Error al cargar los datos del conductor'
+            mainMessage: 'Error al cargar los datos del oficinista'
           });
-          this.router.navigate(['/drivers']);
+          this.router.navigate(['/oficinistas']);
         }
       })
     );

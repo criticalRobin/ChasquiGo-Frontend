@@ -13,7 +13,22 @@ export class DriverManagementService {
   private readonly http: HttpClient = inject(HttpClient);
 
   createDriver(driverData: IDriverRequest): Observable<IDriver> {
-    const url: string = `${this.baseUrl}/users/driver`;
+    const url: string = `${this.baseUrl}/drivers`;
     return this.http.post<IDriver>(url, driverData);
+  }
+
+  updateDriver(id: number, driverData: Partial<IDriverRequest>): Observable<IDriver> {
+    const url: string = `${this.baseUrl}/drivers/${id}`;
+    return this.http.put<IDriver>(url, driverData);
+  }
+
+  deleteDriver(id: number): Observable<void> {
+    const url: string = `${this.baseUrl}/drivers/${id}`;
+    return this.http.delete<void>(url);
+  }
+
+  getDriverById(id: number): Observable<IDriver> {
+    const url: string = `${this.baseUrl}/drivers/one/${id}`;
+    return this.http.get<IDriver>(url);
   }
 }

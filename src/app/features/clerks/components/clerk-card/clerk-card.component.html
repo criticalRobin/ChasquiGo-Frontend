@@ -1,31 +1,31 @@
-<div class="card driver-detail-card">
+<div class="card clerk-detail-card">
   <div class="card-body">
     <div class="mb-4 text-center">
       <h2 class="card-title mb-2">
-        {{ driver.firstName }} {{ driver.lastName }}
+        {{ clerk.firstName }} {{ clerk.lastName }}
       </h2>
-      <p class="text-muted mb-0">{{ driver.role === 'DRIVER' ? 'Conductor' : driver.role }}</p>
+      <p class="text-muted mb-0">{{ clerk.role === 'WORKER' ? 'Oficinista' : clerk.role }}</p>
     </div>
 
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="mb-3">
           <span class="detail-label">Cédula/RUC:</span>
-          <div class="detail-value">{{ driver.idNumber }}</div>
+          <div class="detail-value">{{ clerk.idNumber }}</div>
         </div>
         <div class="mb-3">
           <span class="detail-label">Email:</span>
-          <div class="detail-value">{{ driver.email }}</div>
+          <div class="detail-value">{{ clerk.email }}</div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="mb-3">
           <span class="detail-label">Teléfono:</span>
-          <div class="detail-value">{{ driver.phone }}</div>
+          <div class="detail-value">{{ clerk.phone }}</div>
         </div>
         <div class="mb-3">
           <span class="detail-label">Tipo de Documento:</span>
-          <div class="detail-value">{{ driver.documentType | titlecase }}</div>
+          <div class="detail-value">{{ clerk.documentType | titlecase }}</div>
         </div>
       </div>
     </div>
@@ -40,7 +40,7 @@
         </svg>
         Editar
       </button>
-      <button class="btn btn-outline-danger" data-bs-toggle="modal" [attr.data-bs-target]="'#deleteModal' + driver.id">
+      <button class="btn btn-outline-danger" data-bs-toggle="modal" [attr.data-bs-target]="'#deleteModal' + clerk.id">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <path d="M4 7l16 0"></path>
@@ -56,7 +56,7 @@
 </div>
 
 <!-- Modal de confirmación de eliminación -->
-<div class="modal fade" [id]="'deleteModal' + driver.id" tabindex="-1" aria-hidden="true">
+<div class="modal fade" [id]="'deleteModal' + clerk.id" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-body text-center py-4">
@@ -66,9 +66,9 @@
           <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
           <path d="M12 16h.01"/>
         </svg>
-        <h3>¿Eliminar conductor?</h3>
+        <h3>¿Eliminar oficinista?</h3>
         <div class="text-muted">
-          Se eliminará a <strong>{{driver.firstName}} {{driver.lastName}}</strong>. 
+          Se eliminará a <strong>{{clerk.firstName}} {{clerk.lastName}}</strong>. 
           Esta acción no se puede deshacer.
         </div>
       </div>

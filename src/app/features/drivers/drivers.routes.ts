@@ -16,4 +16,12 @@ export const driversRoutes: Routes = [
       ).then((c) => c.CreateUpdateDriverComponent),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'create-update-driver/:id',
+    loadComponent: () =>
+      import(
+        './pages/create-update-driver/create-update-driver.component'
+      ).then((c) => c.CreateUpdateDriverComponent),
+    canActivate: [AuthGuard],
+  },
 ];

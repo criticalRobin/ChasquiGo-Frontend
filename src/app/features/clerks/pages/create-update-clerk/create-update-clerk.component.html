@@ -1,11 +1,11 @@
 <div class="mb-3">
-  <h1 class="text-secondary-yellow">{{ isEditMode ? 'Editar Conductor' : 'Nuevo Conductor' }}</h1>
+  <h1 class="text-secondary-yellow">{{ isEditMode ? 'Editar Oficinista' : 'Nuevo Oficinista' }}</h1>
   <ol class="breadcrumb breadcrumb-arrows">
     <li class="breadcrumb-item">
       <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
     </li>
     <li class="breadcrumb-item">
-      <a [routerLink]="['/drivers']" class="text-primary-blue">Conductores</a>
+      <a [routerLink]="['/oficinistas']" class="text-primary-blue">Oficinistas</a>
     </li>
     <li class="breadcrumb-item active">
       <a href="#" class="text-secondary-yellow">{{ isEditMode ? 'Editar' : 'Registrar' }}</a>
@@ -23,13 +23,13 @@
     </div>
   </div>
   } @else if (cooperativeId) {
-  <app-driver-form
+  <app-clerk-form
     [cooperativeId]="cooperativeId"
-    [driverData]="driverData"
+    [clerkData]="clerkData"
     [isEditMode]="isEditMode"
-    (driverCreated)="onDriverCreated()"
+    (clerkCreated)="onClerkCreated()"
   >
-  </app-driver-form>
+  </app-clerk-form>
   } @else {
   <div class="card">
     <div class="card-body text-center py-4">
@@ -54,7 +54,7 @@
       </svg>
       <h3>No se pudo obtener la información de la cooperativa</h3>
       <p class="text-muted">
-        No es posible registrar un conductor sin la información de la
+        No es posible registrar un oficinista sin la información de la
         cooperativa.
       </p>
     </div>
