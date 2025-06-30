@@ -1,0 +1,501 @@
+/* Contenedor principal */
+.floor-container {
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  margin-bottom: 20px;
+}
+
+/* Parte delantera del bus */
+.bus-front {
+  border: 2px solid #6c757d;
+  border-radius: 15px 15px 0 0;
+  background-color: #e9ecef;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.driver-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: bold;
+  color: #495057;
+}
+
+/* Grid de asientos */
+.seats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 8px;
+}
+
+.seat-side {
+  display: flex;
+  gap: 8px;
+}
+
+/* Pasillo */
+.aisle {
+  width: 40px;
+  height: 2px;
+  background-color: #dee2e6;
+  border-radius: 1px;
+}
+
+/* Estilos de asientos */
+.seat {
+  width: 45px;
+  height: 45px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  user-select: none;
+  position: relative;
+}
+
+.seat:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tipos de asientos */
+.seat-normal {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #2563eb;
+}
+
+.seat-vip {
+  background-color: #fbbf24;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+.seat-normal:hover {
+  background-color: #2563eb;
+}
+
+.seat-vip:hover {
+  background-color: #f59e0b;
+}
+
+/* Ubicación de asientos */
+.seat-window::after {
+  content: '🪟';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+.seat-aisle::after {
+  content: '🚶';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+.seat-middle::after {
+  content: '🎯';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+/* Leyenda */
+.legend {
+  padding: 15px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.legend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legend .seat {
+  width: 30px;
+  height: 30px;
+  cursor: default;
+  font-size: 10px;
+}
+
+.legend .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Panel de leyenda lateral */
+.legend-panel {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 1.5rem;
+}
+
+.legend-panel h5 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.legend-item span {
+  font-size: 0.875rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Asientos en la leyenda */
+.legend-item .seat {
+  width: 35px;
+  height: 35px;
+  font-size: 10px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.legend-item .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Leyenda inline dentro de instrucciones */
+.legend-inline {
+  margin-top: 0.5rem;
+}
+
+.legend-inline h6 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.legend-items-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legend-item-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-item-inline span {
+  font-size: 0.8rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Asientos en la leyenda inline */
+.legend-item-inline .seat {
+  width: 28px;
+  height: 28px;
+  font-size: 9px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.legend-item-inline .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Leyenda horizontal */
+.legend-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.legend-item-horizontal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.legend-item-horizontal span {
+  font-size: 0.75rem;
+  color: #495057;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Asientos en la leyenda horizontal */
+.legend-item-horizontal .seat {
+  width: 32px;
+  height: 32px;
+  font-size: 10px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.legend-item-horizontal .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive para leyenda horizontal */
+@media (max-width: 768px) {
+  .legend-horizontal {
+    gap: 0.5rem;
+  }
+  
+  .legend-item-horizontal span {
+    font-size: 0.7rem;
+  }
+  
+  .legend-item-horizontal .seat {
+    width: 28px;
+    height: 28px;
+    font-size: 9px;
+  }
+}
+
+/* Leyenda vertical para columna lateral */
+.legend-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.legend-item-vertical {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.legend-item-vertical:hover {
+  background-color: #e9ecef;
+  transform: translateX(2px);
+}
+
+.legend-item-vertical span {
+  font-size: 0.9rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Asientos en la leyenda vertical */
+.legend-item-vertical .seat {
+  width: 40px;
+  height: 40px;
+  font-size: 11px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.legend-item-vertical .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Estilos para cards laterales */
+.col-md-4 .card {
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.col-md-4 .card-title {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Fila especial para asiento central */
+.seat-center-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.seat-center-row .seat {
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .seat {
+    width: 35px;
+    height: 35px;
+    font-size: 10px;
+  }
+  
+  .seat-row {
+    gap: 10px;
+  }
+  
+  .seat-side {
+    gap: 5px;
+  }
+  
+  .aisle {
+    width: 30px;
+  }
+  
+  .legend-item {
+    font-size: 11px;
+  }
+  
+  .legend .seat {
+    width: 25px;
+    height: 25px;
+    font-size: 8px;
+  }
+}
+
+/* Animaciones */
+@keyframes seatSelect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.seat:active {
+  animation: seatSelect 0.2s ease;
+}
+
+/* Estados adicionales */
+.seat:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+/* Placeholder para asientos faltantes */
+.seat-placeholder {
+  width: 45px;
+  height: 45px;
+  visibility: hidden;
+}
+
+/* Mejoras visuales */
+.floor-container h4 {
+  margin-bottom: 20px;
+}
+
+.badge {
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+.alert-info {
+  background-color: #cff4fc;
+  border-color: #b8daff;
+  color: #055160;
+}
+
+.form-footer {
+  padding-top: 20px;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Efectos de hover para botones */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Selector de pisos */
+.floor-selector {
+  margin-bottom: 30px;
+}
+
+.floor-selector .btn-group {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.floor-selector .btn {
+  padding: 12px 20px;
+  font-weight: 600;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+}
+
+.floor-selector .btn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.floor-selector .btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.floor-selector .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.floor-selector .btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.floor-selector .btn-primary {
+  color: white !important;
+}
+
+.floor-selector .btn-outline-primary {
+  color: #0d6efd !important;
+}
