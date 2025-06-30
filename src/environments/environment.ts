@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  API_URL: 'https://chasquigo-backend-7yn2.onrender.com',
+  API_URL: 'http://localhost:3000',
 };

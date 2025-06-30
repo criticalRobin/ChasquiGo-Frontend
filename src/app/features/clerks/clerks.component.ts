@@ -1,48 +1,48 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { DriversService } from './services/drivers.service';
+import { ClerkManagementService } from './services/clerk-management.service';
 import { LoginService } from '@core/login/services/login.service';
 import { AlertService } from '@shared/services/alert.service';
-import { IDriver } from './models/driver.interface';
+import { IClerk, IClerkResponse } from './models/clerk-response.interface';
 import { IBaseUser } from '@shared/models/base-user.interface';
 import { ICooperative } from '@features/coops/models/cooperative.interface';
 import { AlertType } from '@utils/enums/alert-type.enum';
 import { Subscription } from 'rxjs';
-import { DriverCardComponent } from './components/driver-card/driver-card.component';
+import { ClerkCardComponent } from './components/clerk-card/clerk-card.component';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-drivers',
+  selector: 'app-clerks',
   standalone: true,
-  imports: [CommonModule, RouterLink, DriverCardComponent],
-  templateUrl: './drivers.component.html',
-  styleUrl: './drivers.component.css',
+  imports: [CommonModule, RouterLink, ClerkCardComponent],
+  templateUrl: './clerks.component.html',
+  styleUrl: './clerks.component.css',
 })
-export class DriversComponent implements OnInit, OnDestroy {
-  protected drivers: IDriver[] = [];
+export class ClerksComponent implements OnInit, OnDestroy {
+  protected clerks: IClerk[] = [];
   protected isLoading: boolean = false;
   protected currentCooperativeId: number | null = null;
   private subscriptions: Subscription = new Subscription();
 
   constructor(
-    private driversService: DriversService,
+    private clerkManagementService: ClerkManagementService,
     private loginService: LoginService,
     private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.loadCooperativeAndDrivers();
+    this.loadCooperativeAndClerks();
   }
 
-  private loadCooperativeAndDrivers(): void {
+  private loadCooperativeAndClerks(): void {
     // Primero intentar obtener la cooperativa del localStorage
     const cooperative = this.loginService.getCooperativeFromLocalStorage();
     if (cooperative?.id) {
       this.currentCooperativeId = cooperative.id;
       console.log('Cooperative loaded from localStorage:', cooperative);
-      this.loadDrivers();
+      this.loadClerks();
       return;
     }
 
@@ -57,7 +57,7 @@ export class DriversComponent implements OnInit, OnDestroy {
                 next: (coop: ICooperative) => {
                   console.log('Cooperative loaded from API:', coop);
                   this.currentCooperativeId = coop.id;
-                  this.loadDrivers();
+                  this.loadClerks();
                 },
                 error: (error: HttpErrorResponse) => {
                   console.error('Error loading cooperative:', error);
@@ -90,7 +90,7 @@ export class DriversComponent implements OnInit, OnDestroy {
     );
   }
 
-  private loadDrivers(): void {
+  private loadClerks(): void {
     if (!this.currentCooperativeId) {
       console.error('No cooperative ID available');
       this.isLoading = false;
@@ -101,20 +101,20 @@ export class DriversComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('Loading drivers for cooperative:', this.currentCooperativeId);
+    console.log('Loading clerks for cooperative:', this.currentCooperativeId);
     this.subscriptions.add(
-      this.driversService.getDriversByCooperative(this.currentCooperativeId).subscribe({
-        next: (drivers: IDriver[]) => {
-          console.log('Drivers loaded:', drivers);
-          this.drivers = drivers;
+      this.clerkManagementService.getClerks(this.currentCooperativeId).subscribe({
+        next: (response: IClerkResponse) => {
+          console.log('Clerks loaded:', response);
+          this.clerks = response.workers;
           this.isLoading = false;
         },
         error: (error: HttpErrorResponse) => {
-          console.error('Error loading drivers:', error);
+          console.error('Error loading clerks:', error);
           this.isLoading = false;
           this.alertService.showAlert({
             alertType: AlertType.ERROR,
-            mainMessage: 'Error al cargar la lista de conductores'
+            mainMessage: 'Error al cargar la lista de oficinistas'
           });
         },
       })

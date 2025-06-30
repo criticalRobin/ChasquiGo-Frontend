@@ -1,10 +1,9 @@
-export interface IDriverRequest {
+export interface IClerkUpdateRequest {
   idNumber: string;
   documentType: string;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  password: string;
   cooperativeId: number;
 }

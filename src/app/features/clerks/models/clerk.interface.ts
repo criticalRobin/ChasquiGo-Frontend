@@ -1,5 +1,4 @@
-
-export interface IDriver {
+export interface IClerk {
   id: number;
   idNumber: string;
   documentType: string;
@@ -8,6 +7,9 @@ export interface IDriver {
   email: string;
   phone: string;
   role: string;
-  cooperativeId: number;
-  isDeleted: boolean;
+  cooperative: {
+    id: number;
+    name: string;
+  };
+  createdAt: string;
 }

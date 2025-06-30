@@ -1,4 +1,4 @@
-export interface IDriverRequest {
+export interface IClerkRequest {
   idNumber: string;
   documentType: string;
   firstName: string;

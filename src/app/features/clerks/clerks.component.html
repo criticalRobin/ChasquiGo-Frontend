@@ -1,17 +1,33 @@
 <div class="mb-3">
-  <h1 class="text-secondary-yellow">{{ isEditMode ? 'Editar Conductor' : 'Nuevo Conductor' }}</h1>
-  <ol class="breadcrumb breadcrumb-arrows">
+  <h1 class="text-secondary-yellow">Oficinistas</h1>
+  <ol class="breadcrumb breadcrumb-arrows d-none d-md-flex">
     <li class="breadcrumb-item">
       <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
     </li>
-    <li class="breadcrumb-item">
-      <a [routerLink]="['/drivers']" class="text-primary-blue">Conductores</a>
-    </li>
     <li class="breadcrumb-item active">
-      <a href="#" class="text-secondary-yellow">{{ isEditMode ? 'Editar' : 'Registrar' }}</a>
+      <a href="#" class="text-secondary-yellow">Oficinistas</a>
     </li>
   </ol>
 </div>
+<button class="btn btn-primary" [routerLink]="['/create-update-clerk']">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="icon"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    stroke-width="2"
+    stroke="currentColor"
+    fill="none"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path d="M12 5l0 14"></path>
+    <path d="M5 12l14 0"></path>
+  </svg>
+  Nuevo Oficinista
+</button>
 
 <div class="container-xl">
   @if (isLoading) {
@@ -22,14 +38,14 @@
       </div>
     </div>
   </div>
-  } @else if (cooperativeId) {
-  <app-driver-form
-    [cooperativeId]="cooperativeId"
-    [driverData]="driverData"
-    [isEditMode]="isEditMode"
-    (driverCreated)="onDriverCreated()"
-  >
-  </app-driver-form>
+  } @else if (clerks.length > 0) {
+  <div class="row row-cards">
+    @for (clerk of clerks; track clerk.id) {
+    <div class="col-md-6 col-lg-4">
+      <app-clerk-card [clerk]="clerk"></app-clerk-card>
+    </div>
+    }
+  </div>
   } @else {
   <div class="card">
     <div class="card-body text-center py-4">
@@ -52,10 +68,9 @@
         <path d="M12 9v4"></path>
         <path d="M12 17h.01"></path>
       </svg>
-      <h3>No se pudo obtener la información de la cooperativa</h3>
+      <h3>No se encontraron oficinistas</h3>
       <p class="text-muted">
-        No es posible registrar un conductor sin la información de la
-        cooperativa.
+        No hay oficinistas registrados o asociados a tu cooperativa.
       </p>
     </div>
   </div>
