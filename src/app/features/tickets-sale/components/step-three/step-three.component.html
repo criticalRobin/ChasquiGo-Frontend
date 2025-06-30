@@ -1,0 +1,199 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Datos de los Pasajeros</h3>
+    <div class="card-actions">
+      <span class="badge bg-blue text-white">{{ selectedSeats.length }} pasajero{{ selectedSeats.length !== 1 ? 's' : '' }}</span>
+      <span class="badge bg-success text-white">Total: ${{ getTotalPrice().toFixed(2) }}</span>
+    </div>
+  </div>
+  
+  <div class="card-body">
+    <!-- Información del viaje -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="alert alert-info">
+          <div class="d-flex align-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon me-3" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              <polyline points="11,12 12,12 12,16 13,16"></polyline>
+            </svg>
+            <div>
+              <h4 class="alert-title">Resumen del Viaje</h4>
+              <div class="text-muted">
+                <strong>{{ selectedFrequency.frequency.originCity.name }}</strong> → 
+                <strong>{{ selectedFrequency.frequency.destinationCity.name }}</strong> | 
+                {{ selectedFrequency.date }} | 
+                {{ selectedFrequency.frequency.departureTime.substring(0, 5) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de pasajeros -->
+    <form [formGroup]="passengersForm" (ngSubmit)="onPurchaseTicket()">
+      <div formArrayName="passengers" class="passengers-container">
+        
+        <div 
+          *ngFor="let passengerForm of passengersFormArray.controls; let i = index" 
+          class="passenger-card mb-4"
+          [formGroupName]="i"
+        >
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">
+                Pasajero {{ i + 1 }} - Asiento {{ getPassengerForm(i).get('seatNumber')?.value }}
+                <span 
+                  class="badge ms-2 text-white" 
+                  [class]="getPassengerForm(i).get('seatType')?.value === 'VIP' ? 'bg-amber-500' : 'bg-blue-500'"
+                >
+                  {{ getPassengerForm(i).get('seatType')?.value }}
+                </span>
+                <span class="badge bg-gray-600 text-white ms-1">
+                  {{ getPassengerTypeLabel(getPassengerForm(i).get('passengerType')?.value) }}
+                </span>
+              </h4>
+              <div class="card-actions">
+                <span class="text-primary">${{ getPassengerForm(i).get('price')?.value.toFixed(2) }}</span>
+                <!-- Botón para llenar datos de ejemplo (solo en desarrollo) -->
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="fillSampleData(i)"
+                  title="Llenar datos de ejemplo"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                    <path d="M6 12h.01"></path>
+                    <path d="M18 12h.01"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="card-body">
+              <div class="row">
+                <!-- Tipo de Pasajero -->
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Tipo de Pasajero</label>
+                  <select 
+                    class="form-select" 
+                    formControlName="passengerType"
+                    [class.is-invalid]="getFieldError(getPassengerForm(i), 'passengerType')"
+                  >
+                    <option value="ADULT">Adulto</option>
+                    <option value="CHILD">Niño</option>
+                    <option value="SENIOR">Adulto Mayor</option>
+                    <option value="HANDICAPPED">Persona con Discapacidad</option>
+                  </select>
+                  <div class="invalid-feedback">
+                    {{ getFieldError(getPassengerForm(i), 'passengerType') }}
+                  </div>
+                </div>
+
+                <!-- Nombres -->
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Nombres</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="firstName"
+                    placeholder="Ej: Juan Carlos"
+                    [class.is-invalid]="getFieldError(getPassengerForm(i), 'firstName')"
+                  >
+                  <div class="invalid-feedback">
+                    {{ getFieldError(getPassengerForm(i), 'firstName') }}
+                  </div>
+                </div>
+
+                <!-- Apellidos -->
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Apellidos</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="lastName"
+                    placeholder="Ej: Pérez García"
+                    [class.is-invalid]="getFieldError(getPassengerForm(i), 'lastName')"
+                  >
+                  <div class="invalid-feedback">
+                    {{ getFieldError(getPassengerForm(i), 'lastName') }}
+                  </div>
+                </div>
+
+                <!-- Número de Cédula -->
+                <div class="col-md-12 mb-3">
+                  <label class="form-label">Número de Cédula</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="idNumber"
+                    placeholder="Ej: 1234567890"
+                    maxlength="10"
+                    [class.is-invalid]="getFieldError(getPassengerForm(i), 'idNumber')"
+                  >
+                  <div class="form-hint">Ingrese 10 dígitos sin guiones ni espacios</div>
+                  <div class="invalid-feedback">
+                    {{ getFieldError(getPassengerForm(i), 'idNumber') }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Resumen de compra -->
+      <div class="card bg-light">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h4 class="mb-0">Total a Pagar</h4>
+              <div class="text-muted">
+                {{ selectedSeats.length }} asiento{{ selectedSeats.length !== 1 ? 's' : '' }} | 
+                Pago en Efectivo
+              </div>
+            </div>
+            <div class="col-md-4 text-end">
+              <div class="h2 text-primary mb-0">${{ getTotalPrice().toFixed(2) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="form-footer d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-secondary" (click)="onPrevious()" [disabled]="isPurchasing">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M5 12l14 0"/>
+            <path d="M5 12l6 6"/>
+            <path d="M5 12l6 -6"/>
+          </svg>
+          Anterior
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn btn-success btn-lg"
+          [disabled]="!canProceed() || isPurchasing"
+        >
+          <span *ngIf="isPurchasing" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <rect x="3" y="5" width="18" height="14" rx="3"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <line x1="7" y1="15" x2="7.01" y2="15"/>
+            <line x1="11" y1="15" x2="13" y2="15"/>
+          </svg>
+          {{ isPurchasing ? 'Procesando...' : 'Comprar Tickets' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
