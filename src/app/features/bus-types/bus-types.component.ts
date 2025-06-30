@@ -16,7 +16,6 @@ import { ListBusTypesComponent } from './components/list-bus-types/list-bus-type
 })
 export class BusTypesComponent implements OnInit {
   busTypes: IBusType[] = [];
-  loading: boolean = true;
 
   constructor(
     private busTypesService: BusTypesService,
@@ -29,15 +28,12 @@ export class BusTypesComponent implements OnInit {
   }
 
   loadBusTypes(): void {
-    this.loading = true;
     this.busTypesService.getBusTypes().subscribe({
       next: (busTypes) => {
         this.busTypes = busTypes;
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error al cargar tipos de bus:', error);
-        this.loading = false;
         this.alertService.showAlert({
           alertType: AlertType.ERROR,
           mainMessage: 'Error al cargar tipos de bus',

@@ -30,7 +30,6 @@ interface IUploadResponse {
 })
 export class CoopFormComponent implements OnInit {
   @Input() cooperative: ICoopResponse | null = null;
-  @Input() isLoading: boolean = false;
   @Output() formSubmit = new EventEmitter<ICoopRequest>();
   @Output() cancelEdit = new EventEmitter<void>();
 
@@ -47,6 +46,10 @@ export class CoopFormComponent implements OnInit {
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.required, Validators.email]],
       logo: [''],
+      facebook: [''],
+      instagram: [''],
+      X: [''],
+      website: [''],
     });
   }
 
@@ -58,6 +61,10 @@ export class CoopFormComponent implements OnInit {
         phone: this.cooperative.phone,
         email: this.cooperative.email,
         logo: this.cooperative.logo,
+        facebook: this.cooperative.facebook,
+        instagram: this.cooperative.instagram,
+        X: this.cooperative.X,
+        website: this.cooperative.website,
       });
       this.uploadedLogoUrl = this.cooperative.logo;
     }
@@ -72,23 +79,19 @@ export class CoopFormComponent implements OnInit {
   }
 
   private handleFileUpload(file: File): void {
-    this.isLoading = true;
     const formData = new FormData();
     formData.append('file', file);
 
-    const uploadUrl =
-      'https://chasquigo-backend-7yn2.onrender.com/cloudinary/image';
+    const uploadUrl = 'http://45.14.225.213:3000/cloudinary/image';
 
     this.http.post<IUploadResponse>(uploadUrl, formData).subscribe({
       next: (response) => {
         this.uploadedLogoUrl = response.url;
         this.coopForm.patchValue({ logo: response.url });
-        this.isLoading = false;
         console.log('Image uploaded, URL:', response.url);
       },
       error: (error) => {
         console.error('Error uploading image:', error);
-        this.isLoading = false;
         this.selectedFile = null;
       },
     });
@@ -113,6 +116,10 @@ export class CoopFormComponent implements OnInit {
         phone: this.cooperative.phone,
         email: this.cooperative.email,
         logo: this.cooperative.logo,
+        facebook: this.cooperative.facebook,
+        instagram: this.cooperative.instagram,
+        X: this.cooperative.X,
+        website: this.cooperative.website,
       });
       this.uploadedLogoUrl = this.cooperative.logo;
     }

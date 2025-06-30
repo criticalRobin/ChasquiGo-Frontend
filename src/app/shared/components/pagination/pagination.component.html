@@ -1,0 +1,80 @@
+<div class="card-footer d-flex align-items-center">
+  <p class="m-0 text-secondary">
+    Página <span>{{ currentPage }}</span> de
+    <span>{{ totalPages }}</span>
+  </p>
+  <ul class="pagination m-0 ms-auto">
+    <!-- Botón Anterior -->
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link cursor-pointer" (click)="changePage(currentPage - 1)">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon icon-1"
+        >
+          <path d="M15 6l-6 6l6 6"></path>
+        </svg>
+        ant
+      </a>
+    </li>
+
+    <!-- Primera página si no está en el rango visible -->
+    <li class="page-item" *ngIf="getPages()[0] > 1">
+      <a class="page-link cursor-pointer" (click)="changePage(1)">1</a>
+    </li>
+    <li class="page-item disabled" *ngIf="getPages()[0] > 2">
+      <span class="page-link">...</span>
+    </li>
+
+    <!-- Páginas visibles -->
+    <li
+      class="page-item"
+      *ngFor="let page of getPages()"
+      [class.active]="page === currentPage"
+    >
+      <a class="page-link cursor-pointer" (click)="changePage(page)">{{ page }}</a>
+    </li>
+
+    <!-- Última página si no está en el rango visible -->
+    <li
+      class="page-item disabled"
+      *ngIf="getPages()[getPages().length - 1] < totalPages - 1"
+    >
+      <span class="page-link">...</span>
+    </li>
+    <li
+      class="page-item"
+      *ngIf="getPages()[getPages().length - 1] < totalPages"
+    >
+      <a class="page-link cursor-pointer" (click)="changePage(totalPages)">{{ totalPages }}</a>
+    </li>
+
+    <!-- Botón Siguiente -->
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link cursor-pointer" (click)="changePage(currentPage + 1)">
+        sig
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon icon-1"
+        >
+          <path d="M9 6l6 6l-6 6"></path>
+        </svg>
+      </a>
+    </li>
+  </ul>
+</div>

@@ -4,4 +4,8 @@ export interface ICoopRequest {
   phone: string;
   email: string;
   logo: string;
+  facebook: string;
+  instagram: string;
+  X: string;
+  website: string;
 }

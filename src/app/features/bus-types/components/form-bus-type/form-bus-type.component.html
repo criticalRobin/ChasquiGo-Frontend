@@ -1,10 +1,25 @@
+<div class="mb-3">
+  <h1 class="text-secondary-yellow">Tipos de Bus</h1>
+  <ol class="breadcrumb breadcrumb-arrows d-none d-md-flex">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/bus-types']" class="text-primary-blue">Tipos de Bus</a>
+    </li>
+    <li class="breadcrumb-item active">
+      <a href="#" class="text-secondary-yellow">Crear/Editar Tipo de Bus</a>
+    </li>
+  </ol>
+</div>
+
 <div class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card">
-        <div class="card-header">
+        <!-- <div class="card-header">
           <h3 class="card-title">{{ pageTitle }}</h3>
-        </div>
+        </div> -->
 
         <div class="card-body" *ngIf="!loading; else loadingTemplate">
           <form [formGroup]="busTypeForm" (ngSubmit)="onSubmit()">

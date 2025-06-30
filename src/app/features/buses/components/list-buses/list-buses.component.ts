@@ -1,30 +1,38 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IBuses, IBusType } from '../../models/buses.interface';
 import { BusesService } from '../../services/buses.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
+import { PaginationComponent } from '@shared/components/pagination/pagination.component';
+import { SearchComponent } from '@shared/components/search/search.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-list-buses',
   standalone: true,
-  imports: [CommonModule, FormsModule], 
+  imports: [CommonModule, PaginationComponent, SearchComponent], 
   templateUrl: './list-buses.component.html',
   styleUrl: './list-buses.component.css'
 })
-export class ListBusesComponent implements OnInit {
+export class ListBusesComponent implements OnInit, OnDestroy {
   @Output() createBusClicked = new EventEmitter<void>();
   @Output() editBusClicked = new EventEmitter<IBuses>();
   
   buses: IBuses[] = [];
   busTypes: IBusType[] = [];
   filteredBuses: IBuses[] = [];
-  loading: boolean = true;
+  paginatedBuses: IBuses[] = [];
   busToDelete: IBuses | null = null;
   showDeleteModal = false;
-  searchTerm: string = '';
+  
+  // Propiedades de paginación
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  totalPages: number = 1;
+  
+  private subscriptions: Subscription = new Subscription();
     constructor(
     private busService: BusesService,
     private router: Router,
@@ -37,13 +45,10 @@ export class ListBusesComponent implements OnInit {
   }
   
   loadBuses(): void {
-    this.loading = true;
-    
     // Obtener el ID de la cooperativa del localStorage
     const userCooperative = localStorage.getItem('userCooperative');
     if (!userCooperative) {
       console.error('No se encontró información de la cooperativa en localStorage');
-      this.loading = false;
       return;
     }
     
@@ -54,38 +59,43 @@ export class ListBusesComponent implements OnInit {
       
       if (!cooperativeId) {
         console.error('ID de cooperativa no válido:', cooperativeData);
-        this.loading = false;
         return;
       }
     } catch (error) {
       console.error('Error al parsear datos de cooperativa desde localStorage:', error);
-      this.loading = false;
       return;
     }
     
     // Usar el nuevo endpoint con el ID de la cooperativa
-    this.busService.getBusesByCooperativeId(cooperativeId).subscribe({
-      next: (buses: IBuses[]) => {
-        this.buses = buses;
-        this.filteredBuses = [...buses]; // Inicializar la lista filtrada
-        this.loading = false;
-      },
-      error: (error: any) => {
-        console.error('Error loading buses:', error);
-        this.loading = false;
-      }
-    });
+    this.subscriptions.add(
+      this.busService.getBusesByCooperativeId(cooperativeId).subscribe({
+        next: (buses: IBuses[]) => {
+          this.buses = buses;
+          this.filteredBuses = [...buses];
+          this.updatePagination();
+        },
+        error: (error: any) => {
+          console.error('Error loading buses:', error);
+          this.alertService.showAlert({
+            alertType: AlertType.ERROR,
+            mainMessage: 'Error al cargar buses'
+          });
+        }
+      })
+    );
   }
 
   loadBusTypes(): void {
-    this.busService.getBusTypes().subscribe({
-      next: (types: IBusType[]) => {
-        this.busTypes = types;
-      },
-      error: (error) => {
-        console.error('Error al cargar los tipos de bus:', error);
-      }
-    });
+    this.subscriptions.add(
+      this.busService.getBusTypes().subscribe({
+        next: (types: IBusType[]) => {
+          this.busTypes = types;
+        },
+        error: (error) => {
+          console.error('Error al cargar los tipos de bus:', error);
+        }
+      })
+    );
   }
   
   onCreateBus(): void {
@@ -108,33 +118,33 @@ export class ListBusesComponent implements OnInit {
   
   confirmDelete(): void {
     if (this.busToDelete && this.busToDelete.id) {
-      this.loading = true;
-      this.busService.deleteBus(this.busToDelete.id).subscribe({
-        next: () => {
-          // Mostrar alerta de éxito
-          this.alertService.showAlert({
-            alertType: AlertType.SUCCESS,
-            mainMessage: 'Bus dado de Baja',
-            subMessage: 'El bus ha sido eliminado exitosamente'
-          });
-          
-          this.loadBuses(); // Esto ya actualiza filteredBuses
-          this.cancelDelete();
-        },
-        error: (error) => {
-          console.error('Error al eliminar el bus:', error);
-          
-          // Mostrar alerta de error
-          this.alertService.showAlert({
-            alertType: AlertType.ERROR,
-            mainMessage: 'Error al eliminar bus',
-            subMessage: 'Ocurrió un error al eliminar el bus. Inténtalo nuevamente.'
-          });
-          
-          this.loading = false;
-          this.cancelDelete();
-        }
-      });
+      this.subscriptions.add(
+        this.busService.deleteBus(this.busToDelete.id).subscribe({
+          next: () => {
+            // Mostrar alerta de éxito
+            this.alertService.showAlert({
+              alertType: AlertType.SUCCESS,
+              mainMessage: 'Bus dado de Baja',
+              subMessage: 'El bus ha sido eliminado exitosamente'
+            });
+            
+            this.loadBuses(); // Esto ya actualiza filteredBuses
+            this.cancelDelete();
+          },
+          error: (error) => {
+            console.error('Error al eliminar el bus:', error);
+            
+            // Mostrar alerta de error
+            this.alertService.showAlert({
+              alertType: AlertType.ERROR,
+              mainMessage: 'Error al eliminar bus',
+              subMessage: 'Ocurrió un error al eliminar el bus. Inténtalo nuevamente.'
+            });
+            
+            this.cancelDelete();
+          }
+        })
+      );
     }
   }
   
@@ -148,40 +158,48 @@ export class ListBusesComponent implements OnInit {
     return busType ? busType.name : `Tipo ${busTypeId}`;
   }
 
-  onSearchChange(): void {
-    this.filterBuses();
-  }
-
-  filterBuses(): void {
-    if (!this.searchTerm.trim()) {
-      // Si no hay término de búsqueda, mostrar todos los buses
-      this.filteredBuses = [...this.buses];
-      return;
+  // Métodos para búsqueda
+  protected onSearch(searchTerm: string): void {
+    if (!searchTerm.trim()) {
+      this.filteredBuses = this.buses;
+    } else {
+      const searchTermLower = searchTerm.toLowerCase().trim();
+      this.filteredBuses = this.buses.filter(bus => {
+        // Filtrar por placa
+        const plateMatch = bus.licensePlate?.toLowerCase().includes(searchTermLower);
+        
+        // Filtrar por chasis
+        const chassisMatch = bus.chassisBrand?.toLowerCase().includes(searchTermLower);
+        
+        // Filtrar por carrocería
+        const bodyworkMatch = bus.bodyworkBrand?.toLowerCase().includes(searchTermLower);
+        
+        // Filtrar por tipo de bus
+        const busTypeName = this.getBusTypeName(bus.busTypeId);
+        const typeMatch = busTypeName.toLowerCase().includes(searchTermLower);
+        
+        // Retornar true si coincide con cualquiera de los criterios
+        return plateMatch || chassisMatch || bodyworkMatch || typeMatch;
+      });
     }
-
-    const searchTermLower = this.searchTerm.toLowerCase().trim();
-    
-    this.filteredBuses = this.buses.filter(bus => {
-      // Filtrar por placa
-      const plateMatch = bus.licensePlate?.toLowerCase().includes(searchTermLower);
-      
-      // Filtrar por chasis
-      const chassisMatch = bus.chassisBrand?.toLowerCase().includes(searchTermLower);
-      
-      // Filtrar por carrocería
-      const bodyworkMatch = bus.bodyworkBrand?.toLowerCase().includes(searchTermLower);
-      
-      // Filtrar por tipo de bus
-      const busTypeName = this.getBusTypeName(bus.busTypeId);
-      const typeMatch = busTypeName.toLowerCase().includes(searchTermLower);
-      
-      // Retornar true si coincide con cualquiera de los criterios
-      return plateMatch || chassisMatch || bodyworkMatch || typeMatch;
-    });
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
-  clearSearch(): void {
-    this.searchTerm = '';
-    this.filterBuses();
+  // Métodos para paginación
+  protected onPageChange(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  private updatePagination(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedBuses = this.filteredBuses.slice(startIndex, endIndex);
+    this.totalPages = Math.ceil(this.filteredBuses.length / this.itemsPerPage);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }
