@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BusTypesService } from '../../services/bus-types.service';
 import { IBusType, IBusTypeCreate, IBusTypeUpdate } from '../../models/bus-type.interface';
 import { AlertService } from '@shared/services/alert.service';
@@ -10,7 +10,7 @@ import { AlertType } from '@utils/enums/alert-type.enum';
 @Component({
   selector: 'app-form-bus-type',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './form-bus-type.component.html',
   styleUrl: './form-bus-type.component.css'
 })

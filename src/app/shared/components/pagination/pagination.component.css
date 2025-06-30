@@ -1,0 +1,7 @@
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.page-link:hover {
+  text-decoration: none;
+}

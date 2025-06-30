@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+.btn-primary {
+  background: linear-gradient(90deg, #206bc4 0%, #1a56a6 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #1a56a6 0%, #154a8f 100%);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
