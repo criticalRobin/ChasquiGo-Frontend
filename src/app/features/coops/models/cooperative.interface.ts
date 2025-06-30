@@ -5,4 +5,8 @@ export interface ICooperative {
   logo: string;
   phone: string;
   email: string;
+  facebook: string;
+  instagram: string;
+  X: string;
+  website: string;
 } 
