@@ -52,7 +52,34 @@ export class HomepageComponent implements OnInit, OnDestroy, AfterViewInit {
   error: string | null = null;
 
   ngOnInit(): void {
-    this.loadDashboardData();
+    // Esperar un poco para que el localStorage esté completamente cargado después del login
+    this.waitForCooperativeData();
+  }
+
+  public waitForCooperativeData(): void {
+    this.isLoading = true;
+    this.error = null;
+
+    // Intentar obtener la cooperativa con reintentos
+    const checkCooperative = (attempts: number = 0): void => {
+      const cooperative = this.loginService.getCooperativeFromLocalStorage();
+      
+      if (cooperative?.id) {
+        // Cooperativa encontrada, cargar datos
+        console.log('Cooperativa encontrada:', cooperative);
+        this.loadDashboardData();
+      } else if (attempts < 10) {
+        // Reintentar después de 200ms, máximo 10 intentos (2 segundos total)
+        console.log(`Intento ${attempts + 1}: Esperando datos de cooperativa...`);
+        setTimeout(() => checkCooperative(attempts + 1), 200);
+      } else {
+        // No se encontró la cooperativa después de todos los intentos
+        this.error = 'No se encontró información de la cooperativa. Por favor, vuelve a iniciar sesión.';
+        this.isLoading = false;
+      }
+    };
+
+    checkCooperative();
   }
 
   ngAfterViewInit(): void {
@@ -74,14 +101,12 @@ export class HomepageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.error = null;
 
     const cooperative = this.loginService.getCooperativeFromLocalStorage();
-    if (!cooperative?.id) {
-      this.error = 'No se encontró información de la cooperativa';
-      this.isLoading = false;
-      return;
-    }
+    // En este punto ya sabemos que cooperative existe por la validación anterior
+    
+    console.log('Cargando datos del dashboard para cooperativa:', cooperative?.id);
 
     const requests = forkJoin({
-      buses: this.busesService.getBusesByCooperativeId(cooperative.id),
+      buses: this.busesService.getBusesByCooperativeId(cooperative!.id),
       busTypes: this.busTypesService.getBusTypes(),
       frequencies: this.routesService.getAllFrequencies(),
       routeSheets: this.routeSheetService.getAllRouteSheets()
@@ -90,6 +115,7 @@ export class HomepageComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.add(
       requests.subscribe({
         next: (data) => {
+          console.log('Datos del dashboard cargados:', data);
           this.processStatsData(data);
           this.isLoading = false;
           // Crear gráficos después de que la vista esté inicializada y los datos estén cargados
@@ -97,7 +123,7 @@ export class HomepageComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         error: (error) => {
           console.error('Error loading dashboard data:', error);
-          this.error = 'Error al cargar los datos del dashboard';
+          this.error = 'Error al cargar los datos del dashboard. Por favor, intenta nuevamente.';
           this.isLoading = false;
         }
       })
