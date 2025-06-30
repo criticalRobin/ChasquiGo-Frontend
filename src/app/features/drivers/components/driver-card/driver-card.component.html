@@ -1,56 +1,37 @@
 <div class="card driver-detail-card">
   <div class="card-body">
-    <div class="d-flex justify-content-between align-items-start mb-4">
-      <div>
-        <h2 class="card-title mb-1">
-          <i class="ti ti-user-check me-2"></i>
-          {{ driver.firstName }} {{ driver.lastName }}
-        </h2>
-        <p class="text-muted">{{ driver.role }}</p>
-      </div>
-      <div class="status-indicator">
-        <span class="status-badge d-flex align-items-center status-active">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-            <path d="M9 12l2 2l4 -4" />
-          </svg>
-          Activo
-        </span>
-      </div>
+    <div class="mb-4 text-center">
+      <h2 class="card-title mb-2">
+        {{ driver.firstName }} {{ driver.lastName }}
+      </h2>
+      <p class="text-muted mb-0">{{ driver.role === 'DRIVER' ? 'Conductor' : driver.role }}</p>
     </div>
 
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="mb-3">
           <span class="detail-label">Cédula/RUC:</span>
-          <div>{{ driver.idNumber }}</div>
+          <div class="detail-value">{{ driver.idNumber }}</div>
         </div>
         <div class="mb-3">
           <span class="detail-label">Email:</span>
-          <div>{{ driver.email }}</div>
+          <div class="detail-value">{{ driver.email }}</div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="mb-3">
           <span class="detail-label">Teléfono:</span>
-          <div>{{ driver.phone }}</div>
+          <div class="detail-value">{{ driver.phone }}</div>
         </div>
         <div class="mb-3">
-          <span class="detail-label">Cooperativa:</span>
-          <div>
-            @if (driver.cooperative) {
-              {{ driver.cooperative.name }}
-            } @else {
-              N/A
-            }
-          </div>
+          <span class="detail-label">Tipo de Documento:</span>
+          <div class="detail-value">{{ driver.documentType | titlecase }}</div>
         </div>
       </div>
     </div>
     
     <div class="d-flex justify-content-end gap-2 mt-4">
-      <button class="btn btn-outline-primary">
+      <button class="btn btn-outline-primary" (click)="onEdit()">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
@@ -59,7 +40,7 @@
         </svg>
         Editar
       </button>
-      <button class="btn btn-outline-danger">
+      <button class="btn btn-outline-danger" data-bs-toggle="modal" [attr.data-bs-target]="'#deleteModal' + driver.id">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <path d="M4 7l16 0"></path>
@@ -70,6 +51,43 @@
         </svg>
         Eliminar
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" [id]="'deleteModal' + driver.id" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M12 9v4"/>
+          <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+          <path d="M12 16h.01"/>
+        </svg>
+        <h3>¿Eliminar conductor?</h3>
+        <div class="text-muted">
+          Se eliminará a <strong>{{driver.firstName}} {{driver.lastName}}</strong>. 
+          Esta acción no se puede deshacer.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="w-100">
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+            </div>
+            <div class="col">
+              <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal" (click)="confirmDelete()">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

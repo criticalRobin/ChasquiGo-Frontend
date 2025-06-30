@@ -1,12 +1,27 @@
 <form [formGroup]="driverForm" (ngSubmit)="onSubmit()" class="card">
   <div class="card-header">
-    <h3 class="card-title">Información del Conductor</h3>
+    <h3 class="card-title">{{ isEditMode ? 'Editar Conductor' : 'Registrar Conductor' }}</h3>
+    @if (isEditMode) {
+    <div class="card-subtitle">
+      <small class="text-muted">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M12 9v2"/>
+          <path d="M12 15h.01"/>
+          <path d="M12 3c7.2 0 9 1.8 9 9s-1.8 9 -9 9s-9 -1.8 -9 -9s1.8 -9 9 -9z"/>
+        </svg>
+        Solo email y teléfono pueden modificarse
+      </small>
+    </div>
+    }
   </div>
   <div class="card-body">
     <!-- ID Number and Document Type -->
     <div class="row mb-3">
       <div class="col-md-6">
-        <label class="form-label required">Cédula/RUC</label>
+        <label class="form-label required">
+          Cédula/RUC
+        </label>
         <input
           type="text"
           class="form-control"
@@ -20,11 +35,48 @@
         @if (driverForm.get('idNumber')?.invalid &&
         driverForm.get('idNumber')?.touched) {
         <div class="invalid-feedback">
-          Cédula/RUC requerida y debe tener 10 dígitos
+          @if (driverForm.get('idNumber')?.errors?.['required']) {
+            Cédula/RUC es requerida
+          }
+          @if (driverForm.get('idNumber')?.errors?.['pattern']) {
+            Debe tener exactamente 10 dígitos
+          }
+          @if (driverForm.get('idNumber')?.errors?.['invalidId']) {
+            Cédula ecuatoriana inválida
+          }
         </div>
         }
       </div>
       <div class="col-md-6">
+        <label class="form-label required">
+          Tipo de Documento
+        </label>
+        <select
+          class="form-select"
+          formControlName="documentType"
+          [class.is-invalid]="
+            driverForm.get('documentType')?.invalid &&
+            driverForm.get('documentType')?.touched
+          "
+        >
+          <option value="CEDULA">Cédula</option>
+          <option value="RUC">RUC</option>
+        </select>
+        @if (driverForm.get('documentType')?.invalid &&
+        driverForm.get('documentType')?.touched) {
+        <div class="invalid-feedback">
+          @if (driverForm.get('documentType')?.errors?.['required']) {
+            Tipo de documento es requerido
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Password section -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        @if (!isEditMode) {
         <label class="form-label required">Contraseña</label>
         <input
           type="password"
@@ -34,13 +86,81 @@
             driverForm.get('password')?.invalid &&
             driverForm.get('password')?.touched
           "
-          placeholder="Ingrese una contraseña"
+          placeholder="Ej: Password123"
         />
         @if (driverForm.get('password')?.invalid &&
         driverForm.get('password')?.touched) {
         <div class="invalid-feedback">
-          Contraseña requerida y debe tener al menos 6 caracteres
+          @if (driverForm.get('password')?.errors?.['required']) {
+            Contraseña es requerida
+          }
+          @if (driverForm.get('password')?.errors?.['minlength']) {
+            Debe tener al menos 6 caracteres
+          }
+          @if (driverForm.get('password')?.errors?.['maxlength']) {
+            No debe exceder 20 caracteres
+          }
+          @if (driverForm.get('password')?.errors?.['passwordPattern']) {
+            Debe contener al menos una mayúscula y un número
+          }
         </div>
+        }
+        } @else {
+        <label class="form-label">Contraseña</label>
+        <div class="mb-2">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary btn-sm"
+            (click)="togglePasswordSection()"
+          >
+            @if (!showPasswordSection) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"/>
+                <path d="M9 12l2 2l4 -4"/>
+              </svg>
+              Reestablecer contraseña
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M18 6l-12 12"/>
+                <path d="M6 6l12 12"/>
+              </svg>
+              Cancelar
+            }
+          </button>
+        </div>
+        @if (showPasswordSection) {
+        <input
+          type="password"
+          class="form-control"
+          formControlName="password"
+          [class.is-invalid]="
+            driverForm.get('password')?.invalid &&
+            driverForm.get('password')?.touched
+          "
+          placeholder="Nueva contraseña"
+        />
+        @if (driverForm.get('password')?.invalid &&
+        driverForm.get('password')?.touched) {
+        <div class="invalid-feedback">
+          @if (driverForm.get('password')?.errors?.['required']) {
+            Contraseña es requerida
+          }
+          @if (driverForm.get('password')?.errors?.['minlength']) {
+            Debe tener al menos 6 caracteres
+          }
+          @if (driverForm.get('password')?.errors?.['maxlength']) {
+            No debe exceder 20 caracteres
+          }
+          @if (driverForm.get('password')?.errors?.['passwordPattern']) {
+            Debe contener al menos una mayúscula y un número
+          }
+        </div>
+        }
+        } @else {
+        <small class="text-muted">La contraseña actual se mantendrá sin cambios</small>
+        }
         }
       </div>
     </div>
@@ -62,7 +182,15 @@
         @if (driverForm.get('firstName')?.invalid &&
         driverForm.get('firstName')?.touched) {
         <div class="invalid-feedback">
-          Nombre requerido y debe tener al menos 3 caracteres
+          @if (driverForm.get('firstName')?.errors?.['required']) {
+            Nombre es requerido
+          }
+          @if (driverForm.get('firstName')?.errors?.['minlength']) {
+            Debe tener al menos 2 caracteres
+          }
+          @if (driverForm.get('firstName')?.errors?.['maxlength']) {
+            No debe exceder 50 caracteres
+          }
         </div>
         }
       </div>
@@ -81,7 +209,15 @@
         @if (driverForm.get('lastName')?.invalid &&
         driverForm.get('lastName')?.touched) {
         <div class="invalid-feedback">
-          Apellido requerido y debe tener al menos 3 caracteres
+          @if (driverForm.get('lastName')?.errors?.['required']) {
+            Apellido es requerido
+          }
+          @if (driverForm.get('lastName')?.errors?.['minlength']) {
+            Debe tener al menos 2 caracteres
+          }
+          @if (driverForm.get('lastName')?.errors?.['maxlength']) {
+            No debe exceder 50 caracteres
+          }
         </div>
         }
       </div>
@@ -102,7 +238,14 @@
         />
         @if (driverForm.get('email')?.invalid &&
         driverForm.get('email')?.touched) {
-        <div class="invalid-feedback">Ingrese un correo electrónico válido</div>
+        <div class="invalid-feedback">
+          @if (driverForm.get('email')?.errors?.['required']) {
+            Correo electrónico es requerido
+          }
+          @if (driverForm.get('email')?.errors?.['email']) {
+            Ingrese un correo electrónico válido
+          }
+        </div>
         }
       </div>
       <div class="col-md-6">
@@ -119,14 +262,16 @@
         @if (driverForm.get('phone')?.invalid &&
         driverForm.get('phone')?.touched) {
         <div class="invalid-feedback">
-          Teléfono requerido y debe tener 10 dígitos
+          @if (driverForm.get('phone')?.errors?.['required']) {
+            Teléfono es requerido
+          }
+          @if (driverForm.get('phone')?.errors?.['pattern']) {
+            Debe tener exactamente 10 dígitos
+          }
         </div>
         }
       </div>
     </div>
-
-    <!-- Hidden role field -->
-    <input type="hidden" formControlName="role" />
 
     <!-- Action Buttons -->
     <div class="form-footer d-flex justify-content-end">
@@ -142,7 +287,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="driverForm.invalid || isLoading"
+          [disabled]="!isFormValid() || isLoading"
         >
           @if (isLoading) {
           <span
@@ -150,7 +295,7 @@
             role="status"
             aria-hidden="true"
           ></span>
-          } Registrar Conductor
+          } {{ isEditMode ? 'Actualizar Conductor' : 'Registrar Conductor' }}
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
 <div class="mb-3">
-  <h1 class="text-secondary-yellow">Nuevo Conductor</h1>
+  <h1 class="text-secondary-yellow">{{ isEditMode ? 'Editar Conductor' : 'Nuevo Conductor' }}</h1>
   <ol class="breadcrumb breadcrumb-arrows">
     <li class="breadcrumb-item">
       <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
@@ -8,7 +8,7 @@
       <a [routerLink]="['/drivers']" class="text-primary-blue">Conductores</a>
     </li>
     <li class="breadcrumb-item active">
-      <a href="#" class="text-secondary-yellow">Registrar</a>
+      <a href="#" class="text-secondary-yellow">{{ isEditMode ? 'Editar' : 'Registrar' }}</a>
     </li>
   </ol>
 </div>
@@ -25,6 +25,8 @@
   } @else if (cooperativeId) {
   <app-driver-form
     [cooperativeId]="cooperativeId"
+    [driverData]="driverData"
+    [isEditMode]="isEditMode"
     (driverCreated)="onDriverCreated()"
   >
   </app-driver-form>
