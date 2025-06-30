@@ -3,21 +3,37 @@
   <div class="row mb-3">
           <div class="col-sm-6 col-md-6">
             <div class="mb-3">
-              <label class="form-label required">Cooperativa</label>
-              <select class="form-select" formControlName="cooperativeId">
-                <option [ngValue]="null" disabled>Seleccione una cooperativa</option>
-                <option *ngFor="let coop of cooperatives" [value]="coop.id">{{ coop.name }}</option>
-              </select>
-              <div class="invalid-feedback" *ngIf="busForm.get('cooperativeId')?.invalid && busForm.get('cooperativeId')?.touched">
-                La cooperativa es requerida
+              <label class="form-label required">Placa</label>
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('licensePlate')"
+                formControlName="licensePlate" 
+                placeholder="Ej: ABC-123 o ABC-1234"
+                maxlength="8"
+                style="text-transform: uppercase;"
+              >
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('licensePlate')">
+                {{ getFieldError('licensePlate') }}
               </div>
+              <small class="form-text text-muted">Formato: 3 letras, guión, 3 o 4 números (ABC-123 o ABC-1234)</small>
             </div>
           </div>
           <div class="col-sm-6 col-md-6">
-            <div class="mb-3">              <label class="form-label required">Placa</label>
-              <input type="text" class="form-control" formControlName="licensePlate" placeholder="Ej: ICH-090">
-              <div class="invalid-feedback" *ngIf="busForm.get('licensePlate')?.invalid && busForm.get('licensePlate')?.touched">
-                La placa es requerida y debe tener el formato correcto (Ej: ICH-090)
+            <div class="mb-3">
+              <label class="form-label required">Tipo de Bus</label>
+              <select 
+                class="form-select"
+                [class.is-invalid]="isFieldInvalid('busTypeId')"
+                formControlName="busTypeId"
+              >
+                <option value="">Seleccione un tipo de bus</option>
+                <option *ngFor="let busType of busTypes" [value]="busType.id">
+                  {{ busType.name }} - {{ busType.description }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('busTypeId')">
+                {{ getFieldError('busTypeId') }}
               </div>
             </div>
           </div>
@@ -28,18 +44,32 @@
           <div class="col-sm-6 col-md-6">
             <div class="mb-3">
               <label class="form-label required">Marca del Chasis</label>
-              <input type="text" class="form-control" formControlName="chassisBrand" placeholder="Ej: Mercedes-Benz">
-              <div class="invalid-feedback" *ngIf="busForm.get('chassisBrand')?.invalid && busForm.get('chassisBrand')?.touched">
-                La marca del chasis es requerida
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('chassisBrand')"
+                formControlName="chassisBrand" 
+                placeholder="Ej: Mercedes-Benz, Volvo, Scania"
+                minlength="2"
+              >
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('chassisBrand')">
+                {{ getFieldError('chassisBrand') }}
               </div>
             </div>
           </div>
           <div class="col-sm-6 col-md-6">
             <div class="mb-3">
               <label class="form-label required">Marca de Carrocería</label>
-              <input type="text" class="form-control" formControlName="bodyworkBrand" placeholder="Ej: Marcopolo">
-              <div class="invalid-feedback" *ngIf="busForm.get('bodyworkBrand')?.invalid && busForm.get('bodyworkBrand')?.touched">
-                La marca de carrocería es requerida
+              <input 
+                type="text" 
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('bodyworkBrand')"
+                formControlName="bodyworkBrand" 
+                placeholder="Ej: Marcopolo, Busscar, Caio"
+                minlength="2"
+              >
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('bodyworkBrand')">
+                {{ getFieldError('bodyworkBrand') }}
               </div>
             </div>
           </div>
@@ -47,62 +77,48 @@
 
         <!-- Tercera fila -->
         <div class="row mb-3">
-          <div class="col-sm-4 col-md-4">            <div class="mb-3">
-              <label class="form-label required">Capacidad</label>
+          <div class="col-sm-6 col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Capacidad</label>
               <input 
                 type="number" 
                 id="capacity" 
                 formControlName="capacity" 
                 class="form-control" 
-                min="1"
-                [class.is-invalid]="busForm.get('capacity')?.invalid && busForm.get('capacity')?.touched"
+                readonly
+                [value]="busForm.get('capacity')?.value || ''"
+                [placeholder]="busForm.get('capacity')?.value ? '' : 'Selecciona un tipo de bus'"
               >
-              <div class="invalid-feedback" *ngIf="busForm.get('capacity')?.errors?.['required']">
-                La capacidad es requerida
-              </div>
-              <div class="invalid-feedback" *ngIf="busForm.get('capacity')?.errors?.['min']">
-                La capacidad debe ser mayor a 0
-              </div>
+              <small class="form-text text-muted">
+                <span *ngIf="busForm.get('capacity')?.value; else noCapacity">
+                  Capacidad: {{ busForm.get('capacity')?.value }} asientos
+                </span>
+                <ng-template #noCapacity>
+                  La capacidad se asigna automáticamente según el tipo de bus seleccionado
+                </ng-template>
+              </small>
             </div>
           </div>
-          <div class="col-sm-4 col-md-4">
+          <div class="col-sm-6 col-md-6">
             <div class="mb-3">
-              <label class="form-label required">Días de Parada</label>
-              <input type="number" class="form-control" formControlName="stoppageDays" min="0">
-              <div class="invalid-feedback" *ngIf="busForm.get('stoppageDays')?.invalid && busForm.get('stoppageDays')?.touched">
-                El valor debe ser 0 o mayor
-              </div>
-            </div>
-          </div>          <div class="col-sm-4 col-md-4">
-            <div class="mb-3">
-              <label class="form-label required">Número de Pisos</label>
-              <select 
+              <label class="form-label">Número de Pisos</label>
+              <input 
+                type="number" 
                 id="floorCount" 
                 formControlName="floorCount" 
                 class="form-control"
-                [class.is-invalid]="busForm.get('floorCount')?.invalid && busForm.get('floorCount')?.touched"
+                readonly
+                [value]="busForm.get('floorCount')?.value || ''"
+                [placeholder]="busForm.get('floorCount')?.value ? '' : 'Selecciona un tipo de bus'"
               >
-                <option [ngValue]="1">1 Piso</option>
-                <option [ngValue]="2">2 Pisos</option>
-              </select>
-              <div class="invalid-feedback" *ngIf="busForm.get('floorCount')?.errors?.['required']">
-                El número de pisos es requerido
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-4 col-md-4">
-            <div class="mb-3">
-              <label class="form-label required">Tipo de Bus</label>
-              <select class="form-select" formControlName="busTypeId">
-                <option [value]="1">Tipo 1 - Estándar</option>
-                <option [value]="2">Tipo 2 - Ejecutivo</option>
-                <option [value]="3">Tipo 3 - Premium</option>
-                <option [value]="4">Tipo 4 - VIP</option>
-                <option [value]="5">Tipo 5 - Lujo</option>
-              </select>
-              <div class="invalid-feedback" *ngIf="busForm.get('busTypeId')?.invalid && busForm.get('busTypeId')?.touched">
-                El tipo de bus es requerido
-              </div>
+              <small class="form-text text-muted">
+                <span *ngIf="busForm.get('floorCount')?.value; else noFloor">
+                  Pisos: {{ busForm.get('floorCount')?.value }}
+                </span>
+                <ng-template #noFloor>
+                  El número de pisos se asigna automáticamente según el tipo de bus seleccionado
+                </ng-template>
+              </small>
             </div>
           </div>
         </div>
