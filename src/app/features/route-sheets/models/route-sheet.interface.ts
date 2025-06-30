@@ -1,53 +1,93 @@
-export interface IRouteSheet {
-  id: number;
-  frequencyId: number;
-  busId: number;
-  date: string;
-  status: 'Activo' | 'Pendiente' | 'Completado' | 'Cancelado';
-  availableSeats: number;
-  occupiedSeats: number;
-  totalSeats: number;
-  createdAt: string;
-  updatedAt?: string;
-  routeSheetDetails?: IRouteSheetDetail[];
-  frequencyIds?: number[];
-  busIds?: number[];
-}
+// Estado posible para las hojas de ruta
+export type RouteSheetStatus = 'ACTIVE' | 'INACTIVE'
 
-export interface IRouteSheetDetail {
+// Interfaz para la cabecera de la hoja de ruta
+export interface IRouteSheetHeader {
   id: number;
-  routeSheetId: number;
-  seatNumber: number;
-  status: 'Activo' | 'Pendiente' | 'Completado' | 'Cancelado';
-  client?: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email?: string;
-    phone?: string;
-  };
+  cooperativeId: number;
+  startDate: string; // Formato: ISO 8601 (ej: '2025-06-30T10:00:00.000Z')
+  status: RouteSheetStatus;
+  isDeleted: boolean;
+  routeSheetDetails?: IRouteSheetDetail[];
   createdAt?: string;
   updatedAt?: string;
-  // Campos antiguos que pueden estar en uso en otras partes del código
-  date?: string;
-  frequencyId?: number;
-  busId?: number;
-  availableNormalSeats?: number;
-  totalNormalSeats?: number;
-  availableVIPSeats?: number;
-  totalVIPSeats?: number;
 }
 
-export interface IRouteSheetRequest {
+// Interfaz para los detalles de la hoja de ruta
+export interface IRouteSheetDetail {
+  id: number;
+  routeSheetHeaderId: number;
   frequencyId: number;
   busId: number;
-  date: string;
-  status?: string;
+  status: RouteSheetStatus;
+  isDeleted: boolean;
+  routeSheetHeader?: IRouteSheetHeader;
+  bus?: IBus;
+  frequency?: IFrequency;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+// Interfaz para la creación/actualización de hojas de ruta
+export interface IRouteSheetRequest {
+  cooperativeId: number;
+  startDate: string; // Formato: ISO 8601
+  details: IRouteSheetDetailRequest[];
+}
+
+// Interfaz para la creación/actualización de detalles
 export interface IRouteSheetDetailRequest {
+  frequencyId: number;
+  busId: number;
+  status?: RouteSheetStatus;
+}
+
+// Interfaces para relaciones
+interface IBus {
+  id: number;
+  plate: string;
+  capacity: number;
+  // Agregar más propiedades según sea necesario
+}
+
+interface IFrequency {
+  id: number;
+  name: string;
+  // Agregar más propiedades según sea necesario
+}
+
+// Alias para compatibilidad con código existente
+export type IRouteSheet = IRouteSheetHeader;
+
+export interface ScheduleRequest {
+  routeSheetHeaderId: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface ScheduleAssignment {
+  frequencyId: number;
+  frequencyName: string;
+  busId: number;
+  busName: string;
+  departureTime: string;
+}
+
+export interface ScheduleDay {
+  date: string;
+  dayOfWeek: string;
+  assignments: ScheduleAssignment[];
+}
+
+export interface ScheduleResponse {
   routeSheetId: number;
-  seatNumber: number;
-  clientId?: number;
-  status?: string;
+  startDate: string;
+  endDate: string;
+  schedule: ScheduleDay[];
+}
+
+export interface schedule {
+  routeSheetHeaderId: number;
+  startDate: string;
+  endDate: string;
 }

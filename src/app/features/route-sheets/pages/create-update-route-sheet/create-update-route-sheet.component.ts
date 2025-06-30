@@ -1,25 +1,26 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormControl, AbstractControl } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RouteSheetService } from '../../services/route-sheet.service';
 import { AlertService } from '@shared/services/alert.service';
 import { AlertType } from '@utils/enums/alert-type.enum';
-import { IRouteSheet, IRouteSheetRequest } from '../../models/route-sheet.interface';
+import { IRouteSheetHeader, IRouteSheetDetail, IRouteSheetRequest, RouteSheetStatus } from '../../models/route-sheet.interface';
 import { LoginService } from '@core/login/services/login.service';
 import { ICooperative } from '@features/coops/models/cooperative.interface';
 import { BusesService } from '@features/buses/services/buses.service';
-import { IBuses } from '@features/buses/models/buses.interface';
 import { RoutesService } from '@features/frequencies/services/frequencies.service';
 import { IFrequency } from '@features/frequencies/models/frequency.interface';
-import { IntermediateStopService } from '../../services/intermediate-stop.service';
-import { IIntermediateStop, IIntermediateStopRequest } from '../../models/intermediate-stop.interface';
 
 @Component({
   selector: 'app-create-update-route-sheet',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule, 
+    RouterModule
+  ],
   templateUrl: './create-update-route-sheet.component.html',
   styleUrl: './create-update-route-sheet.component.css'
 })
@@ -32,23 +33,24 @@ export class CreateUpdateRouteSheetComponent implements OnInit {
   private readonly router: Router = inject(Router);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly loginService: LoginService = inject(LoginService);
-  private readonly intermediateStopService: IntermediateStopService = inject(IntermediateStopService);
 
   protected routeSheetForm!: FormGroup;
   protected isLoading: boolean = false;
   protected isEditMode: boolean = false;
   protected routeSheetId: number | null = null;
   protected cooperative: ICooperative | null = null;
-  protected buses: IBuses[] = [];
+  protected buses: any[] = [];
   protected frequencies: IFrequency[] = [];
-  protected intermediateStops: IIntermediateStop[] = [];
-  protected statusOptions: string[] = ['Activo', 'Pendiente', 'Completado', 'Cancelado'];
+  protected statusOptions: RouteSheetStatus[] = ['ACTIVE', 'INACTIVE'];
   
   // Variables para el formulario de múltiples pasos
   protected currentStep: number = 1;
-  protected totalSteps: number = 3;
+  protected totalSteps: number = 2;
   protected selectedFrequencyId: number | null = null;
-  protected stepTitles: string[] = ['Información Básica', 'Selección de Bus y Frecuencia', 'Paradas Intermedias'];
+  protected stepTitles: string[] = ['Información Básica', 'Detalles de la Hoja de Ruta'];
+  
+  // Mapa para almacenar detalles de la hoja de ruta
+  protected routeSheetDetails: IRouteSheetDetail[] = [];
 
   ngOnInit(): void {
     this.initForm();
@@ -69,54 +71,33 @@ export class CreateUpdateRouteSheetComponent implements OnInit {
   private initForm(): void {
     this.routeSheetForm = this.fb.group({
       // Paso 1: Información básica
-      basicInfo: this.fb.group({
-        date: ['', Validators.required],
-        status: ['Activo', Validators.required]
-      }),
+      startDate: ['', Validators.required],
+      status: ['ACTIVE' as RouteSheetStatus, Validators.required],
       
-      // Paso 2: Selección de bus y frecuencia
-      busAndFrequency: this.fb.group({
-        busId: ['', Validators.required],
-        frequencyId: ['', Validators.required]
-      }),
-      
-      // Paso 3: Paradas intermedias
-      intermediateStops: this.fb.array([])
-    });
-
-    // Escuchar cambios en la frecuencia seleccionada
-    this.routeSheetForm.get('busAndFrequency.frequencyId')?.valueChanges.subscribe(value => {
-      if (value) {
-        this.selectedFrequencyId = +value;
-        this.loadIntermediateStopsByFrequency(this.selectedFrequencyId);
-      }
+      // Paso 2: Detalles (se llenará dinámicamente)
+      details: this.fb.array([])
     });
   }
 
-  // Getter para acceder al FormArray de paradas intermedias
-  get intermediateStopsArray(): FormArray {
-    return this.routeSheetForm.get('intermediateStops') as FormArray;
+  // Getter para acceder al FormArray de detalles
+  get detailsArray(): FormArray<FormGroup> {
+    return this.routeSheetForm.get('details') as FormArray<FormGroup>;
   }
 
-  // Método para añadir una nueva parada intermedia al FormArray
-  addIntermediateStop(): void {
-    this.intermediateStopsArray.push(
-      this.fb.group({
-        cityId: ['', Validators.required],
-        frequencyId: [this.selectedFrequencyId, Validators.required],
-        order: [this.intermediateStopsArray.length + 1, Validators.required]
-      })
-    );
-  }
-
-  // Método para eliminar una parada intermedia del FormArray
-  removeIntermediateStop(index: number): void {
-    this.intermediateStopsArray.removeAt(index);
+  // Método para añadir un nuevo detalle al FormArray
+  addDetail(): void {
+    const detailGroup = this.fb.group({
+      frequencyId: ['', Validators.required],
+      busId: ['', Validators.required],
+      status: ['ACTIVE' as RouteSheetStatus, Validators.required]
+    });
     
-    // Actualizar el orden de las paradas restantes
-    for (let i = index; i < this.intermediateStopsArray.length; i++) {
-      this.intermediateStopsArray.at(i).get('order')?.setValue(i + 1);
-    }
+    this.detailsArray.push(detailGroup);
+  }
+
+  // Método para eliminar un detalle del FormArray
+  removeDetail(index: number): void {
+    this.detailsArray.removeAt(index);
   }
 
   private loadCooperative(): void {
@@ -132,9 +113,9 @@ export class CreateUpdateRouteSheetComponent implements OnInit {
   }
 
   private loadBuses(): void {
-    if (this.cooperative && this.cooperative.id) {
+    if (this.cooperative?.id) {
       this.isLoading = true;
-      this.busesService.getBusesByCooperativeId(this.cooperative.id).subscribe({
+      this.busesService.getBuses().subscribe({
         next: (buses) => {
           this.buses = buses;
           this.isLoading = false;
@@ -171,70 +152,73 @@ export class CreateUpdateRouteSheetComponent implements OnInit {
     });
   }
 
-  private loadIntermediateStopsByFrequency(frequencyId: number): void {
-    this.isLoading = true;
-    this.intermediateStopService.getIntermediateStopsByFrequencyId(frequencyId).subscribe({
-      next: (stops) => {
-        this.intermediateStops = stops;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading intermediate stops:', error);
-        this.alertService.showAlert({
-          alertType: AlertType.ERROR,
-          mainMessage: 'Error al cargar las paradas intermedias',
-          subMessage: error.message
-        });
-        this.isLoading = false;
-      }
-    });
-  }
+  // Este método se eliminó ya que no se está utilizando en el componente actual
 
-  private loadRouteSheet(id: number): void {
+  private loadRouteSheet(routeSheetId: number): void {
     this.isLoading = true;
-    this.routeSheetService.getRouteSheetById(id).subscribe({
+    this.routeSheetService.getRouteSheetById(routeSheetId).subscribe({
       next: (routeSheet) => {
-        // Actualizar el formulario con los datos de la hoja de ruta
+        // Parchear el formulario con los datos de la hoja de ruta
         this.routeSheetForm.patchValue({
-          basicInfo: {
-            date: routeSheet.date,
-            status: routeSheet.status
-          },
-          busAndFrequency: {
-            busId: routeSheet.busId,
-            frequencyId: routeSheet.frequencyId
-          }
+          startDate: routeSheet.startDate,
+          status: routeSheet.status
         });
-        
-        // Cargar las paradas intermedias asociadas a la frecuencia
-        if (routeSheet.frequencyId) {
-          this.selectedFrequencyId = routeSheet.frequencyId;
-          this.loadIntermediateStopsByFrequency(routeSheet.frequencyId);
+
+        // Cargar los detalles de la hoja de ruta
+        if (routeSheet.routeSheetDetails && routeSheet.routeSheetDetails.length > 0) {
+          this.patchDetails(routeSheet.routeSheetDetails);
         }
-        
+
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading route sheet:', error);
+        console.error('Error al cargar la hoja de ruta:', error);
         this.alertService.showAlert({
           alertType: AlertType.ERROR,
           mainMessage: 'Error al cargar la hoja de ruta',
-          subMessage: error.message
+          subMessage: 'No se pudo cargar la información de la hoja de ruta'
         });
-        this.isLoading = false;
+        this.router.navigate(['/route-sheets']);
       }
     });
   }
-
-  // Método para manejar el cambio de frecuencia seleccionada
-  onFrequencyChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const frequencyId = +select.value;
-    
-    if (frequencyId) {
-      this.selectedFrequencyId = frequencyId;
-      this.loadIntermediateStopsByFrequency(frequencyId);
+  
+  private patchDetails(details: IRouteSheetDetail[]): void {
+    // Limpiar el array de detalles
+    while (this.detailsArray.length) {
+      this.detailsArray.removeAt(0);
     }
+
+    // Agregar cada detalle al formulario
+    details.forEach(detail => {
+      const detailGroup = this.fb.group({
+        id: [detail.id],
+        frequencyId: [detail.frequencyId, Validators.required],
+        busId: [detail.busId, Validators.required],
+        status: [detail.status, Validators.required]
+      });
+      this.detailsArray.push(detailGroup);
+    });
+  }
+
+  // Método para obtener el nombre de la frecuencia
+  getFrequencyName(frequencyId: number): string {
+    const frequency = this.frequencies.find(f => f.id === frequencyId);
+    if (frequency) {
+      return `${frequency.originCity?.name || 'Origen'} - ${frequency.destinationCity?.name || 'Destino'}`;
+    }
+    return 'Frecuencia no encontrada';
+  }
+  
+  // Método para obtener la placa del bus
+  getBusPlate(busId: number): string {
+    const bus = this.buses.find(b => b.id === busId);
+    return bus?.plate || 'Placa no disponible';
+  }
+  
+  // Método para formatear el estado
+  formatStatus(status: RouteSheetStatus): string {
+    return status === 'ACTIVE' ? 'Activo' : 'Inactivo';
   }
 
   protected onSubmit(): void {
@@ -249,10 +233,13 @@ export class CreateUpdateRouteSheetComponent implements OnInit {
 
     const formValue = this.routeSheetForm.value;
     const routeSheetData: IRouteSheetRequest = {
-      date: formValue.basicInfo.date,
-      busId: formValue.busAndFrequency.busId,
-      frequencyId: formValue.busAndFrequency.frequencyId,
-      status: formValue.basicInfo.status
+      cooperativeId: this.cooperative?.id || 0,
+      startDate: new Date(formValue.startDate).toISOString(),
+      details: formValue.details.map((detail: any) => ({
+        frequencyId: detail.frequencyId,
+        busId: detail.busId,
+        status: detail.status
+      }))
     };
 
     this.isLoading = true;
