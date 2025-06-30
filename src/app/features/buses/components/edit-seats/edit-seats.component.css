@@ -1,0 +1,361 @@
+/* Contenedor principal */
+.floor-container {
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  margin-bottom: 20px;
+}
+
+/* Parte delantera del bus */
+.bus-front {
+  border: 2px solid #6c757d;
+  border-radius: 15px 15px 0 0;
+  background-color: #e9ecef;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.driver-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: bold;
+  color: #495057;
+}
+
+/* Grid de asientos */
+.seats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 8px;
+}
+
+.seat-side {
+  display: flex;
+  gap: 8px;
+}
+
+/* Pasillo */
+.aisle {
+  width: 40px;
+  height: 2px;
+  background-color: #dee2e6;
+  border-radius: 1px;
+}
+
+/* Asiento central en el medio de la fila (donde estaría el pasillo) */
+.seat-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+
+.seat-center .seat {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+  font-weight: bold;
+}
+
+.seat-center .seat.seat-vip {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
+
+/* Fila especial para asiento central (cuando está solo) */
+.seat-center-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.seat-center-row .seat {
+  margin: 0 auto;
+}
+
+/* Estilos de asientos */
+.seat {
+  width: 45px;
+  height: 45px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  position: relative;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+  color: #495057;
+}
+
+.seat:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Tipos de asientos */
+.seat-normal {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #495057;
+}
+
+.seat-vip {
+  background-color: #ffc107;
+  border-color: #ffca2c;
+  color: #212529;
+  font-weight: bold;
+}
+
+.seat-vip:hover {
+  background-color: #ffb302;
+  border-color: #ffb302;
+}
+
+/* Ubicación de asientos */
+.seat-window::after {
+  content: '🪟';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+.seat-aisle::after {
+  content: '🚶';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+.seat-middle::after {
+  content: '🎯';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 10px;
+}
+
+/* Leyenda vertical */
+.legend-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item-vertical {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.legend-item-vertical .seat {
+  width: 35px;
+  height: 35px;
+  cursor: default;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.legend-item-vertical .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Información del bus */
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.info-value {
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Selector de pisos */
+.floor-selector {
+  margin-bottom: 20px;
+}
+
+.floor-selector .btn {
+  border-radius: 25px;
+  padding: 8px 20px;
+  font-weight: 500;
+  border: 2px solid #007bff;
+  transition: all 0.3s ease;
+}
+
+.floor-selector .btn:not(.btn-primary) {
+  background-color: transparent;
+  color: #007bff;
+}
+
+.floor-selector .btn:not(.btn-primary):hover {
+  background-color: #007bff;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.floor-selector .btn.btn-primary {
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+.floor-selector .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.floor-selector .btn:disabled:hover {
+  background-color: transparent;
+  color: #6c757d;
+  transform: none;
+}
+
+/* Badges en botones de piso */
+.floor-selector .badge {
+  font-size: 12px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botones de acción */
+.form-footer {
+  border-top: 1px solid #dee2e6;
+  padding-top: 20px;
+}
+
+.form-footer .btn {
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.form-footer .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.form-footer .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.form-footer .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+/* Iconos */
+.icon {
+  stroke: currentColor;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.alert-icon {
+  color: #007bff;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .seat {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
+  }
+  
+  .seat-row {
+    gap: 10px;
+  }
+  
+  .seat-side {
+    gap: 6px;
+  }
+  
+  .aisle {
+    width: 30px;
+  }
+  
+  .legend-item-vertical .seat {
+    width: 30px;
+    height: 30px;
+    font-size: 10px;
+  }
+  
+  .floor-selector .btn {
+    padding: 6px 15px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .floor-container {
+    padding: 15px;
+  }
+  
+  .seat {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+  
+  .seat-row {
+    gap: 8px;
+  }
+  
+  .seat-side {
+    gap: 4px;
+  }
+  
+  .aisle {
+    width: 25px;
+  }
+}
