@@ -8,6 +8,7 @@ import { frequenciesRoutes } from '@features/frequencies/routes.routes';
 import { driversRoutes } from '@features/drivers/drivers.routes';
 import { clerksRoutes } from '@features/clerks/clerks.routes';
 import { ROUTE_SHEETS_ROUTES } from '@features/route-sheets/sheets.routes';
+import { ticketsRoutes } from '@features/tickets-sale/tickets.routes';
 
 export const routes: Routes = [
   ...authRoutes,
@@ -19,6 +20,7 @@ export const routes: Routes = [
   ...driversRoutes,
   ...clerksRoutes,
   ...ROUTE_SHEETS_ROUTES,
+  ...ticketsRoutes,
   {
     path: '',
     redirectTo: '/login',

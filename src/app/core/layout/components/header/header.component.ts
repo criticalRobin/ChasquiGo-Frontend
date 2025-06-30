@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 export class HeaderComponent implements OnInit, OnDestroy {
   protected loginSrv: LoginService = inject(LoginService);
 
-  protected loggedUser: IBaseUser | null;
+  protected loggedUser: any | null;
   protected cooperative: ICooperative | null = null;
   private cooperativeSubscription: Subscription | null = null;
 
@@ -53,5 +53,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // Fallback to default logo if cooperative logo fails to load
     event.target.src = 'assets/chasqui-go/logo-black.jpeg';
     event.target.alt = 'ChasquiGo';
+  }
+
+  protected isWorker(): boolean {
+    return this.loggedUser?.role === 'WORKER';
   }
 }

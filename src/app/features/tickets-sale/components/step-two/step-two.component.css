@@ -1,0 +1,297 @@
+/* Estilos para el layout de asientos */
+
+.bus-front {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.driver-area {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #475569;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.seats-grid {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 400px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.seat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 10px;
+}
+
+.seat-side {
+  display: flex;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.left-side {
+  justify-content: flex-end;
+}
+
+.right-side {
+  justify-content: flex-start;
+}
+
+.seat-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 60px;
+}
+
+.aisle {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 60px;
+  padding: 0 10px;
+}
+
+.aisle-line {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 50%, #cbd5e1 100%);
+  border-radius: 1px;
+}
+
+.seat {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.seat:hover:not(.seat-occupied) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Tipos de asiento */
+.seat-normal {
+  background: #f0f9ff;
+  border-color: #0ea5e9;
+  color: #0c4a6e;
+}
+
+.seat-vip {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.seat-selected {
+  background: #dcfce7 !important;
+  border-color: #16a34a !important;
+  color: #14532d !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  animation: seatSelect 0.4s ease;
+}
+
+.seat-occupied {
+  background: #fee2e2 !important;
+  border-color: #dc2626 !important;
+  color: #7f1d1d !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.seat-occupied::after {
+  content: '✕';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Ubicaciones de asiento */
+.seat-window {
+  position: relative;
+}
+
+.seat-window::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 20px;
+  background: #0ea5e9;
+  border-radius: 2px;
+}
+
+.seat-window.left-side::before {
+  left: -8px;
+}
+
+.seat-window.right-side::before {
+  right: -8px;
+}
+
+.seat-middle {
+  background: #f3e8ff;
+  border-color: #8b5cf6;
+  color: #5b21b6;
+}
+
+/* Leyenda */
+.legend-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item-vertical {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid #e2e8f0;
+}
+
+.legend-item-vertical .seat {
+  width: 35px;
+  height: 35px;
+  font-size: 11px;
+  cursor: default;
+  font-weight: bold;
+}
+
+.legend-item-vertical .seat:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.legend-item-vertical span {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Asientos seleccionados */
+.selected-seats-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.selected-seat-item {
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.selected-seat-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Clases personalizadas para colores adicionales */
+.bg-amber-500 {
+  background-color: #f59e0b !important;
+}
+
+.bg-blue-500 {
+  background-color: #3b82f6 !important;
+}
+
+.bg-gray-600 {
+  background-color: #4b5563 !important;
+}
+
+.text-primary-custom {
+  color: #0ea5e9 !important;
+}
+
+/* Mejoras adicionales */
+.card-title {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+/* Animación mejorada para selección */
+@keyframes seatSelect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+.seat-selected {
+  animation: seatSelect 0.4s ease;
+}
+
+/* Responsivo mejorado */
+@media (max-width: 768px) {
+  .seat {
+    width: 35px;
+    height: 35px;
+    font-size: 10px;
+  }
+  
+  .seat-row {
+    margin-bottom: 8px;
+    padding: 0 5px;
+  }
+  
+  .seat-side {
+    gap: 4px;
+    min-width: 80px;
+  }
+  
+  .seats-grid {
+    padding: 15px;
+  }
+  
+  .selected-seat-item {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .legend-item-vertical {
+    padding: 6px 10px;
+  }
+}
