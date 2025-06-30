@@ -121,27 +121,37 @@
 </div>
 
 <!-- Modal de Confirmación para Eliminar -->
-<div class="modal" [style.display]="showDeleteModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+<div class="modal modal-blur fade" [class.show]="showDeleteModal" [style.display]="showDeleteModal ? 'block' : 'none'" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirmar eliminación</h5>
-        <button type="button" class="btn-close" (click)="cancelDelete()" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <h3>¿Está seguro?</h3>
-        <div class="text-muted">¿Realmente desea eliminar el bus con placa {{ busToDelete?.licensePlate }}? Esta acción no se puede deshacer.</div>
+      <button type="button" class="btn-close" (click)="cancelDelete()" aria-label="Close"></button>
+      <div class="modal-status bg-danger"></div>
+      <div class="modal-body text-center py-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <circle cx="12" cy="12" r="9"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <h3>¿Estás seguro?</h3>
+        <div class="text-muted">¿Realmente deseas eliminar el bus con placa "<strong>{{ busToDelete?.licensePlate }}</strong>"? Esta acción no se puede deshacer.</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">
-          Cancelar
-        </button>
-        <button type="button" class="btn btn-danger" (click)="confirmDelete()">
-          Eliminar
-        </button>
+        <div class="w-100">
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn w-100" (click)="cancelDelete()">
+                Cancelar
+              </button>
+            </div>
+            <div class="col">
+              <button type="button" class="btn btn-danger w-100" (click)="confirmDelete()">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<!-- Overlay oscuro para el modal -->
-<div class="modal-backdrop" [style.display]="showDeleteModal ? 'block' : 'none'"></div>

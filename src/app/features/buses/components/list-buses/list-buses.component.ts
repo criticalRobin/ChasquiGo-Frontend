@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IBuses, IBusType } from '../../models/buses.interface';
 import { BusesService } from '../../services/buses.service';
+import { AlertService } from '@shared/services/alert.service';
+import { AlertType } from '@utils/enums/alert-type.enum';
 
 @Component({
   selector: 'app-list-buses',
@@ -25,7 +27,8 @@ export class ListBusesComponent implements OnInit {
   searchTerm: string = '';
     constructor(
     private busService: BusesService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
   
   ngOnInit(): void {
@@ -108,11 +111,26 @@ export class ListBusesComponent implements OnInit {
       this.loading = true;
       this.busService.deleteBus(this.busToDelete.id).subscribe({
         next: () => {
+          // Mostrar alerta de éxito
+          this.alertService.showAlert({
+            alertType: AlertType.SUCCESS,
+            mainMessage: 'Bus dado de Baja',
+            subMessage: 'El bus ha sido eliminado exitosamente'
+          });
+          
           this.loadBuses(); // Esto ya actualiza filteredBuses
           this.cancelDelete();
         },
         error: (error) => {
           console.error('Error al eliminar el bus:', error);
+          
+          // Mostrar alerta de error
+          this.alertService.showAlert({
+            alertType: AlertType.ERROR,
+            mainMessage: 'Error al eliminar bus',
+            subMessage: 'Ocurrió un error al eliminar el bus. Inténtalo nuevamente.'
+          });
+          
           this.loading = false;
           this.cancelDelete();
         }
