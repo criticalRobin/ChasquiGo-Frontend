@@ -1,11 +1,9 @@
 export interface IBuses {
     id?: number;
-    cooperativeId: number;
     licensePlate: string;
     chassisBrand: string;
     bodyworkBrand: string;
     photo?: string | null;
-    stoppageDays: number;
     busTypeId: number;
     seats: IBusSeat[];
     // Campos locales para UI (no se envían al backend)
@@ -20,8 +18,21 @@ export interface IBuses {
 export interface IBusSeat {
     id?: number;
     busId?: number;
-    number: string;
+    number: string | number;
     type: 'NORMAL' | 'VIP';
-    location: 'ventana' | 'pasillo' | 'other';
+    location: 'WINDOW_LEFT' | 'WINDOW_RIGHT' | 'AISLE_LEFT' | 'AISLE_RIGHT' | 'MIDDLE';
     floor?: number; // 1 or 2 - Solo para UI (ahora opcional)
+    status?: 'ACTIVE' | 'INACTIVE';
+    isDeleted?: boolean;
+}
+
+export interface IBusType {
+    id: number;
+    name: string;
+    description: string;
+    floorCount: number;
+    seatsFloor1: number;
+    seatsFloor2: number;
+    aditionalPrice: string;
+    isDeleted: boolean;
 }
