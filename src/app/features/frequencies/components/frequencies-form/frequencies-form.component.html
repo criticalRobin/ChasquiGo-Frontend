@@ -121,9 +121,9 @@
               formControlName="status"
               [ngClass]="{'is-invalid': frequencyForm.get('status')?.invalid && frequencyForm.get('status')?.touched}"
             >
-              <option value="Activo">Activo</option>
-              <option value="Inactivo">Inactivo</option>
-              <option value="Pendiente">Pendiente</option>
+              <option value="ACTIVE">Activo</option>
+              <option value="INACTIVE">Inactivo</option>
+              
             </select>
             @if (frequencyForm.get('status')?.invalid && frequencyForm.get('status')?.touched) {
               <div class="invalid-feedback">
