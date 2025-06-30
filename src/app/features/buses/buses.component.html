@@ -67,7 +67,7 @@
       <!-- Step Content -->
       <div class="step-content">
         <div *ngIf="currentStep === 1">
-          <app-form-buses [cachedBusData]="currentBus" (formSubmitted)="onFormSubmitted($event)"></app-form-buses>
+          <app-form-buses [cachedBusData]="currentBus" (formSubmitted)="onFormSubmitted($event)" (formCancelled)="cancel()"></app-form-buses>
         </div>
         
         <!-- Loading state for step 2 -->
@@ -97,14 +97,6 @@
               <polyline points="15,18 9,12 15,6"></polyline>
             </svg>
             Volver al paso anterior
-          </button>
-        </div>
-      </div>      <!-- Step Navigation -->
-      <div class="form-footer d-flex justify-content-between mt-3" *ngIf="currentStep === 1">
-        <div></div> <!-- Spacer -->
-        <div class="btn-list">
-          <button class="btn btn-outline-secondary" (click)="cancel()">
-            Cancelar
           </button>
         </div>
       </div>

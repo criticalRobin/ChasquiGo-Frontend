@@ -179,11 +179,16 @@ export class BusesComponent implements OnInit, AfterViewInit {
         busTypeId: this.currentBus.busTypeId || 1
       };
       
-      // Si hay fotos, usar solo la primera como 'photo'
-      if (this.currentBus.photos && this.currentBus.photos.length > 0) {
+      // Usar la foto de Cloudinary si está disponible, sino usar por defecto
+      if (this.currentBus.photo) {
+        busCopy.photo = this.currentBus.photo; // URL de Cloudinary
+        console.log('✅ Usando foto de Cloudinary:', this.currentBus.photo);
+      } else if (this.currentBus.photos && this.currentBus.photos.length > 0) {
         busCopy.photo = this.currentBus.photos[0];
+        console.log('✅ Usando foto del array photos:', this.currentBus.photos[0]);
       } else {
-        busCopy.photo = "https://ejemplo.com/foto-default.jpg"; // URL por defecto
+        busCopy.photo = "https://ejemplo.com/foto-default.jpg"; // URL por defecto solo si no hay foto
+        console.log('⚠️ Usando foto por defecto (no hay foto de Cloudinary)');
       }
       
       // Configurar asientos según la nueva estructura
@@ -211,7 +216,7 @@ export class BusesComponent implements OnInit, AfterViewInit {
               // Mostrar alerta de éxito
               this.alertService.showAlert({
                 alertType: AlertType.SUCCESS,
-                mainMessage: 'BUS ACTUALIZADO',
+                mainMessage: 'Bus Actualizado',
                 subMessage: 'El bus ha sido actualizado exitosamente'
               });
               this.returnToList();
@@ -234,7 +239,7 @@ export class BusesComponent implements OnInit, AfterViewInit {
               // Mostrar alerta de éxito
               this.alertService.showAlert({
                 alertType: AlertType.SUCCESS,
-                mainMessage: 'BUS CREADO',
+                mainMessage: 'Bus Creado',
                 subMessage: 'El bus ha sido creado exitosamente'
               });
               this.returnToList();

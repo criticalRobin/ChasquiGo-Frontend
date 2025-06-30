@@ -16,15 +16,21 @@ import { Subject } from 'rxjs';
 })
 export class FormBusesComponent implements OnInit {
   @Output() formSubmitted = new EventEmitter<IBuses>();
+  @Output() formCancelled = new EventEmitter<void>();
   @Input() cachedBusData: IBuses | null = null;
   @Input() isEditMode: boolean = false;
   
   busForm: FormGroup;
   isEditing = false;
   busId: number | null = null;
-  photos: string[] = [];
+  photo: string | null = null; // Cambio: solo una foto como string URL
+  photoFile: File | null = null; // Archivo de la foto seleccionada
+  uploadingPhoto: boolean = false; // Estado de carga
   busTypes: IBusType[] = [];
   private destroy$ = new Subject<void>();
+  
+  // Constantes para validación
+  readonly MAX_FILE_SIZE = 1024 * 1024; // 1MB en bytes
 
   constructor(
     private fb: FormBuilder,
@@ -64,8 +70,8 @@ export class FormBusesComponent implements OnInit {
       if (this.cachedBusData) {
         console.log('Loading cached bus data:', this.cachedBusData);
         this.busForm.patchValue(this.cachedBusData);
-        if (this.cachedBusData.photos) {
-          this.photos = [...this.cachedBusData.photos];
+        if (this.cachedBusData.photo) {
+          this.photo = this.cachedBusData.photo;
         }
         // Si hay un tipo de bus en cache, disparar el cambio para calcular capacidad y pisos
         if (this.cachedBusData.busTypeId) {
@@ -128,7 +134,7 @@ export class FormBusesComponent implements OnInit {
           });
         }
         
-        this.photos = bus.photos || [];
+        this.photo = bus.photo || null;
       },
       error: (error) => {
         console.error('Error al cargar los datos del bus', error);
@@ -138,42 +144,118 @@ export class FormBusesComponent implements OnInit {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files) {
-      for (let i = 0; i < input.files.length; i++) {
-        const file = input.files[i];
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = (e: ProgressEvent<FileReader>) => {
-            if (e.target?.result) {
-              this.photos.push(e.target.result as string);
-            }
-          };
-          reader.readAsDataURL(file);
-        }
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      // Validar que sea una imagen
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido.');
+        return;
       }
+      
+      // Validar tamaño (1MB máximo)
+      if (file.size > this.MAX_FILE_SIZE) {
+        alert(`El archivo es demasiado grande. El tamaño máximo permitido es ${this.MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+        return;
+      }
+      
+      this.photoFile = file;
+      
+      // Mostrar preview de la imagen
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target?.result) {
+          this.photo = e.target.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
     }
   }
 
-  removePhoto(index: number): void {
-    this.photos.splice(index, 1);
+  removePhoto(): void {
+    this.photo = null;
+    this.photoFile = null;
+    // Limpiar el input file
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
-  onSubmit(): void {
+  private async uploadPhotoToCloudinary(): Promise<string | null> {
+    console.log('=== INICIO uploadPhotoToCloudinary ===');
+    console.log('¿Hay photoFile?', !!this.photoFile);
+    console.log('photoFile:', this.photoFile);
+    console.log('photo actual:', this.photo);
+    
+    if (!this.photoFile) {
+      console.log('No hay archivo nuevo, retornando photo existente:', this.photo);
+      return this.photo; // Si no hay archivo nuevo, usar la URL existente
+    }
+    
+    this.uploadingPhoto = true;
+    console.log('Iniciando subida a Cloudinary...');
+    
+    try {
+      console.log('Llamando al servicio uploadImageToCloudinary...');
+      const response = await this.busesService.uploadImageToCloudinary(this.photoFile).toPromise();
+      console.log('✅ Respuesta completa de Cloudinary:', response);
+      console.log('✅ Estructura de la respuesta:', JSON.stringify(response, null, 2));
+      
+      const cloudinaryUrl = response?.url || null;
+      console.log('✅ URL extraída de Cloudinary:', cloudinaryUrl);
+      console.log('✅ Tipo de URL:', typeof cloudinaryUrl);
+      
+      if (!cloudinaryUrl) {
+        console.error('❌ ERROR: No se obtuvo URL de Cloudinary');
+        console.error('❌ Response recibida:', response);
+      }
+      
+      return cloudinaryUrl;
+    } catch (error) {
+      console.error('❌ Error al subir imagen a Cloudinary:', error);
+      console.error('❌ Detalles del error:', JSON.stringify(error, null, 2));
+      alert('Error al subir la imagen. Por favor intenta nuevamente.');
+      return null;
+    } finally {
+      this.uploadingPhoto = false;
+      console.log('=== FIN uploadPhotoToCloudinary ===');
+    }
+  }
+
+  async onSubmit(): Promise<void> {
     // Marcar todos los campos como tocados para mostrar errores
     Object.keys(this.busForm.controls).forEach(key => {
       this.busForm.get(key)?.markAsTouched();
     });
 
     if (this.busForm.valid) {
-      const busData: IBuses = {
-        ...this.busForm.value,
-        photos: this.photos,
-        seats: this.generateDefaultSeats(
-          this.busForm.value.capacity,
-          this.busForm.value.floorCount
-        )
-      };
-      this.formSubmitted.emit(busData);
+      try {
+        // Subir foto a Cloudinary si hay una nueva foto seleccionada
+        console.log('Iniciando proceso de subida de imagen...');
+        const photoUrl = await this.uploadPhotoToCloudinary();
+        console.log('URL final de la foto:', photoUrl);
+        
+        const busData: IBuses = {
+          ...this.busForm.value,
+          photo: photoUrl,
+          seats: this.generateDefaultSeats(
+            this.busForm.value.capacity,
+            this.busForm.value.floorCount
+          )
+        };
+        
+        console.log('=== DATOS DEL BUS A ENVIAR ===');
+        console.log('Bus data completo:', JSON.stringify(busData, null, 2));
+        console.log('Campo photo específicamente:', busData.photo);
+        console.log('Tipo de photo:', typeof busData.photo);
+        console.log('=== FIN DATOS DEL BUS ===');
+        
+        this.formSubmitted.emit(busData);
+      } catch (error) {
+        console.error('Error en el proceso de envío:', error);
+        alert('Error al procesar la imagen. Por favor intenta nuevamente.');
+      }
     } else {
       console.log('Formulario inválido. Errores por campo:');
       Object.keys(this.busForm.controls).forEach(key => {
@@ -252,7 +334,7 @@ export class FormBusesComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/buses']);
+    this.formCancelled.emit();
   }
 
   onBusTypeChange(busTypeId: number): void {
@@ -350,5 +432,22 @@ export class FormBusesComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.busForm.get(fieldName);
     return field ? field.invalid && (field.dirty || field.touched) : false;
+  }
+
+  // Métodos auxiliares para la gestión de fotos
+  hasPhoto(): boolean {
+    return !!this.photo;
+  }
+
+  isPhotoUploading(): boolean {
+    return this.uploadingPhoto;
+  }
+
+  getPhotoSizeInMB(size: number): string {
+    return (size / (1024 * 1024)).toFixed(2);
+  }
+
+  getMaxSizeInMB(): string {
+    return (this.MAX_FILE_SIZE / (1024 * 1024)).toString();
   }
 }

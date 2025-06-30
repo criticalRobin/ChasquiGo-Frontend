@@ -126,29 +126,33 @@
         <!-- Fotos -->
         <div class="row mb-3">
           <div class="col-12">
-            <label class="form-label">Fotos del Bus</label>
+            <label class="form-label">Foto del Bus</label>
             <div class="mb-3">
               <div class="input-group">
                 <input type="file" 
                        class="form-control" 
                        accept="image/*" 
-                       multiple
                        (change)="onFileSelected($event)"
+                       [disabled]="isPhotoUploading()"
                        #fileInput>
-                <button class="btn btn-outline-primary" type="button" (click)="fileInput.click()">
+                <button class="btn btn-outline-primary" 
+                        type="button" 
+                        (click)="fileInput.click()"
+                        [disabled]="isPhotoUploading()">
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                     <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
                     <path d="M7 9l5 -5l5 5"></path>
                     <path d="M12 4l0 12"></path>
                   </svg>
-                  Seleccionar Imágenes
+                  <span *ngIf="!isPhotoUploading()">Seleccionar Imagen</span>
+                  <span *ngIf="isPhotoUploading()">Subiendo...</span>
                 </button>
               </div>
             </div>
             
-            <div class="row g-2" *ngIf="photos.length > 0">
-              <div class="col-6 col-sm-4 col-md-3 col-xl-2" *ngFor="let photo of photos; let i = index">
+            <div class="row g-2" *ngIf="hasPhoto()">
+              <div class="col-12 col-sm-6 col-md-4">
                 <div class="card card-sm">
                   <a href="#" class="d-block" data-bs-toggle="modal">
                     <img [src]="photo" class="card-img-top" style="height: 120px; object-fit: cover;">
@@ -156,16 +160,18 @@
                   <div class="card-body">
                     <div class="d-flex align-items-center">
                       <div>
-                        <div>Foto {{ i + 1 }}</div>
+                        <div>Foto del Bus</div>
+                        <small class="text-muted" *ngIf="isPhotoUploading()">Subiendo...</small>
                       </div>
                       <div class="ms-auto">
-                        <a href="#" class="text-danger" (click)="removePhoto(i); $event.preventDefault()">
+                        <a href="#" class="text-danger" (click)="removePhoto(); $event.preventDefault()" 
+                           [class.disabled]="isPhotoUploading()">
                           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <path d="M4 7l16 0"></path>
                             <path d="M10 11l0 6"></path>
                             <path d="M14 11l0 6"></path>
-                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                            <path d="M5 7l1 12a2 2 0 0 0 2 -2l1 -12"></path>
                             <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
                           </svg>
                         </a>
@@ -175,14 +181,43 @@
                 </div>
               </div>
             </div>
+            
+            <!-- Mensaje informativo sobre tamaño de archivo -->
+            <div class="alert alert-info mt-2" *ngIf="!hasPhoto()">
+              <div class="d-flex">
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="alert-title">Información sobre la foto</h4>
+                  <div class="text-muted">
+                    • Solo se permite una foto por bus<br>
+                    • Tamaño máximo: {{ getMaxSizeInMB() }}MB<br>
+                    • Formatos permitidos: JPG, PNG, GIF, WebP
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Botones de acción -->
-        <div class="form-footer d-flex justify-content-end">
+        <div class="form-footer d-flex justify-content-between">
           <div class="btn-list">
-            <button type="submit" class="btn btn-primary" [disabled]="busForm.invalid">
-              {{ isEditing ? 'Actualizar' : 'Siguiente' }}
+            <button type="button" class="btn btn-outline-secondary" (click)="cancel()" *ngIf="!isEditing">
+              Cancelar
             </button>
-          </div>        </div>
+          </div>
+          <div class="btn-list">
+            <button type="submit" class="btn btn-primary" [disabled]="busForm.invalid || isPhotoUploading()">
+              <span *ngIf="!isPhotoUploading()">{{ isEditing ? 'Actualizar' : 'Siguiente' }}</span>
+              <span *ngIf="isPhotoUploading()">Subiendo imagen...</span>
+            </button>
+          </div>
+        </div>
       </form>
