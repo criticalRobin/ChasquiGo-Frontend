@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
-import { IRouteSheet, IRouteSheetRequest } from '../models/route-sheet.interface';
+import { IRouteSheet, IRouteSheetRequest, ScheduleRequest, ScheduleResponse } from '../models/route-sheet.interface';
 import { LoginService } from '@core/login/services/login.service';
 
 @Injectable({
@@ -58,5 +58,9 @@ export class RouteSheetService {
 
   deleteRouteSheet(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getScheduleByRouteSheetId(dto: ScheduleRequest): Observable<ScheduleResponse> {
+    return this.http.post<ScheduleResponse>(`${this.baseUrl}/schedule`, dto);
   }
 }
