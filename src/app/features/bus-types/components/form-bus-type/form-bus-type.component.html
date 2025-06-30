@@ -1,0 +1,177 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ pageTitle }}</h3>
+        </div>
+
+        <div class="card-body" *ngIf="!loading; else loadingTemplate">
+          <form [formGroup]="busTypeForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+              <!-- Información básica -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Nombre del Tipo <span class="text-danger">*</span></label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="name" 
+                    formControlName="name"
+                    [class.is-invalid]="busTypeForm.get('name')?.invalid && busTypeForm.get('name')?.touched"
+                    placeholder="Ej: Bus Interprovincial A"
+                  />
+                  <div class="invalid-feedback">{{ getFieldError('name') }}</div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="aditionalPrice" class="form-label">Precio Adicional <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      id="aditionalPrice" 
+                      formControlName="aditionalPrice"
+                      [class.is-invalid]="busTypeForm.get('aditionalPrice')?.invalid && busTypeForm.get('aditionalPrice')?.touched"
+                      placeholder="0.00"
+                      min="0"
+                      max="50"
+                      step="0.01"
+                    />
+                  </div>
+                  <div class="invalid-feedback">{{ getFieldError('aditionalPrice') }}</div>
+                  <small class="text-muted">Máximo $50.00</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción <span class="text-danger">*</span></label>
+              <textarea 
+                class="form-control" 
+                id="description" 
+                formControlName="description"
+                [class.is-invalid]="busTypeForm.get('description')?.invalid && busTypeForm.get('description')?.touched"
+                rows="3"
+                placeholder="Describe las características principales de este tipo de bus"
+              ></textarea>
+              <div class="invalid-feedback">{{ getFieldError('description') }}</div>
+            </div>
+
+            <!-- Configuración de asientos (solo en creación) -->
+            <div *ngIf="!isEditMode">
+              <h5 class="text-primary mb-3">Configuración de Asientos</h5>
+              
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="floorCount" class="form-label">Número de Pisos <span class="text-danger">*</span></label>
+                    <select 
+                      class="form-select" 
+                      id="floorCount" 
+                      formControlName="floorCount"
+                      (change)="onFloorCountChange()"
+                      [class.is-invalid]="busTypeForm.get('floorCount')?.invalid && busTypeForm.get('floorCount')?.touched"
+                    >
+                      <option value="1">1 Piso</option>
+                      <option value="2">2 Pisos</option>
+                    </select>
+                    <div class="invalid-feedback">{{ getFieldError('floorCount') }}</div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="seatsFloor1" class="form-label">Asientos Piso 1 <span class="text-danger">*</span></label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      id="seatsFloor1" 
+                      formControlName="seatsFloor1"
+                      [class.is-invalid]="busTypeForm.get('seatsFloor1')?.invalid && busTypeForm.get('seatsFloor1')?.touched"
+                      min="1"
+                      max="40"
+                    />
+                    <div class="invalid-feedback">{{ getFieldError('seatsFloor1') }}</div>
+                    <small class="text-muted">Máximo 40 asientos</small>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="seatsFloor2" class="form-label">Asientos Piso 2</label>
+                    <input 
+                      type="number" 
+                      class="form-control" 
+                      id="seatsFloor2" 
+                      formControlName="seatsFloor2"
+                      [class.is-invalid]="busTypeForm.get('seatsFloor2')?.invalid && busTypeForm.get('seatsFloor2')?.touched"
+                      min="0"
+                      max="40"
+                    />
+                    <div class="invalid-feedback">{{ getFieldError('seatsFloor2') }}</div>
+                    <small class="text-muted">Solo para buses de 2 pisos (máximo 40)</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Preview de configuración -->
+              <div class="alert alert-info" *ngIf="busTypeForm.get('floorCount')?.value && busTypeForm.get('seatsFloor1')?.value">
+                <h6 class="alert-heading">Vista previa de configuración:</h6>
+                <ul class="mb-0">
+                  <li>Tipo: {{ busTypeForm.get('floorCount')?.value == 1 ? 'Bus de 1 piso' : 'Bus de 2 pisos' }}</li>
+                  <li>Piso 1: {{ busTypeForm.get('seatsFloor1')?.value }} asientos (máx. 40)</li>
+                  <li *ngIf="busTypeForm.get('floorCount')?.value == 2">Piso 2: {{ busTypeForm.get('seatsFloor2')?.value || 0 }} asientos (máx. 40)</li>
+                  <li><strong>Total: {{ (busTypeForm.get('seatsFloor1')?.value || 0) + (busTypeForm.get('floorCount')?.value == 2 ? (busTypeForm.get('seatsFloor2')?.value || 0) : 0) }} asientos (máx. 80)</strong></li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Información de solo lectura en modo edición -->
+            <div *ngIf="isEditMode" class="alert alert-warning">
+               <h6 class="alert-heading">Información de configuración (solo lectura):</h6>
+              <p class="mb-0">En modo edición solo se pueden modificar el nombre, la descripción, y el adicional del tipo de bus. Los demás campos son de solo lectura para mantener la integridad de los buses ya creados.</p>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="form-footer d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="saving">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15,18 9,12 15,6"></polyline>
+                </svg>
+                Cancelar
+              </button>
+              
+              <button type="submit" class="btn btn-primary" [disabled]="busTypeForm.invalid || saving">
+                <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <svg *ngIf="!saving && !isEditMode" xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <svg *ngIf="!saving && isEditMode" xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                  <polyline points="7,3 7,8 15,8"></polyline>
+                </svg>
+                {{ submitButtonText }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Template de carga -->
+        <ng-template #loadingTemplate>
+          <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted">Cargando información del tipo de bus...</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
