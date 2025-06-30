@@ -26,6 +26,7 @@ export class CoopsService {
     coopData: ICoopRequest,
     adminId: number
   ): Observable<ICoopResponse> {
+    console.log('Updating cooperative data:', coopId, adminId);
     console.log(coopData);
     let url: string = `${this.baseUrl}/cooperatives/${coopId}`;
     const params = new HttpParams().set('userId', adminId.toString());
