@@ -1,0 +1,199 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Configuración de Asientos - {{ busType?.name }}</h3>
+  </div>
+  
+  <div class="card-body">
+    <!-- Layout de 2 columnas -->
+    <div class="row">
+      <!-- Columna 1: Instrucciones y Leyenda -->
+      <div class="col-md-4">
+        <!-- Instrucciones -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex align-items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon me-3" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <circle cx="12" cy="12" r="9"></circle>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                <polyline points="11,12 12,12 12,16 13,16"></polyline>
+              </svg>
+              <div class="flex-grow-1">
+                <h5 class="card-title text-primary">Instrucciones:</h5>
+                <ul class="mb-0">
+                  <li>Haz clic en los asientos para marcarlos como VIP</li>
+                  <li>Distribución: Ventana - Pasillo - Pasillo - Ventana</li>
+                  <li>Asientos VIP: {{ getVipSeatsCount() }} / {{ getTotalSeatsCount() }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leyenda de asientos -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title text-primary">Tipos de asientos:</h5>
+            <div class="legend-vertical">
+              <div class="legend-item-vertical">
+                <div class="seat seat-normal seat-window">1</div>
+                <span>Normal - Ventana</span>
+              </div>
+              <div class="legend-item-vertical">
+                <div class="seat seat-normal seat-aisle">2</div>
+                <span>Normal - Pasillo</span>
+              </div>
+              <div class="legend-item-vertical">
+                <div class="seat seat-vip seat-window">3</div>
+                <span>VIP - Ventana</span>
+              </div>
+              <div class="legend-item-vertical">
+                <div class="seat seat-vip seat-aisle">4</div>
+                <span>VIP - Pasillo</span>
+              </div>
+              <div class="legend-item-vertical">
+                <div class="seat seat-normal seat-middle">M</div>
+                <span>Asiento Central</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna 2: Asientos -->
+      <div class="col-md-8">
+        <!-- Selector de pisos -->
+        <div class="floor-selector text-center mb-4">
+          <div class="btn-group" role="group">
+            <button 
+              type="button" 
+              [class]="'btn ' + (selectedFloor === 1 ? 'btn-primary' : 'btn-outline-primary')"
+              (click)="selectFloor(1)"
+            >
+              <span class="badge me-2" [class]="selectedFloor === 1 ? 'bg-light text-primary' : 'bg-primary text-white'">1</span>
+              Piso 1 ({{ busType?.seatsFloor1 }} asientos)
+            </button>
+            <button 
+              type="button" 
+              [class]="'btn ' + (selectedFloor === 2 ? 'btn-primary' : 'btn-outline-primary')"
+              [disabled]="!isFloorEnabled(2)"
+              (click)="selectFloor(2)"
+            >
+              <span class="badge me-2" [class]="selectedFloor === 2 ? 'bg-light text-primary' : 'bg-primary text-white'">2</span>
+              Piso 2 ({{ busType?.seatsFloor2 || 0 }} asientos)
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenedor del piso seleccionado -->
+        <div class="floor-container mb-4">
+          
+          <!-- Parte delantera del bus (solo mostrar en piso 1) -->
+          <div class="bus-front mb-3" *ngIf="selectedFloor === 1">
+            <div class="driver-area">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6"></path>
+                <path d="m15.5 3.5-3 3-3-3"></path>
+                <path d="m15.5 20.5-3-3-3 3"></path>
+              </svg>
+              Conductor
+            </div>
+          </div>
+
+          <!-- Asientos del piso seleccionado -->
+          <div class="seats-grid">
+            <div class="seat-row" *ngFor="let row of getSeatsInRows(getCurrentFloorSeats()); let rowIndex = index">
+              
+              <!-- Fila con 5 asientos (última fila con asiento central) -->
+              <ng-container *ngIf="row.length === 5">
+                <!-- Lado izquierdo (2 asientos) -->
+                <div class="seat-side left-side">
+                  <div 
+                    *ngFor="let seat of row.slice(0, 2)" 
+                    [class]="getSeatClass(seat)"
+                    (click)="toggleSeatType(seat)"
+                    [title]="'Asiento ' + seat.number + ' - ' + seat.type + ' (' + seat.location + ')'"
+                  >
+                    {{ seat.number }}
+                  </div>
+                </div>
+                
+                <!-- Asiento central (donde estaría el pasillo) -->
+                <div class="seat-center">
+                  <div 
+                    [class]="getSeatClass(row[2])"
+                    (click)="toggleSeatType(row[2])"
+                    [title]="'Asiento ' + row[2].number + ' - ' + row[2].type + ' (' + row[2].location + ')'"
+                  >
+                    {{ row[2].number }}
+                  </div>
+                </div>
+                
+                <!-- Lado derecho (2 asientos) -->
+                <div class="seat-side right-side">
+                  <div 
+                    *ngFor="let seat of row.slice(3, 5)" 
+                    [class]="getSeatClass(seat)"
+                    (click)="toggleSeatType(seat)"
+                    [title]="'Asiento ' + seat.number + ' - ' + seat.type + ' (' + seat.location + ')'"
+                  >
+                    {{ seat.number }}
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Fila normal con 4 asientos o menos -->
+              <ng-container *ngIf="row.length <= 4">
+                <!-- Lado izquierdo -->
+                <div class="seat-side left-side">
+                  <div 
+                    *ngFor="let seat of row.slice(0, 2)" 
+                    [class]="getSeatClass(seat)"
+                    (click)="toggleSeatType(seat)"
+                    [title]="'Asiento ' + seat.number + ' - ' + seat.type + ' (' + seat.location + ')'"
+                  >
+                    {{ seat.number }}
+                  </div>
+                </div>
+                
+                <!-- Pasillo -->
+                <div class="aisle"></div>
+                
+                <!-- Lado derecho -->
+                <div class="seat-side right-side">
+                  <div 
+                    *ngFor="let seat of row.slice(2, 4)" 
+                    [class]="getSeatClass(seat)"
+                    (click)="toggleSeatType(seat)"
+                    [title]="'Asiento ' + seat.number + ' - ' + seat.type + ' (' + seat.location + ')'"
+                  >
+                    {{ seat.number }}
+                  </div>
+                </div>
+              </ng-container>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-footer d-flex justify-content-between mt-4">
+      <button type="button" class="btn btn-secondary" (click)="onBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15,18 9,12 15,6"></polyline>
+        </svg>
+        Atrás
+      </button>
+      
+      <button type="button" class="btn btn-primary" (click)="onContinue()">
+        Continuar
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9,18 15,12 9,6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
