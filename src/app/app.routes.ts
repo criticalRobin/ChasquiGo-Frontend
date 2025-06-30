@@ -3,6 +3,7 @@ import { authRoutes } from './core/login/auth.routes';
 import { homePageRoutes } from '@features/homepage/hompage.routes';
 import { coopsRoutes } from '@features/coops/coops.routes';
 import { busesRoutes } from '@features/buses/buses.routes';
+import { busTypesRoutes } from '@features/bus-types/bus-types.routes';
 import { frequenciesRoutes } from '@features/frequencies/routes.routes';
 import { driversRoutes } from '@features/drivers/drivers.routes';
 import { clerksRoutes } from '@features/clerks/clerks.routes';
@@ -13,6 +14,7 @@ export const routes: Routes = [
   ...homePageRoutes,
   ...coopsRoutes,
   ...busesRoutes,
+  ...busTypesRoutes,
   ...frequenciesRoutes,
   ...driversRoutes,
   ...clerksRoutes,
