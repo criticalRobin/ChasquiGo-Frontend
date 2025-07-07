@@ -1,0 +1,293 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            {{ isEditMode ? 'Editar' : 'Crear' }} Hoja de Ruta
+          </h3>
+          <div class="steps d-flex flex-wrap flex-sm-nowrap justify-content-between mt-3">
+            <div class="step" [ngClass]="{'active': currentStep === 1, 'completed': currentStep > 1}">
+              <span class="step-number">1</span>
+              <span class="step-title">Información General</span>
+            </div>
+            <div class="step" [ngClass]="{'active': currentStep === 2, 'completed': currentStep > 2}">
+              <span class="step-number">2</span>
+              <span class="step-title">Detalles</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          @if (isLoading) {
+            <div class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          } @else {
+            <form [formGroup]="routeSheetForm" (ngSubmit)="onSubmit()">
+              <!-- Paso 1: Información General -->
+              @if (currentStep === 1) {
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="startDate" class="form-label">Fecha de Inicio</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="startDate"
+                      formControlName="startDate"
+                      [class.is-invalid]="routeSheetForm.get('startDate')?.invalid && routeSheetForm.get('startDate')?.touched"
+                    >
+                    @if (routeSheetForm.get('startDate')?.invalid && routeSheetForm.get('startDate')?.touched) {
+                      <div class="invalid-feedback">
+                        La fecha de inicio es requerida
+                      </div>
+                    }
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Estado</label>
+                    <select
+                      class="form-select"
+                      id="status"
+                      formControlName="status"
+                      [class.is-invalid]="routeSheetForm.get('status')?.invalid && routeSheetForm.get('status')?.touched"
+                    >
+                      @for (status of statusOptions; track status) {
+                        <option [value]="status">{{ formatStatus(status) }}</option>
+                      }
+                    </select>
+                    @if (routeSheetForm.get('status')?.invalid && routeSheetForm.get('status')?.touched) {
+                      <div class="invalid-feedback">
+                        El estado es requerido
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <button type="button" class="btn btn-secondary" routerLink="/route-sheets">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    [disabled]="routeSheetForm.get('startDate')?.invalid || routeSheetForm.get('status')?.invalid"
+                    (click)="nextStep()"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i> Siguiente
+                  </button>
+                </div>
+              }
+
+              <!-- Paso 2: Detalles de la Hoja de Ruta -->
+              @if (currentStep === 2) {
+                <div class="row mb-4">
+                  <div class="col-12">
+                    <h4 class="mb-3">Detalles de la Hoja de Ruta</h4>
+                    <p class="text-muted">Agregue los detalles de la hoja de ruta, incluyendo las frecuencias y buses asociados.</p>
+
+                    <div class="mb-3">
+                      <button type="button" class="btn btn-outline-primary" (click)="addDetail()">
+                        <i class="bi bi-plus"></i> Agregar Detalle
+                      </button>
+                    </div>
+
+                    <!-- Lista de detalles -->
+                    <div formArrayName="details" class="mb-4">
+                      @for (detail of detailsArray.controls; track $index; let i = $index) {
+                        <div [formGroup]="detail" class="card mb-3">
+                          <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                              <h5 class="card-title mb-0">Detalle #{{ i + 1 }}</h5>
+                              <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeDetail(i)">
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </div>
+
+                            <div class="row">
+                              <div class="col-md-6 mb-3">
+                                <label [for]="'frequencyId' + i" class="form-label">Frecuencia</label>
+                                <select
+                                  class="form-select"
+                                  [id]="'frequencyId' + i"
+                                  formControlName="frequencyId"
+                                  [class.is-invalid]="detail.get('frequencyId')?.invalid && detail.get('frequencyId')?.touched"
+                                >
+                                  <option value="">Seleccione una frecuencia</option>
+                                  @for (frequency of frequencies; track frequency.id) {
+                                    <option [value]="frequency.id">
+                                      {{ getFrequencyName(frequency.id) }}
+                                    </option>
+                                  }
+                                </select>
+                                @if (detail.get('frequencyId')?.invalid && detail.get('frequencyId')?.touched) {
+                                  <div class="invalid-feedback">
+                                    La frecuencia es requerida
+                                  </div>
+                                }
+                              </div>
+
+                              <div class="col-md-6 mb-3">
+                                <label [for]="'busId' + i" class="form-label">Bus</label>
+                                <select
+                                  class="form-select"
+                                  [id]="'busId' + i"
+                                  formControlName="busId"
+                                  [class.is-invalid]="detail.get('busId')?.invalid && detail.get('busId')?.touched"
+                                >
+                                  <option value="">Seleccione un bus</option>
+                                  @for (bus of buses; track bus.id) {
+                                    <option [value]="bus.id">
+                                      {{ bus.plate }} - {{ bus.chassisBrand }}
+                                    </option>
+                                  }
+                                </select>
+                                @if (detail.get('busId')?.invalid && detail.get('busId')?.touched) {
+                                  <div class="invalid-feedback">
+                                    El bus es requerido
+                                  </div>
+                                }
+                              </div>
+
+                              <div class="col-md-6">
+                                <label [for]="'status' + i" class="form-label">Estado</label>
+                                <select
+                                  class="form-select"
+                                  [id]="'status' + i"
+                                  formControlName="status"
+                                >
+                                  @for (status of statusOptions; track status) {
+                                    <option [value]="status">{{ formatStatus(status) }}</option>
+                                  }
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      } @empty {
+                        <div class="alert alert-info">
+                          No se han agregado detalles a la hoja de ruta. Haga clic en "Agregar Detalle" para comenzar.
+                        </div>
+                      }
+                    </div>
+
+                    <div class="d-flex justify-content-between gap-2 mt-4">
+                      <button type="button" class="btn btn-secondary" (click)="previousStep()">
+                        <i class="bi bi-arrow-left me-1"></i> Anterior
+                      </button>
+                      <div>
+                        <button type="button" class="btn btn-secondary me-2" routerLink="/route-sheets">
+                          <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          class="btn btn-primary"
+                          [disabled]="detailsArray.length === 0"
+                        >
+                          <i class="bi bi-save me-1"></i> {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .steps {
+    position: relative;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .step {
+    flex: 1;
+    position: relative;
+    text-align: center;
+    padding: 0 0.5rem;
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: #dee2e6;
+    z-index: 1;
+  }
+
+  .step.completed:not(:last-child)::after {
+    background-color: #0d6efd;
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto 0.5rem;
+    border-radius: 50%;
+    background-color: #dee2e6;
+    color: #6c757d;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+  }
+
+  .step.active .step-number {
+    background-color: #0d6efd;
+    color: white;
+  }
+
+  .step.completed .step-number {
+    background-color: #198754;
+    color: white;
+  }
+
+  .step-title {
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: block;
+  }
+
+  .step.active .step-title {
+    font-weight: 600;
+    color: #0d6efd;
+  }
+
+  .step.completed .step-title {
+    color: #198754;
+  }
+
+  .card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .btn i {
+    margin-right: 0.25rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+  }
+</style>

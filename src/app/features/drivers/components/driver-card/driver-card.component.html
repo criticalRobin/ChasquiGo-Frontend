@@ -1,0 +1,93 @@
+<div class="card driver-detail-card">
+  <div class="card-body">
+    <div class="mb-4 text-center">
+      <h2 class="card-title mb-2">
+        {{ driver.firstName }} {{ driver.lastName }}
+      </h2>
+      <p class="text-muted mb-0">{{ driver.role === 'DRIVER' ? 'Conductor' : driver.role }}</p>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <span class="detail-label">Cédula/RUC:</span>
+          <div class="detail-value">{{ driver.idNumber }}</div>
+        </div>
+        <div class="mb-3">
+          <span class="detail-label">Email:</span>
+          <div class="detail-value">{{ driver.email }}</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <span class="detail-label">Teléfono:</span>
+          <div class="detail-value">{{ driver.phone }}</div>
+        </div>
+        <div class="mb-3">
+          <span class="detail-label">Tipo de Documento:</span>
+          <div class="detail-value">{{ driver.documentType | titlecase }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="d-flex justify-content-end gap-2 mt-4">
+      <button class="btn btn-outline-primary" (click)="onEdit()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+          <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+          <path d="M16 5l3 3"></path>
+        </svg>
+        Editar
+      </button>
+      <button class="btn btn-outline-danger" data-bs-toggle="modal" [attr.data-bs-target]="'#deleteModal' + driver.id">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M4 7l16 0"></path>
+          <path d="M10 11l0 6"></path>
+          <path d="M14 11l0 6"></path>
+          <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+          <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+        </svg>
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" [id]="'deleteModal' + driver.id" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M12 9v4"/>
+          <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+          <path d="M12 16h.01"/>
+        </svg>
+        <h3>¿Eliminar conductor?</h3>
+        <div class="text-muted">
+          Se eliminará a <strong>{{driver.firstName}} {{driver.lastName}}</strong>. 
+          Esta acción no se puede deshacer.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="w-100">
+          <div class="row">
+            <div class="col">
+              <button type="button" class="btn w-100" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+            </div>
+            <div class="col">
+              <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal" (click)="confirmDelete()">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

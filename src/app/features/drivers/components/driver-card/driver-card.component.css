@@ -1,0 +1,39 @@
+.driver-detail-card {
+  border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  box-shadow: var(--tblr-box-shadow-sm);
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--tblr-body-color);
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  color: var(--tblr-body-color);
+  font-size: 0.9rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--tblr-body-color);
+}
+
+.status-active {
+  background-color: var(--tblr-green-lt);
+  color: var(--tblr-green);
+}
+
+.status-inactive {
+  background-color: var(--tblr-red-lt);
+  color: var(--tblr-red);
+}
+
+.status-pending {
+  background-color: var(--tblr-yellow-lt);
+  color: var(--tblr-yellow);
+}

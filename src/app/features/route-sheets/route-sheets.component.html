@@ -1,0 +1,183 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Hojas de Ruta</h2>
+    <a routerLink="/hojas-ruta/create" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nueva Hoja de Ruta
+    </a>
+  </div>
+
+  @if (isLoading) {
+    <div class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (routeSheets.length === 0) {
+    <div class="alert alert-info">
+      No hay hojas de ruta disponibles.
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Frecuencia</th>
+            <th>Bus</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (routeSheet of routeSheets; track routeSheet.id) {
+            <tr>
+              <td>{{ routeSheet.id }}</td>
+              <td>{{ formatDate(routeSheet.startDate) }}</td>
+              <td>{{ routeSheet.routeSheetDetails?.length || 0 }} detalles</td>
+              <td>
+                <span [class]="'badge ' + getStatusClass(routeSheet.status)">
+                  {{ formatStatus(routeSheet.status) }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+                  <button (click)="viewRouteSheetDetails(routeSheet.id)" class="btn btn-sm btn-info">
+                    <i class="bi bi-eye"></i> Ver
+                  </button>
+                  <button (click)="onGenerateScheduleClick(routeSheet)" class="btn btn-sm btn-success">
+                    <i class="bi bi-file-excel"></i> Excel
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- Modal de detalles -->
+<div class="modal" [class.show]="showDetailsModal" [style.display]="showDetailsModal ? 'block' : 'none'" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Detalles de Hoja de Ruta #{{selectedRouteSheet?.id}}</h5>
+        <button type="button" class="btn-close" (click)="closeDetailsModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedRouteSheet">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6>Información General</h6>
+              <p><strong>ID:</strong> {{ selectedRouteSheet.id }}</p>
+              <p><strong>Fecha de inicio:</strong> {{ formatDate(selectedRouteSheet.startDate) }}</p>
+              <p><strong>Estado:</strong> 
+                <span class="badge {{ getStatusClass(selectedRouteSheet.status) }}">
+                  {{ formatStatus(selectedRouteSheet.status) }}
+                </span>
+              </p>
+              <p><strong>Creado:</strong> {{ selectedRouteSheet.createdAt ? formatDate(selectedRouteSheet.createdAt) : 'N/A' }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6>Estadísticas</h6>
+              <p><strong>Total de detalles:</strong> {{ selectedRouteSheet.routeSheetDetails?.length || 0 }}</p>
+              <p><strong>Última actualización:</strong> {{ selectedRouteSheet.updatedAt ? formatDate(selectedRouteSheet.updatedAt) : 'N/A' }}</p>
+            </div>
+          </div>
+
+
+
+          <!-- Detalles de la hoja de ruta -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <h6>Detalles de la Hoja de Ruta</h6>
+              <div *ngIf="loadingDetails" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </div>
+              <div *ngIf="!loadingDetails && selectedRouteSheet.routeSheetDetails && selectedRouteSheet.routeSheetDetails.length > 0">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Frecuencia</th>
+                        <th>Bus</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (loadingDetails) {
+                        <tr>
+                          <td colspan="5" class="text-center">
+                            <div class="spinner-border spinner-border-sm" role="status">
+                              <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            Cargando detalles...
+                          </td>
+                        </tr>
+                      } @else if (selectedRouteSheet && selectedRouteSheet.routeSheetDetails && selectedRouteSheet.routeSheetDetails.length > 0) {
+                        @for (detail of selectedRouteSheet.routeSheetDetails; track detail.id) {
+                          <tr>
+                            <td>{{ detail.id }}</td>
+                            <td>{{ getFrequencyName(detail.frequencyId) }}</td>
+                            <td>{{ getBusPlate(detail.busId) }}</td>
+                            <td>
+                              <span class="badge {{ getStatusClass(detail.status) }}">
+                                {{ formatStatus(detail.status) }}
+                              </span>
+                            </td>
+                            <td>
+                              <button class="btn btn-sm btn-outline-primary me-1" (click)="viewDetail(detail)">
+                                <i class="bi bi-eye"></i> Ver
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      } @else {
+                        <tr>
+                          <td colspan="5" class="text-center">No hay detalles disponibles</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div *ngIf="!loadingDetails && (!selectedRouteSheet.routeSheetDetails || selectedRouteSheet.routeSheetDetails.length === 0)" class="alert alert-info">
+                No hay detalles registrados para esta hoja de ruta.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">
+          <i class="bi bi-x-circle"></i> Cerrar
+        </button>
+        <div class="ms-auto">
+          <ng-container *ngIf="selectedRouteSheet && selectedRouteSheet.id">
+            <a [routerLink]="['/route-sheets/edit', selectedRouteSheet.id]" class="btn btn-warning me-2">
+              <i class="bi bi-pencil"></i> Editar
+            </a>
+            <button type="button" class="btn btn-danger" (click)="deleteRouteSheet(selectedRouteSheet.id)">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Diálogo para generar horario en Excel -->
+<app-schedule-dialog 
+  #scheduleDialog
+  [visible]="showScheduleDialog"
+  [routeSheetId]="selectedRouteSheet?.id || 0"
+  (submit)="onGenerateSchedule($event)"
+  (close)="showScheduleDialog = false">
+</app-schedule-dialog>

@@ -1,0 +1,7 @@
+.input-group .btn {
+  border-left: 0;
+}
+
+.input-group .form-control:focus + .btn {
+  border-color: #86b7fe;
+}

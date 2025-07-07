@@ -1,0 +1,19 @@
+<div class="mb-3">
+  <h1 class="text-secondary-yellow">Tipos de Bus</h1>
+  <ol class="breadcrumb breadcrumb-arrows d-none d-md-flex">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/inicio']" class="text-primary-blue">Inicio</a>
+    </li>
+    <li class="breadcrumb-item active">
+      <a href="#" class="text-secondary-yellow">Tipos de Bus</a>
+    </li>
+  </ol>
+</div>
+
+<!-- Lista de tipos de bus -->
+<app-list-bus-types 
+  [busTypes]="busTypes"
+  (editBusType)="onEditBusType($event)"
+  (deleteBusType)="onDeleteBusType($event)"
+  (createBusType)="onCreateBusType()">
+</app-list-bus-types>

@@ -1,0 +1,92 @@
+/* Estilos para el dashboard */
+.card-sm {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card-sm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.font-weight-medium {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.alert-icon {
+  margin-right: 0.5rem;
+}
+
+.icon-lg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Estilos para las tarjetas de estadísticas */
+.bg-blue {
+  background-color: #206bc4 !important;
+}
+
+.bg-red {
+  background-color: #d63384 !important;
+}
+
+.bg-yellow {
+  background-color: #f59f00 !important;
+}
+
+.bg-teal {
+  background-color: #17a2b8 !important;
+}
+
+.text-blue {
+  color: #206bc4 !important;
+}
+
+.text-red {
+  color: #d63384 !important;
+}
+
+.text-yellow {
+  color: #f59f00 !important;
+}
+
+.text-teal {
+  color: #17a2b8 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .font-weight-medium {
+    font-size: 1.25rem;
+  }
+  
+  .avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+/* Chart containers */
+canvas {
+  max-height: 300px;
+}
+
+.card-body canvas {
+  width: 100% !important;
+  height: auto !important;
+}

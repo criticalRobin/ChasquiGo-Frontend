@@ -1,0 +1,40 @@
+/* Estilos para el formulario de tipos de bus */
+.icon {
+  margin-right: 0.5rem;
+}
+
+.form-footer .btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+  color: #664d03;
+}
+
+.card-title {
+  margin-bottom: 0;
+  font-weight: 500;
+}
+
+.input-group-text {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
